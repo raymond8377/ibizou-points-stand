@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#5a22a8">
+<meta name="robots" content="noindex">
+<title>IBIZOU – Caisse points</title>
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--rouge:#c8102e;--bordeaux:#7a0f2a;--creme:#fff5e6;--or:#ffc23d;--encre:#2a0f4f;--vert:#0a8f3c}
+*{box-sizing:border-box;margin:0;padding:0}
+body,input,button{letter-spacing:.6px;font-weight:400!important}
+body{font-family:'Luckiest Guy',system-ui,sans-serif;background:linear-gradient(#5a22a8,#2e0f5c) fixed;color:var(--creme);min-height:100vh}
+.wrap{max-width:480px;margin:0 auto;padding:16px 16px 60px}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.logo{font-family:'Luckiest Guy',sans-serif;color:var(--or);font-size:24px}
+.lien{color:var(--creme);opacity:.7;font-size:13px;background:none;border:0;text-decoration:underline;width:auto;padding:0;margin:0;box-shadow:none;font-family:'Luckiest Guy'}
+.bloc{background:#fff;color:var(--encre);border-radius:16px;padding:16px;margin-bottom:14px}
+h2{font-family:'Luckiest Guy',sans-serif;font-size:16px;margin-bottom:10px}
+input{width:100%;font:inherit;font-size:18px;padding:12px;border:3px solid var(--encre);border-radius:10px}
+button{font-family:'Luckiest Guy',sans-serif;font-size:17px;padding:14px;border:3px solid var(--encre);border-radius:12px;
+ background:var(--rouge);color:#fff;cursor:pointer;width:100%;margin-top:10px}
+button:active{transform:scale(.97)}
+button.vert{background:var(--vert)}button.gris{background:#6b3fb3}
+.grille{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.grille button{margin:0;padding:14px 0;font-size:18px;background:var(--vert)}
+.jouer{display:grid;grid-template-columns:2fr 1fr;gap:8px}
+.jouer button{background:var(--rouge);font-size:22px;padding:18px 0;margin:0}
+.jouer button+button{font-size:16px;background:#a3324b}
+video{width:100%;border-radius:12px;background:#000;aspect-ratio:1;object-fit:cover;display:none}
+.client{display:none}
+.nom{font-size:22px;font-weight:800}
+.meta{font-size:13px;opacity:.7}
+.solde{font-family:'Luckiest Guy',sans-serif;font-size:64px;color:var(--rouge);text-align:center;line-height:1.1}
+.unite{text-align:center;font-weight:800;letter-spacing:2px;font-size:12px;margin-bottom:12px}
+.err{background:#ffe0e0;color:#8a0000;border-radius:10px;padding:10px;margin-top:10px;font-weight:600;display:none}
+.ok{background:#d9f7e3;color:#05501f;border-radius:10px;padding:10px;margin-top:10px;font-weight:800;display:none;text-align:center;font-size:18px}
+.res{border:2px solid var(--encre);border-radius:10px;padding:10px;margin-top:8px;cursor:pointer;display:flex;justify-content:space-between}
+.journal div{display:flex;justify-content:space-between;border-bottom:1px solid #e6dcf5;padding:7px 0;font-size:14px}
+.plus{color:var(--vert);font-weight:800}.moins{color:var(--rouge);font-weight:800}
+#qrRecup{display:flex;justify-content:center;margin-top:10px}
+.ligne{display:flex;gap:8px}.ligne input{flex:1}.ligne button{width:auto;margin:0;padding:0 16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="logo">IBIZOU · Caisse</div><button class="lien" id="btnSortir" style="display:none">Verrouiller</button></header>
+
+<div class="bloc" id="vuePin">
+  <h2>Code caisse</h2>
+  <input id="pin" type="password" inputmode="numeric" maxlength="12" placeholder="••••••">
+  <button id="btnPin">Ouvrir</button>
+  <div class="err" id="errPin"></div>
+</div>
+
+<div id="vueCaisse" style="display:none">
+  <div class="bloc">
+    <button id="btnScan">📷 Scanner un client</button>
+    <video id="video" playsinline muted></video>
+    <canvas id="canvas" style="display:none"></canvas>
+    <div class="ligne" style="margin-top:10px">
+      <input id="recherche" placeholder="Code, téléphone ou prénom">
+      <button id="btnChercher" class="gris">OK</button>
+    </div>
+    <div id="resultats"></div>
+    <div class="err" id="errScan"></div>
+  </div>
+
+  <div class="bloc client" id="vueClient">
+    <div class="nom" id="cNom"></div>
+    <div class="meta" id="cMeta"></div>
+    <div class="solde" id="cSolde">0</div>
+    <div class="unite">POINTS</div>
+    <h2>Encaisser des points</h2>
+    <div class="grille">
+      <button data-d="1">+1</button><button data-d="3">+3</button><button data-d="5">+5</button><button data-d="10">+10</button>
+    </div>
+    <h2 style="margin-top:14px">Faire jouer</h2>
+    <div class="jouer"><button data-d="-1">JOUER −1</button><button id="btnAutre">Autre…</button></div>
+    <div class="ok" id="okMsg"></div>
+    <div class="err" id="errClient"></div>
+    <button class="gris" id="btnRecup">Carte perdue ? Afficher le QR de récupération</button>
+    <div id="qrRecup"></div>
+    <button class="gris" id="btnFermer">Client suivant</button>
+  </div>
+
+  <div class="bloc">
+    <h2>Dernières opérations</h2>
+    <div class="journal" id="journal"></div>
+    <button class="gris" id="btnJournal">Actualiser</button>
+  </div>
+</div>
+</div>
+<script>
+const SB_URL='https://cytgdpeoxhxempnewrep.supabase.co';
+const SB_KEY='sb_publishable_5nYZv-C8Bfc7AErue3h9-g_D8OUnOOW';
+const $=id=>document.getElementById(id);
+async function rpc(fn,args){
+  const r=await fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',
+    headers:{'apikey':SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(args)});
+  const d=await r.json().catch(()=>null);
+  if(!r.ok) throw new Error((d&&d.message)||'Erreur réseau');
+  return d;
+}
+function montre(id,txt){const e=$(id);e.textContent=txt;e.style.display=txt?'block':'none'}
+let PIN=null,client=null,flux=null,occupe=false;
+try{PIN=localStorage.getItem('ibz_pin')}catch(e){}
+
+async function ouvrir(p){
+  try{
+    if(!(await rpc('ibz_verifier_pin',{p_pin:p}))){montre('errPin','Code incorrect');return}
+    PIN=p;try{localStorage.setItem('ibz_pin',p)}catch(e){}
+    $('vuePin').style.display='none';$('vueCaisse').style.display='block';$('btnSortir').style.display='inline';
+    journal();
+  }catch(e){montre('errPin',e.message)}
+}
+$('btnPin').onclick=()=>ouvrir($('pin').value.trim());
+$('btnSortir').onclick=()=>{try{localStorage.removeItem('ibz_pin')}catch(e){};location.reload()};
+
+// Scanner
+$('btnScan').onclick=async()=>{
+  if(flux){stopScan();return}
+  try{
+    flux=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    const v=$('video');v.srcObject=flux;v.style.display='block';await v.play();
+    $('btnScan').textContent='✕ Arrêter le scan';montre('errScan','');boucle();
+  }catch(e){montre('errScan','Caméra refusée. Autorise la caméra dans Safari ou tape le code.');flux=null}
+};
+function stopScan(){if(flux)flux.getTracks().forEach(t=>t.stop());flux=null;$('video').style.display='none';$('btnScan').textContent='📷 Scanner un client'}
+function boucle(){
+  if(!flux)return;
+  const v=$('video'),c=$('canvas');
+  if(v.readyState===v.HAVE_ENOUGH_DATA){
+    c.width=v.videoWidth;c.height=v.videoHeight;const x=c.getContext('2d',{willReadFrequently:true});
+    x.drawImage(v,0,0);const img=x.getImageData(0,0,c.width,c.height);
+    const q=jsQR(img.data,img.width,img.height,{inversionAttempts:'dontInvert'});
+    if(q&&q.data){const m=q.data.match(/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i);
+      if(m){stopScan();if(navigator.vibrate)navigator.vibrate(80);chercher(m[1],true);return}}
+  }
+  requestAnimationFrame(boucle);
+}
+
+async function chercher(cle,direct){
+  $('resultats').innerHTML='';montre('errScan','');
+  try{
+    const d=await rpc('ibz_trouver',{p_pin:PIN,p_cle:cle});
+    if(!d.length){montre('errScan','Aucun client trouvé');return}
+    if(d.length===1||direct){choisir(d[0]);return}
+    d.forEach(c=>{const r=document.createElement('div');r.className='res';
+      r.innerHTML='<span><b></b> <small></small></span><b></b>';
+      r.children[0].children[0].textContent=c.prenom;r.children[0].children[1].textContent=(c.tel||'')+' · '+c.code;
+      r.children[1].textContent=c.points+' pts';r.onclick=()=>{$('resultats').innerHTML='';choisir(c)};$('resultats').appendChild(r)});
+  }catch(e){montre('errScan',e.message)}
+}
+$('btnChercher').onclick=()=>{const v=$('recherche').value.trim();if(v)chercher(v)};
+$('recherche').onkeydown=e=>{if(e.key==='Enter')$('btnChercher').click()};
+
+function choisir(c){
+  client=c;$('vueClient').style.display='block';$('qrRecup').innerHTML='';
+  $('cNom').textContent=c.prenom;$('cMeta').textContent='Code '+c.code+(c.tel?' · '+c.tel:'');
+  $('cSolde').textContent=c.points;montre('okMsg','');montre('errClient','');
+  $('vueClient').scrollIntoView({behavior:'smooth'});
+}
+async function mouvement(d){
+  if(!client||occupe)return;occupe=true;montre('errClient','');
+  try{
+    const s=await rpc('ibz_mouvement',{p_pin:PIN,p_id:client.id,p_delta:d,p_motif:d>0?'Achat':'Partie'});
+    if(s===null)throw new Error('Code caisse incorrect, reverrouille et retape le code');
+    client.points=s;$('cSolde').textContent=s;
+    montre('okMsg',d>0?('+'+d+' points chargés'):('Partie validée ('+d+')'));journal();
+  }catch(e){montre('errClient',e.message)}
+  occupe=false;
+}
+document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>mouvement(parseInt(b.dataset.d,10)));
+$('btnAutre').onclick=()=>{const v=prompt('Nombre de points (ex : 20 pour charger, -2 pour retirer)');
+  const n=parseInt(v,10);if(n)mouvement(n)};
+$('btnFermer').onclick=()=>{client=null;$('vueClient').style.display='none';$('recherche').value='';window.scrollTo({top:0,behavior:'smooth'})};
+$('btnRecup').onclick=()=>{
+  const base=location.href.replace(/caisse\.html.*$/,'');$('qrRecup').innerHTML='';
+  new QRCode($('qrRecup'),{text:base+'#id='+client.id,width:200,height:200});
+};
+async function journal(){
+  try{const d=await rpc('ibz_journal',{p_pin:PIN});const j=$('journal');j.innerHTML='';
+    if(!d.length){j.textContent='Rien pour le moment.';return}
+    d.forEach(o=>{const r=document.createElement('div');const h=new Date(o.heure);
+      r.innerHTML='<span></span><span></span>';
+      r.children[0].textContent=h.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'  '+o.prenom;
+      r.children[1].textContent=(o.delta>0?'+':'')+o.delta+' → '+o.solde_apres;r.children[1].className=o.delta>0?'plus':'moins';
+      j.appendChild(r)});
+  }catch(e){}
+}
+$('btnJournal').onclick=journal;
+if(PIN)ouvrir(PIN);
+</script>
+</body>
+</html>
