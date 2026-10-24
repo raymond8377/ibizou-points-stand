@@ -43,6 +43,19 @@ video{width:100%;border-radius:12px;background:#000;aspect-ratio:1;object-fit:co
 .plus{color:var(--vert);font-weight:800}.moins{color:var(--rouge);font-weight:800}
 #qrRecup{display:flex;justify-content:center;margin-top:10px}
 .ligne{display:flex;gap:8px}.ligne input{flex:1}.ligne button{width:auto;margin:0;padding:0 16px}
+.cad{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.cad button{margin:0;padding:12px 4px;font-size:14px;background:#ffc23d;color:var(--encre)}
+.cad button.on{outline:4px solid var(--rouge)}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.seg button{margin:0;padding:10px;font-size:14px;background:#e6dcf5;color:var(--encre)}
+.seg button.on{background:#6b3fb3;color:#fff}
+.petitchamp{display:grid;grid-template-columns:2fr 1fr;gap:8px;margin-top:10px}
+.petitchamp input{font-size:16px;padding:10px}
+.bon{display:flex;justify-content:space-between;align-items:center;background:#ffc23d;border:3px solid var(--encre);border-radius:12px;padding:8px 10px;margin-top:8px}
+.bon button{width:auto;margin:0;padding:8px 12px;font-size:14px;background:var(--rouge)}
+.note{font-size:12px;opacity:.7;margin-top:6px}
+.liste div{display:flex;justify-content:space-between;border-bottom:1px solid #e6dcf5;padding:8px 0;font-size:14px;cursor:pointer}
+#pad button{margin:0;font-size:26px;padding:14px 0;background:#6b3fb3}
 </style>
 </head>
 <body>
@@ -72,6 +85,7 @@ video{width:100%;border-radius:12px;background:#000;aspect-ratio:1;object-fit:co
   <div class="bloc client" id="vueClient">
     <div class="nom" id="cNom"></div>
     <div class="meta" id="cMeta"></div>
+    <div class="meta" id="cFiche"></div>
     <div class="solde" id="cSolde">0</div>
     <div class="unite">POINTS</div>
     <h2>Encaisser des points</h2>
@@ -80,6 +94,7 @@ video{width:100%;border-radius:12px;background:#000;aspect-ratio:1;object-fit:co
     </div>
     <h2 style="margin-top:14px">Faire jouer</h2>
     <div class="jouer"><button data-d="-1">JOUER −1</button><button id="btnAutre">Autre…</button></div>
+    <div id="cBons"></div>
     <div class="ok" id="okMsg"></div>
     <div class="err" id="errClient"></div>
     <button class="gris" id="btnRecup">Carte perdue ? Afficher le QR de récupération</button>
@@ -87,12 +102,46 @@ video{width:100%;border-radius:12px;background:#000;aspect-ratio:1;object-fit:co
     <button class="gris" id="btnFermer">Client suivant</button>
   </div>
 
+
+  <div class="bloc">
+    <h2>🎁 Offrir un cadeau surprise</h2>
+    <div class="seg"><button id="cibleClient">Au client affiché</button><button id="cibleTous" class="on">À tous les clients</button></div>
+    <div class="cad">
+      <button data-l="Partie gratuite" data-t="bon">Partie gratuite</button>
+      <button data-l="5 balles offertes" data-t="bon">5 balles offertes</button>
+      <button data-l="10 points offerts" data-p="10" data-t="points">10 points</button>
+    </div>
+    <div class="seg" style="margin-top:10px"><button id="tBon" class="on">Bon cadeau</button><button id="tPts">Des points</button></div>
+    <div class="petitchamp"><input id="gLib" placeholder="Nom du cadeau"><input id="gPts" type="number" inputmode="numeric" min="1" max="100" placeholder="Points" style="display:none"></div>
+    <div class="petitchamp"><span style="align-self:center;font-size:14px">Valable (jours)</span><input id="gJours" type="number" inputmode="numeric" value="7" min="1" max="60"></div>
+    <button class="vert" id="btnOffrir">Envoyer le cadeau</button>
+    <div class="ok" id="okCad"></div><div class="err" id="errCad"></div>
+    <div class="note">Le client voit une boîte cadeau en ouvrant sa carte. Un bon reste affiché sur sa carte jusqu'à ce que tu le valides ici. Des points s'ajoutent directement.</div>
+  </div>
+
+  <div class="bloc">
+    <h2>Tous mes clients</h2>
+    <div class="liste" id="liste"></div>
+    <button class="gris" id="btnListe">Afficher / actualiser</button>
+  </div>
   <div class="bloc">
     <h2>Dernières opérations</h2>
     <div class="journal" id="journal"></div>
     <button class="gris" id="btnJournal">Actualiser</button>
   </div>
 </div>
+</div>
+<div id="pad" style="display:none;position:fixed;inset:0;background:rgba(30,8,60,.88);z-index:50;align-items:center;justify-content:center;padding:16px">
+ <div style="background:#fff;color:var(--encre);border-radius:18px;padding:18px;width:100%;max-width:340px;text-align:center">
+  <div id="padTitre" style="font-size:20px"></div><div id="padSous" style="font-size:14px;opacity:.7;margin:4px 0 10px"></div>
+  <div id="padAff" style="font-size:34px;letter-spacing:10px;margin-bottom:12px"></div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+   <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+   <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+   <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+   <button data-k="x" class="gris">✕</button><button data-k="0">0</button><button data-k="<" class="gris">⌫</button>
+  </div>
+ </div>
 </div>
 <script>
 const SB_URL='https://cytgdpeoxhxempnewrep.supabase.co';
@@ -146,12 +195,12 @@ function boucle(){
 async function chercher(cle,direct){
   $('resultats').innerHTML='';montre('errScan','');
   try{
-    const d=await rpc('ibz_trouver',{p_pin:PIN,p_cle:cle});
+    const d=await rpc('ibz_trouver2',{p_pin:PIN,p_cle:cle});
     if(!d.length){montre('errScan','Aucun client trouvé');return}
     if(d.length===1||direct){choisir(d[0]);return}
     d.forEach(c=>{const r=document.createElement('div');r.className='res';
       r.innerHTML='<span><b></b> <small></small></span><b></b>';
-      r.children[0].children[0].textContent=c.prenom;r.children[0].children[1].textContent=(c.tel||'')+' · '+c.code;
+      r.children[0].children[0].textContent=c.prenom+(c.nom?' '+c.nom:'');r.children[0].children[1].textContent=(c.tel||'')+' · '+c.code;
       r.children[1].textContent=c.points+' pts';r.onclick=()=>{$('resultats').innerHTML='';choisir(c)};$('resultats').appendChild(r)});
   }catch(e){montre('errScan',e.message)}
 }
@@ -160,15 +209,27 @@ $('recherche').onkeydown=e=>{if(e.key==='Enter')$('btnChercher').click()};
 
 function choisir(c){
   client=c;$('vueClient').style.display='block';$('qrRecup').innerHTML='';
-  $('cNom').textContent=c.prenom;$('cMeta').textContent='Code '+c.code+(c.tel?' · '+c.tel:'');
+  $('cNom').textContent=c.prenom+(c.nom?' '+c.nom:'');$('cMeta').textContent='Code '+c.code+(c.tel?' · '+c.tel:'');
   $('cSolde').textContent=c.points;montre('okMsg','');montre('errClient','');
-  $('vueClient').scrollIntoView({behavior:'smooth'});
+  majCible();bonsClient();fiche();$('vueClient').scrollIntoView({behavior:'smooth'});
 }
+function demanderCode(d){return new Promise(res=>{
+  const m=$('pad');let v='';const aff=()=>{$('padAff').textContent='●'.repeat(v.length)+'○'.repeat(4-v.length)};
+  $('padTitre').textContent=client.prenom+', tape ton code secret';$('padSous').textContent='Pour utiliser '+(-d)+' point'+(-d>1?'s':'');
+  aff();m.style.display='flex';
+  const fin=r=>{m.style.display='none';m.onclick=null;res(r)};
+  m.onclick=e=>{const k=e.target.dataset.k;if(k===undefined)return;
+    if(k==='x')return fin(null);if(k==='<'){v=v.slice(0,-1);aff();return}
+    if(v.length<4){v+=k;aff();if(v.length===4)setTimeout(()=>fin(v),150)}};
+});}
 async function mouvement(d){
   if(!client||occupe)return;occupe=true;montre('errClient','');
   try{
-    const s=await rpc('ibz_mouvement',{p_pin:PIN,p_id:client.id,p_delta:d,p_motif:d>0?'Achat':'Partie'});
+    let code=null;
+    if(d<0&&client.protege){code=await demanderCode(d);if(code===null){occupe=false;return}}
+    const s=await rpc('ibz_mouvement2',{p_pin:PIN,p_id:client.id,p_delta:d,p_motif:d>0?'Achat':'Partie',p_secret:code});
     if(s===null)throw new Error('Code caisse incorrect, reverrouille et retape le code');
+    if(s===-1)throw new Error('Code secret incorrect. Après 5 erreurs, la carte est bloquée 15 minutes.');
     client.points=s;$('cSolde').textContent=s;
     montre('okMsg',d>0?('+'+d+' points chargés'):('Partie validée ('+d+')'));journal();
   }catch(e){montre('errClient',e.message)}
@@ -177,7 +238,7 @@ async function mouvement(d){
 document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>mouvement(parseInt(b.dataset.d,10)));
 $('btnAutre').onclick=()=>{const v=prompt('Nombre de points (ex : 20 pour charger, -2 pour retirer)');
   const n=parseInt(v,10);if(n)mouvement(n)};
-$('btnFermer').onclick=()=>{client=null;$('vueClient').style.display='none';$('recherche').value='';window.scrollTo({top:0,behavior:'smooth'})};
+$('btnFermer').onclick=()=>{client=null;cible='tous';majCible();$('vueClient').style.display='none';$('recherche').value='';window.scrollTo({top:0,behavior:'smooth'})};
 $('btnRecup').onclick=()=>{
   const base=location.href.replace(/caisse\.html.*$/,'');$('qrRecup').innerHTML='';
   new QRCode($('qrRecup'),{text:base+'#id='+client.id,width:200,height:200});
@@ -193,6 +254,57 @@ async function journal(){
   }catch(e){}
 }
 $('btnJournal').onclick=journal;
+// Cadeaux
+let cible='tous';
+function majCible(){$('cibleTous').className=cible==='tous'?'on':'';$('cibleClient').className=cible==='client'?'on':'';
+  $('cibleClient').textContent=client?('À '+client.prenom):'Au client affiché'}
+$('cibleTous').onclick=()=>{cible='tous';majCible()};
+$('cibleClient').onclick=()=>{if(!client){montre('errCad','Scanne ou cherche d\'abord un client');return}cible='client';montre('errCad','');majCible()};
+let gType='bon';
+function majType(){$('tBon').className=gType==='bon'?'on':'';$('tPts').className=gType==='points'?'on':'';$('gPts').style.display=gType==='points'?'block':'none'}
+$('tBon').onclick=()=>{gType='bon';majType()};$('tPts').onclick=()=>{gType='points';majType()};
+document.querySelectorAll('.cad button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.cad button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');$('gLib').value=b.dataset.l;gType=b.dataset.t;$('gPts').value=b.dataset.p||'';majType()});
+async function fiche(){$('cFiche').textContent='';if(!client)return;
+  try{const d=await rpc('ibz_fiche',{p_pin:PIN,p_id:client.id});if(!d.length)return;const f=d[0];const t=[];
+    if(f.naissance){const n=new Date(f.naissance+'T12:00:00'),a=new Date();let age=a.getFullYear()-n.getFullYear();
+      if(a<new Date(a.getFullYear(),n.getMonth(),n.getDate()))age--;
+      const anniv=n.getDate()===a.getDate()&&n.getMonth()===a.getMonth();
+      t.push((anniv?'🎂 ANNIVERSAIRE AUJOURD\'HUI · ':'')+age+' ans')}
+    if(f.ville)t.push(f.ville);if(f.email)t.push(f.email);if(f.tel)t.push(f.tel);
+    $('cFiche').textContent=t.join(' · ');
+  }catch(e){}}
+async function bonsClient(){const z=$('cBons');z.innerHTML='';if(!client)return;
+  try{const d=await rpc('ibz_bons_client',{p_pin:PIN,p_id:client.id});
+    if(d.length){const h=document.createElement('h2');h.style.marginTop='14px';h.textContent='🎟️ Bons cadeaux';z.appendChild(h)}
+    d.forEach(b=>{const r=document.createElement('div');r.className='bon';r.innerHTML='<span></span><button>Utiliser</button>';
+      r.children[0].textContent=b.libelle;
+      r.children[1].onclick=async()=>{if(!confirm('Valider « '+b.libelle+' » pour '+client.prenom+' ?'))return;
+        try{const ok=await rpc('ibz_utiliser_bon',{p_pin:PIN,p_bon:b.id});if(ok===null)throw new Error('Code caisse incorrect');
+          montre('okMsg','Bon « '+b.libelle+' » utilisé');bonsClient();journal()}catch(e){montre('errClient',e.message)}};
+      z.appendChild(r)});
+  }catch(e){}}
+$('btnOffrir').onclick=async()=>{
+  montre('okCad','');montre('errCad','');
+  const lib=$('gLib').value.trim(),pts=gType==='bon'?1:parseInt($('gPts').value,10),j=parseInt($('gJours').value,10)||7;
+  if(!lib||!(pts>0)){montre('errCad','Choisis un cadeau, ou mets un nom'+(gType==='points'?' et des points':''));return}
+  if(cible==='client'&&!client){montre('errCad','Aucun client affiché');return}
+  if(cible==='tous'&&!confirm('Envoyer « '+lib+' »'+(gType==='points'?' (+'+pts+' points)':'')+' à TOUS les clients ?'))return;
+  try{const n=await rpc('ibz_offrir2',{p_pin:PIN,p_client:cible==='client'?client.id:null,p_libelle:lib,p_points:pts,p_jours:j,p_type:gType});
+    if(n===null)throw new Error('Code caisse incorrect');
+    montre('okCad','Cadeau envoyé'+(cible==='tous'?' à '+n+' client'+(n>1?'s':''):' à '+client.prenom)+' !');
+  }catch(e){montre('errCad',e.message)}
+};
+async function liste(){
+  try{const d=await rpc('ibz_liste_clients2',{p_pin:PIN});const l=$('liste');l.innerHTML='';
+    if(!d.length){l.textContent='Aucun client pour le moment.';return}
+    const t=document.createElement('div');t.style.cursor='default';t.innerHTML='<b></b>';t.firstChild.textContent=d.length+' client'+(d.length>1?'s':'');l.appendChild(t);
+    d.forEach(c=>{const r=document.createElement('div');r.innerHTML='<span></span><b></b>';
+      r.children[0].textContent=(c.nom?c.nom+' ':'')+c.prenom+' · '+c.code;r.children[1].textContent=c.points+' pts';r.onclick=()=>choisir(c);l.appendChild(r)});
+  }catch(e){}
+}
+$('btnListe').onclick=liste;
+
 if(PIN)ouvrir(PIN);
 </script>
 </body>
