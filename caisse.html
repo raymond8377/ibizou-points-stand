@@ -249,7 +249,7 @@ async function mouvement(d,article){
   try{
     let code=null;
     motifPad=article?article.libelle:null;
-    if(d<0&&client.protege){code=await demanderCode(d);if(code===null){occupe=false;return}}
+    if(d<0&&!confirm('Retirer '+(-d)+' points à '+client.prenom+(client.nom?' '+client.nom:'')+' pour un cadeau ?')){occupe=false;return}
     const s=article
       ?await rpc('ibz_echanger',{p_pin:PIN,p_client:client.id,p_article:article.id,p_secret:code})
       :await rpc('ibz_mouvement2',{p_pin:PIN,p_id:client.id,p_delta:d,p_motif:d>0?'Points gagnés':'Cadeau au stand',p_secret:code});
