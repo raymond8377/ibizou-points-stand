@@ -53,6 +53,15 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--encre)}
 @keyframes jaillit{0%{transform:scale(.4)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
 .cadeau h3{font-family:'Luckiest Guy',sans-serif;font-size:28px;margin:12px 0 4px;color:var(--rouge)}
 .cadeau p{font-size:17px}
+.boutiq{margin-top:16px;border-top:3px dashed var(--encre);padding-top:12px}
+.boutiq h4{font-family:'Luckiest Guy',sans-serif;font-size:18px;margin-bottom:8px;color:var(--rouge)}
+.boutiq .it{border:3px solid var(--encre);border-radius:12px;padding:10px 12px;margin-bottom:8px}
+.boutiq .it.ok{background:#d9f7e3}
+.boutiq .l{display:flex;justify-content:space-between;font-size:16px}
+.boutiq .bar{height:8px;background:#eee;border-radius:5px;margin-top:6px;overflow:hidden}
+.boutiq .bar i{display:block;height:100%;background:var(--rouge)}
+.boutiq .it.ok .bar i{background:#0a8f3c}
+.boutiq small{font-size:13px;opacity:.8}
 .profil{margin-top:16px;border-top:3px dashed var(--encre);padding-top:12px}
 .profil summary{cursor:pointer;font-size:17px}
 .ok2{background:#d9f7e3;color:#05501f;border-radius:10px;padding:10px;margin-top:10px;display:none;text-align:center}
@@ -114,7 +123,7 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--encre)}
     <div class="unite">POINTS</div>
     <div id="qr"></div>
     <div class="code" id="code"></div>
-    <div class="info">Montre ce QR code au stand pour charger ou jouer.</div>
+    <div class="info">Montre ce QR code au stand pour gagner des points ou les échanger contre un cadeau au stand.</div>
     <div class="petit" style="text-align:center">📸 Fais une capture d'écran de ta carte pour la garder.</div>
     <details class="profil" id="profil"><summary>👤 Mon profil (facultatif)</summary>
       <div id="profCode">
