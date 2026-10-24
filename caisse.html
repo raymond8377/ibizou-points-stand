@@ -55,6 +55,20 @@ video{width:100%;border-radius:12px;background:#000;aspect-ratio:1;object-fit:co
 .bon button{width:auto;margin:0;padding:8px 12px;font-size:14px;background:var(--rouge)}
 .note{font-size:12px;opacity:.7;margin-top:6px}
 .liste div{display:flex;justify-content:space-between;border-bottom:1px solid #e6dcf5;padding:8px 0;font-size:14px;cursor:pointer}
+.tab{width:100%;border-collapse:collapse;font-size:15px}
+.tab th{text-align:left;font-size:12px;opacity:.7;padding:4px 2px;border-bottom:2px solid var(--encre)}
+.tab td{padding:8px 2px;border-bottom:1px solid #e6dcf5;cursor:pointer}
+.tab td:last-child{text-align:right;font-size:18px;color:var(--rouge)}
+.tab tr.zero td:last-child{color:#999}
+.grille.retire button{background:var(--rouge)}
+.boutique{display:grid;gap:8px}
+.boutique button{margin:0;display:flex;justify-content:space-between;align-items:center;background:var(--rouge);text-align:left;font-size:16px;padding:12px 14px}
+.boutique button span:last-child{background:#fff;color:var(--rouge);border-radius:8px;padding:3px 8px;font-size:14px;white-space:nowrap}
+.boutique button:disabled{background:#cfc4e2;color:#6d5f86;cursor:not-allowed}
+.boutique button:disabled span:last-child{color:#6d5f86}
+.art{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid #e6dcf5;padding:8px 0}
+.art.off{opacity:.45}
+.art .bt{display:flex;gap:6px}.art .bt button{width:auto;margin:0;padding:6px 10px;font-size:13px}
 #pad button{margin:0;font-size:26px;padding:14px 0;background:#6b3fb3}
 </style>
 </head>
@@ -88,12 +102,15 @@ video{width:100%;border-radius:12px;background:#000;aspect-ratio:1;object-fit:co
     <div class="meta" id="cFiche"></div>
     <div class="solde" id="cSolde">0</div>
     <div class="unite">POINTS</div>
-    <h2>Encaisser des points</h2>
+    <h2>Donner des points</h2>
     <div class="grille">
       <button data-d="1">+1</button><button data-d="3">+3</button><button data-d="5">+5</button><button data-d="10">+10</button>
     </div>
-    <h2 style="margin-top:14px">Faire jouer</h2>
-    <div class="jouer"><button data-d="-1">JOUER −1</button><button id="btnAutre">Autre…</button></div>
+    <h2 style="margin-top:14px">🎁 Utiliser les points pour un cadeau</h2>
+    <div class="grille retire">
+      <button data-d="-5">−5</button><button data-d="-10">−10</button><button data-d="-20">−20</button><button data-d="-50">−50</button>
+    </div>
+    <button class="gris" id="btnAutre" style="margin-top:8px">Autre nombre de points…</button>
     <div id="cBons"></div>
     <div class="ok" id="okMsg"></div>
     <div class="err" id="errClient"></div>
@@ -120,9 +137,13 @@ video{width:100%;border-radius:12px;background:#000;aspect-ratio:1;object-fit:co
   </div>
 
   <div class="bloc">
-    <h2>Tous mes clients</h2>
-    <div class="liste" id="liste"></div>
-    <button class="gris" id="btnListe">Afficher / actualiser</button>
+    <h2>📋 Listing des points</h2>
+    <div class="ligne" style="margin-bottom:8px"><input id="filtre" placeholder="Filtrer par nom ou code"></div>
+    <div id="resume" class="meta" style="margin-bottom:6px"></div>
+    <table class="tab"><thead><tr><th>Client</th><th>Code</th><th style="text-align:right">Points</th></tr></thead><tbody id="liste"></tbody></table>
+    <div class="meta" id="majListe" style="margin-top:6px"></div>
+    <button class="gris" id="btnListe">Actualiser</button>
+    <button class="vert" id="btnExport">⬇️ Sauvegarder la liste (fichier)</button>
   </div>
   <div class="bloc">
     <h2>Dernières opérations</h2>
@@ -163,7 +184,7 @@ async function ouvrir(p){
     if(!(await rpc('ibz_verifier_pin',{p_pin:p}))){montre('errPin','Code incorrect');return}
     PIN=p;try{localStorage.setItem('ibz_pin',p)}catch(e){}
     $('vuePin').style.display='none';$('vueCaisse').style.display='block';$('btnSortir').style.display='inline';
-    journal();
+    journal();liste();
   }catch(e){montre('errPin',e.message)}
 }
 $('btnPin').onclick=()=>ouvrir($('pin').value.trim());
@@ -215,29 +236,36 @@ function choisir(c){
 }
 function demanderCode(d){return new Promise(res=>{
   const m=$('pad');let v='';const aff=()=>{$('padAff').textContent='●'.repeat(v.length)+'○'.repeat(4-v.length)};
-  $('padTitre').textContent=client.prenom+', tape ton code secret';$('padSous').textContent='Pour utiliser '+(-d)+' point'+(-d>1?'s':'');
+  $('padTitre').textContent=client.prenom+', tape ton code secret';$('padSous').textContent='Pour utiliser '+(-d)+' point'+(-d>1?'s':'')+' pour un cadeau';
   aff();m.style.display='flex';
   const fin=r=>{m.style.display='none';m.onclick=null;res(r)};
   m.onclick=e=>{const k=e.target.dataset.k;if(k===undefined)return;
     if(k==='x')return fin(null);if(k==='<'){v=v.slice(0,-1);aff();return}
     if(v.length<4){v+=k;aff();if(v.length===4)setTimeout(()=>fin(v),150)}};
 });}
-async function mouvement(d){
-  if(!client||occupe)return;occupe=true;montre('errClient','');
+let motifPad=null;
+async function mouvement(d,article){
+  if(!client||occupe)return;occupe=true;montre('errClient','');montre('okMsg','');
   try{
     let code=null;
+    motifPad=article?article.libelle:null;
     if(d<0&&client.protege){code=await demanderCode(d);if(code===null){occupe=false;return}}
-    const s=await rpc('ibz_mouvement2',{p_pin:PIN,p_id:client.id,p_delta:d,p_motif:d>0?'Achat':'Partie',p_secret:code});
+    const s=article
+      ?await rpc('ibz_echanger',{p_pin:PIN,p_client:client.id,p_article:article.id,p_secret:code})
+      :await rpc('ibz_mouvement2',{p_pin:PIN,p_id:client.id,p_delta:d,p_motif:d>0?'Points gagnés':'Cadeau au stand',p_secret:code});
     if(s===null)throw new Error('Code caisse incorrect, reverrouille et retape le code');
     if(s===-1)throw new Error('Code secret incorrect. Après 5 erreurs, la carte est bloquée 15 minutes.');
     client.points=s;$('cSolde').textContent=s;
-    montre('okMsg',d>0?('+'+d+' points chargés'):('Partie validée ('+d+')'));journal();
+    montre('okMsg',d>0?('+'+d+' points ajoutés'):('🎁 '+(-d)+' points utilisés : donne-lui son cadeau !'));journal();liste();
   }catch(e){montre('errClient',e.message)}
   occupe=false;
 }
-document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>mouvement(parseInt(b.dataset.d,10)));
-$('btnAutre').onclick=()=>{const v=prompt('Nombre de points (ex : 20 pour charger, -2 pour retirer)');
+document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{const d=parseInt(b.dataset.d,10);
+  if(d<0&&client&&client.points<-d){montre('errClient','Pas assez de points ('+client.points+')');return}
+  mouvement(d)});
+$('btnAutre').onclick=()=>{const v=prompt('Nombre de points (ex : 20 pour ajouter, -15 pour un cadeau)');
   const n=parseInt(v,10);if(n)mouvement(n)};
+
 $('btnFermer').onclick=()=>{client=null;cible='tous';majCible();$('vueClient').style.display='none';$('recherche').value='';window.scrollTo({top:0,behavior:'smooth'})};
 $('btnRecup').onclick=()=>{
   const base=location.href.replace(/caisse\.html.*$/,'');$('qrRecup').innerHTML='';
@@ -295,14 +323,37 @@ $('btnOffrir').onclick=async()=>{
     montre('okCad','Cadeau envoyé'+(cible==='tous'?' à '+n+' client'+(n>1?'s':''):' à '+client.prenom)+' !');
   }catch(e){montre('errCad',e.message)}
 };
+let tousClients=[];
 async function liste(){
-  try{const d=await rpc('ibz_liste_clients2',{p_pin:PIN});const l=$('liste');l.innerHTML='';
-    if(!d.length){l.textContent='Aucun client pour le moment.';return}
-    const t=document.createElement('div');t.style.cursor='default';t.innerHTML='<b></b>';t.firstChild.textContent=d.length+' client'+(d.length>1?'s':'');l.appendChild(t);
-    d.forEach(c=>{const r=document.createElement('div');r.innerHTML='<span></span><b></b>';
-      r.children[0].textContent=(c.nom?c.nom+' ':'')+c.prenom+' · '+c.code;r.children[1].textContent=c.points+' pts';r.onclick=()=>choisir(c);l.appendChild(r)});
+  try{const d=await rpc('ibz_liste_clients2',{p_pin:PIN});tousClients=d||[];afficherListe();
+    $('majListe').textContent='Mis à jour à '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+' · se met à jour tout seul';
   }catch(e){}
 }
+function afficherListe(){
+  const f=$('filtre').value.trim().toLowerCase(),l=$('liste');l.innerHTML='';
+  const d=tousClients.filter(c=>!f||((c.prenom+' '+(c.nom||'')+' '+c.code).toLowerCase().includes(f)))
+    .sort((a,b)=>b.points-a.points||(a.nom||'').localeCompare(b.nom||''));
+  const total=tousClients.reduce((t,c)=>t+c.points,0);
+  $('resume').textContent=tousClients.length+' client'+(tousClients.length>1?'s':'')+' · '+total+' points en circulation';
+  if(!d.length){const r=document.createElement('tr');r.innerHTML='<td colspan="3">Aucun client</td>';l.appendChild(r);return}
+  d.forEach(c=>{const r=document.createElement('tr');if(!c.points)r.className='zero';r.innerHTML='<td></td><td></td><td></td>';
+    r.children[0].textContent=(c.nom?c.nom.toUpperCase()+' ':'')+c.prenom;r.children[1].textContent=c.code;r.children[2].textContent=c.points;
+    r.onclick=()=>choisir(c);l.appendChild(r)});
+}
+$('filtre').oninput=afficherListe;
+setInterval(()=>{if(PIN&&$('vueCaisse').style.display!=='none')liste()},15000);
+$('btnExport').onclick=async()=>{
+  try{const d=await rpc('ibz_export',{p_pin:PIN});
+    const cols=['code','nom','prenom','points','tel','email','naissance','ville','inscrit_le','derniere_visite'];
+    const esc=v=>{v=v==null?'':String(v);return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+    const csv='\ufeff'+cols.join(';')+'\n'+d.map(r=>cols.map(c=>esc(r[c])).join(';')).join('\n');
+    const nom='ibizou-points-'+new Date().toISOString().slice(0,10)+'.csv';
+    const blob=new Blob([csv],{type:'text/csv'});
+    const fichier=new File([blob],nom,{type:'text/csv'});
+    if(navigator.canShare&&navigator.canShare({files:[fichier]})){await navigator.share({files:[fichier],title:nom});return}
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=nom;document.body.appendChild(a);a.click();a.remove();
+  }catch(e){if(e.name!=='AbortError')alert('Sauvegarde impossible : '+e.message)}
+};
 $('btnListe').onclick=liste;
 
 if(PIN)ouvrir(PIN);
