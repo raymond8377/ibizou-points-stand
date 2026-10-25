@@ -69,7 +69,26 @@ video{width:100%;border-radius:12px;background:#000;aspect-ratio:1;object-fit:co
 .art{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid #e6dcf5;padding:8px 0}
 .art.off{opacity:.45}
 .art .bt{display:flex;gap:6px}.art .bt button{width:auto;margin:0;padding:6px 10px;font-size:13px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stats div{background:#f3edfb;border-radius:12px;padding:10px;text-align:center}
+.stats b{display:block;font-size:26px;color:var(--rouge)}
+.stats span{font-size:12px;opacity:.8}
 #pad button{margin:0;font-size:26px;padding:14px 0;background:#6b3fb3}
+
+/* Mise en avant des éléments importants */
+.solde{font-size:80px;color:#ff1744;text-shadow:3px 3px 0 #ffd400}
+.nom{font-size:26px}
+.grille button{background:#00c853;font-size:22px;box-shadow:3px 3px 0 var(--encre)}
+.grille.retire button{background:#ff1744}
+.ok{background:#00c853;color:#fff;font-size:20px;border:3px solid var(--encre)}
+.err{background:#ff1744;color:#fff;font-size:17px;border:3px solid var(--encre)}
+.bon{background:#ffd400;border-color:#ff1744}
+.bon button{background:#ff1744;font-size:16px}
+#btnScan{background:#ff1744;font-size:20px;padding:18px;box-shadow:4px 4px 0 var(--encre)}
+#cNiveau{color:#6b2bd9}
+#cFiche{color:#c2185b;font-weight:700}
+.stats b{color:#ff1744;font-size:30px}
+.tab td:last-child{color:#ff1744;font-weight:800}
 </style>
 </head>
 <body>
@@ -100,6 +119,7 @@ video{width:100%;border-radius:12px;background:#000;aspect-ratio:1;object-fit:co
     <div class="nom" id="cNom"></div>
     <div class="meta" id="cMeta"></div>
     <div class="meta" id="cFiche"></div>
+    <div class="meta" id="cNiveau" style="font-weight:700;opacity:.9"></div>
     <div class="solde" id="cSolde">0</div>
     <div class="unite">POINTS</div>
     <h2>Donner des points</h2>
@@ -146,6 +166,18 @@ video{width:100%;border-radius:12px;background:#000;aspect-ratio:1;object-fit:co
     <button class="vert" id="btnExport">⬇️ Sauvegarder la liste (fichier)</button>
   </div>
   <div class="bloc">
+    <h2>📊 Aujourd'hui</h2>
+    <div class="stats" id="stats"></div>
+    <button class="gris" id="btnStats">Actualiser</button>
+  </div>
+  <div class="bloc">
+    <h2>🤝 Parrainage</h2>
+    <div class="meta">Quand un filleul gagne ses premiers points au stand, lui et son parrain reçoivent ce bonus.</div>
+    <div class="petitchamp"><span style="align-self:center;font-size:15px">Bonus pour chacun (points)</span><input id="bonusParr" type="number" inputmode="numeric" min="0" max="500"></div>
+    <button class="gris" id="btnBonus">Enregistrer</button>
+    <div class="ok" id="okBonus"></div><div class="err" id="errBonus"></div>
+  </div>
+  <div class="bloc">
     <h2>Dernières opérations</h2>
     <div class="journal" id="journal"></div>
     <button class="gris" id="btnJournal">Actualiser</button>
@@ -184,7 +216,7 @@ async function ouvrir(p){
     if(!(await rpc('ibz_verifier_pin',{p_pin:p}))){montre('errPin','Code incorrect');return}
     PIN=p;try{localStorage.setItem('ibz_pin',p)}catch(e){}
     $('vuePin').style.display='none';$('vueCaisse').style.display='block';$('btnSortir').style.display='inline';
-    journal();liste();
+    journal();liste();stats();chargerBonus();
   }catch(e){montre('errPin',e.message)}
 }
 $('btnPin').onclick=()=>ouvrir($('pin').value.trim());
@@ -256,7 +288,7 @@ async function mouvement(d,article){
     if(s===null)throw new Error('Code caisse incorrect, reverrouille et retape le code');
     if(s===-1)throw new Error('Code secret incorrect. Après 5 erreurs, la carte est bloquée 15 minutes.');
     client.points=s;$('cSolde').textContent=s;
-    montre('okMsg',d>0?('+'+d+' points ajoutés'):('🎁 '+(-d)+' points utilisés : donne-lui son cadeau !'));journal();liste();
+    montre('okMsg',d>0?('+'+d+' points ajoutés'):('🎁 '+(-d)+' points utilisés : donne-lui son cadeau !'));journal();liste();stats();fiche();
   }catch(e){montre('errClient',e.message)}
   occupe=false;
 }
@@ -282,6 +314,18 @@ async function journal(){
   }catch(e){}
 }
 $('btnJournal').onclick=journal;
+async function stats(){try{const d=await rpc('ibz_resume_jour',{p_pin:PIN});if(!d.length)return;const r=d[0];
+  const items=[[r.clients_venus,'clients venus'],[r.inscrits,'nouveaux inscrits'],[r.points_donnes,'points donnés'],[r.points_utilises,'points utilisés'],
+    [r.cadeaux_stand,'cadeaux remis'],[r.bons_utilises,'bons utilisés'],[r.surprises_ouvertes,'surprises ouvertes']];
+  const z=$('stats');z.innerHTML='';items.forEach(([v,l])=>{const e=document.createElement('div');e.innerHTML='<b></b><span></span>';
+    e.firstChild.textContent=v;e.lastChild.textContent=l;z.appendChild(e)});}catch(e){}}
+$('btnStats').onclick=stats;
+async function chargerBonus(){try{$('bonusParr').value=await rpc('ibz_bonus_parrainage',{})}catch(e){}}
+$('btnBonus').onclick=async()=>{montre('okBonus','');montre('errBonus','');const v=parseInt($('bonusParr').value,10);
+  if(!(v>=0))return montre('errBonus','Mets un nombre de points');
+  try{const r=await rpc('ibz_reglage_parrainage',{p_pin:PIN,p_bonus:v});if(r===null)throw new Error('Code caisse incorrect');
+    montre('okBonus',v?('Bonus parrainage : '+v+' points chacun'):'Parrainage désactivé (0 point)')}catch(e){montre('errBonus',e.message)}};
+
 // Cadeaux
 let cible='tous';
 function majCible(){$('cibleTous').className=cible==='tous'?'on':'';$('cibleClient').className=cible==='client'?'on':'';
@@ -293,14 +337,18 @@ function majType(){$('tBon').className=gType==='bon'?'on':'';$('tPts').className
 $('tBon').onclick=()=>{gType='bon';majType()};$('tPts').onclick=()=>{gType='points';majType()};
 document.querySelectorAll('.cad button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.cad button').forEach(x=>x.classList.remove('on'));
   b.classList.add('on');$('gLib').value=b.dataset.l;gType=b.dataset.t;$('gPts').value=b.dataset.p||'';majType()});
-async function fiche(){$('cFiche').textContent='';if(!client)return;
-  try{const d=await rpc('ibz_fiche',{p_pin:PIN,p_id:client.id});if(!d.length)return;const f=d[0];const t=[];
+async function fiche(){$('cFiche').textContent='';$('cNiveau').textContent='';if(!client)return;
+  try{const d=await rpc('ibz_fiche2',{p_pin:PIN,p_id:client.id});if(!d.length)return;const f=d[0];const t=[];
     if(f.naissance){const n=new Date(f.naissance+'T12:00:00'),a=new Date();let age=a.getFullYear()-n.getFullYear();
       if(a<new Date(a.getFullYear(),n.getMonth(),n.getDate()))age--;
       const anniv=n.getDate()===a.getDate()&&n.getMonth()===a.getMonth();
       t.push((anniv?'🎂 ANNIVERSAIRE AUJOURD\'HUI · ':'')+age+' ans')}
     if(f.ville)t.push(f.ville);if(f.email)t.push(f.email);if(f.tel)t.push(f.tel);
     $('cFiche').textContent=t.join(' · ');
+    const ic={Bronze:'🥉',Argent:'🥈',Or:'🥇',Diamant:'💎'}[f.niveau]||'';
+    const u=[ic+' '+f.niveau+' ('+f.total_gagne+' pts gagnés au total)'];
+    if(f.parrain)u.push('Parrainé par '+f.parrain);if(f.filleuls)u.push(f.filleuls+' filleul'+(f.filleuls>1?'s':''));
+    $('cNiveau').textContent=u.join(' · ');
   }catch(e){}}
 async function bonsClient(){const z=$('cBons');z.innerHTML='';if(!client)return;
   try{const d=await rpc('ibz_bons_client',{p_pin:PIN,p_id:client.id});
