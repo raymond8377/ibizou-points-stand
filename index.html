@@ -33,6 +33,9 @@ button{width:100%;font-family:'Luckiest Guy',sans-serif;font-size:18px;padding:1
 button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--encre)}
 .petit{font-size:13px;opacity:.75;margin-top:12px;line-height:1.4}
 .pin{letter-spacing:10px;font-size:24px;text-align:center}
+.seg2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.seg2 button{margin:0;padding:10px 4px;font-size:14px;background:#e6dcf5;color:var(--encre);box-shadow:none}
+.seg2 button.on{background:#6b3fb3;color:#fff}
 .bonjour{font-size:18px;font-weight:800;text-align:center}
 .points{font-family:'Luckiest Guy',sans-serif;font-size:76px;text-align:center;color:var(--rouge);line-height:1;margin:8px 0 0}
 .points.pop{animation:pop .6s}
@@ -62,6 +65,14 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--encre)}
 .boutiq .bar i{display:block;height:100%;background:var(--rouge)}
 .boutiq .it.ok .bar i{background:#0a8f3c}
 .boutiq small{font-size:13px;opacity:.8}
+.niveau{text-align:center;margin:-6px 0 14px}
+.badge{display:inline-block;font-family:'Luckiest Guy',sans-serif;font-size:16px;padding:5px 14px;border-radius:20px;border:3px solid var(--encre);letter-spacing:1px}
+.badge.Bronze{background:#e3a76f}.badge.Argent{background:#d9dde3}.badge.Or{background:#ffc23d}.badge.Diamant{background:#8fe3ff}
+.nbar{height:10px;background:#eee;border-radius:6px;overflow:hidden;margin:8px auto 0;max-width:260px;border:2px solid var(--encre)}
+.nbar i{display:block;height:100%;background:var(--rouge);transition:width .6s}
+.parrain{margin-top:16px;border-top:3px dashed var(--encre);padding-top:12px}
+.parrain h4{font-family:'Luckiest Guy',sans-serif;font-size:18px;margin-bottom:6px;color:var(--rouge)}
+.parrain button{margin-top:10px;background:#6b3fb3}
 .profil{margin-top:16px;border-top:3px dashed var(--encre);padding-top:12px}
 .profil summary{cursor:pointer;font-size:17px}
 .ok2{background:#d9f7e3;color:#05501f;border-radius:10px;padding:10px;margin-top:10px;display:none;text-align:center}
@@ -70,6 +81,22 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--encre)}
 .bons div div{background:#ffc23d;border:3px solid var(--encre);border-radius:12px;padding:10px 12px;margin-bottom:8px;font-size:17px}
 .confetti{position:fixed;top:-20px;width:10px;height:14px;z-index:30;animation:tombe linear forwards}
 @keyframes tombe{to{transform:translateY(110vh) rotate(720deg)}}
+
+/* Mise en avant des éléments importants */
+.points{font-size:92px;color:#ff1744;text-shadow:3px 3px 0 #ffd400,6px 6px 0 var(--encre)}
+.unite{font-size:15px;color:#ff1744}
+.code{background:#ffd400;border:3px solid var(--encre);border-radius:12px;padding:6px 10px;display:inline-block;color:var(--encre);box-shadow:3px 3px 0 var(--encre)}
+#vueCarte{text-align:center}
+#vueCarte .bons,#vueCarte .parrain,#vueCarte .profil{text-align:left}
+#qr{border:4px solid #ff1744;border-style:solid;box-shadow:0 0 0 4px #ffd400}
+.badge{box-shadow:3px 3px 0 var(--encre)}
+.bons{background:#fff3b0;border:3px solid #ff1744;border-radius:14px;padding:12px;margin-top:16px}
+.bons h4{color:#ff1744}
+.parrain h4,.profil summary{color:#6b2bd9;font-weight:800}
+.err{background:#ff1744;color:#fff;border-color:var(--encre);font-size:16px}
+button{background:#ff1744}
+#pSecret,#secret,#rSecret{border-color:#ff1744;background:#fff8d6}
+label[for="secret"]{color:#ff1744}
 </style>
 </head>
 <body>
@@ -88,10 +115,12 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--encre)}
     <div class="ampoules"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     <h2>Ta carte de points</h2>
     <p>Fini les tickets papier : tes points sont sur ton téléphone.</p>
+    <div id="champsNom">
     <label for="prenom">Prénom</label>
     <input id="prenom" autocomplete="given-name" maxlength="40">
     <label for="nom">Nom</label>
     <input id="nom" autocomplete="family-name" maxlength="40">
+    </div>
     <label for="secret">Choisis ton code secret (4 chiffres)</label>
     <input id="secret" class="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="new-password" placeholder="••••">
     <p class="petit" style="margin-top:6px">Retiens-le bien : il protège tes points et sert à retrouver ta carte.</p>
@@ -99,16 +128,22 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--encre)}
       <label for="tel">Ton numéro ou celui d'un parent</label>
       <input id="tel" type="tel" inputmode="tel" autocomplete="tel" maxlength="20">
     </details>
+    <label for="parrain">Code d'un copain qui t'a invité (facultatif)</label>
+    <input id="parrain" maxlength="6" autocapitalize="characters" autocomplete="off" style="text-transform:uppercase;letter-spacing:3px">
     <button id="btnInscrire">Créer ma carte</button>
     <div class="err" id="errInsc"></div>
+    <p class="petit" style="text-align:center"><a href="#" id="lienAnonyme" style="color:var(--rouge)">Je préfère ne pas donner mon nom</a></p>
     <p class="petit" style="text-align:center"><a href="#" id="lienDeja" style="color:var(--rouge)">J'ai déjà une carte</a></p>
   </div>
 
   <div class="carte" id="vueRecup" style="display:none">
     <div class="ampoules"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     <h2>Retrouver ma carte</h2>
-    <label for="rPrenom">Prénom</label><input id="rPrenom" autocomplete="given-name" maxlength="40">
-    <label for="rNom">Nom</label><input id="rNom" autocomplete="family-name" maxlength="40">
+    <div class="seg2"><button id="rModeNom" class="on">Avec mon nom</button><button id="rModeCode">Avec mon code carte</button></div>
+    <div id="rChampsNom"><label for="rPrenom">Prénom</label><input id="rPrenom" autocomplete="given-name" maxlength="40">
+    <label for="rNom">Nom</label><input id="rNom" autocomplete="family-name" maxlength="40"></div>
+    <div id="rChampsCode" style="display:none"><label for="rCode">Code de ta carte (6 caractères)</label>
+    <input id="rCode" maxlength="6" autocapitalize="characters" autocomplete="off" style="text-transform:uppercase;letter-spacing:4px;text-align:center;font-size:22px"></div>
     <label for="rSecret">Code secret</label>
     <input id="rSecret" class="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••">
     <button id="btnRecup">Retrouver ma carte</button>
@@ -121,10 +156,18 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--encre)}
     <div class="bonjour" id="bonjour"></div>
     <div class="points" id="points">0</div>
     <div class="unite">POINTS</div>
+    <div class="niveau" id="niveau" style="display:none"><span class="badge" id="badge"></span>
+      <div class="nbar"><i id="nbarI"></i></div><div class="petit" id="nTexte" style="margin-top:4px"></div></div>
     <div id="qr"></div>
     <div class="code" id="code"></div>
     <div class="info">Montre ce QR code au stand pour gagner des points ou les échanger contre un cadeau au stand.</div>
     <div class="petit" style="text-align:center">📸 Fais une capture d'écran de ta carte pour la garder.</div>
+    <div class="parrain" id="blocParrain">
+      <h4>🤝 Invite un copain</h4>
+      <p id="parrTexte"></p>
+      <button id="btnPartager">Envoyer mon invitation</button>
+      <p class="petit" id="parrStats"></p>
+    </div>
     <details class="profil" id="profil"><summary>👤 Mon profil (facultatif)</summary>
       <div id="profCode">
         <label for="pSecret">Ton code secret</label>
@@ -164,7 +207,8 @@ function toast(t){const e=$('toast');e.textContent=t;e.style.display='block';cle
 const m=location.hash.match(/id=([0-9a-f-]{36})/i);
 if(m){garder(m[1]);history.replaceState(null,'',location.pathname)}
 let monId=lire()||(m&&m[1]);
-let dernier=null;
+let dernier=null,monCode=null,niveauPrec=null;
+const qp=new URLSearchParams(location.search);
 
 async function afficherCarte(){
   $('vueInscription').style.display='none';$('vueRecup').style.display='none';$('vueCarte').style.display='block';
@@ -174,7 +218,7 @@ async function afficherCarte(){
 }
 async function rafraichir(){
   try{
-    const d=await rpc('ibz_solde2',{p_id:monId});
+    const d=await rpc('ibz_solde3',{p_id:monId});
     if(!d||!d.length){$('errCarte').textContent='Carte introuvable. Demande au stand.';$('errCarte').style.display='block';return}
     const c=d[0];$('errCarte').style.display='none';
     $('bonjour').textContent='Salut '+c.prenom+(c.nom?' '+c.nom:'')+' !';$('code').textContent=c.code;
@@ -184,6 +228,17 @@ async function rafraichir(){
       if(navigator.vibrate)navigator.vibrate(120);
     }
     dernier=c.points;$('points').textContent=c.points;
+    monCode=c.code;
+    const ic={Bronze:'🥉',Argent:'🥈',Or:'🥇',Diamant:'💎'}[c.niveau]||'';
+    $('niveau').style.display='block';$('badge').className='badge '+c.niveau;$('badge').textContent=ic+' Niveau '+c.niveau;
+    if(c.prochain){$('nbarI').style.width=Math.min(100,Math.round(c.total_gagne/c.seuil*100))+'%';
+      $('nTexte').textContent='Encore '+(c.seuil-c.total_gagne)+' points gagnés pour passer '+c.prochain;$('nbarI').parentNode.style.display='block'}
+    else{$('nbarI').parentNode.style.display='none';$('nTexte').textContent='Tu as atteint le plus haut niveau !'}
+    if(niveauPrec&&niveauPrec!==c.niveau){toast(ic+' Bravo, tu passes '+c.niveau+' !')}
+    niveauPrec=c.niveau;
+    const b=c.bonus_parrainage||0;
+    $('parrTexte').textContent=b?('Donne ton code '+c.code+' à un copain. Quand il gagne ses premiers points au stand, vous recevez chacun '+b+' points !'):('Donne ton code '+c.code+' à un copain pour qu\'il s\'inscrive.');
+    $('parrStats').textContent=c.filleuls?(c.filleuls+' copain'+(c.filleuls>1?'s':'')+' parrainé'+(c.filleuls>1?'s':'')+' 🎉'):'';
   }catch(e){}
 }
 
@@ -213,7 +268,7 @@ async function bons(){try{const d=await rpc('ibz_mes_bons',{p_id:monId});const l
 let cadeauEnCours=null,cadeauOuvert=false;
 async function verifierCadeaux(){
   if(cadeauEnCours||!monId)return;
-  try{const d=await rpc('ibz_cadeaux_attente2',{p_id:monId});
+  try{const d=await rpc('ibz_cadeaux_attente3',{p_id:monId});
     if(d&&d.length){cadeauEnCours=d[0];cadeauOuvert=false;
       $('cEmo').textContent='🎁';$('cEmo').className='emo';$('cTitre').textContent='Tu as un cadeau !';
       $('cTexte').textContent="IBIZOU t'a réservé une surprise.";$('btnOuvrir').textContent='Ouvrir';
@@ -235,22 +290,44 @@ $('btnOuvrir').onclick=async()=>{
   }catch(e){$('cTexte').textContent=e.message;cadeauOuvert=true;$('btnOuvrir').textContent='Fermer'}
   $('btnOuvrir').disabled=false;
 };
+if(qp.get('parrain'))$('parrain').value=qp.get('parrain').toUpperCase().slice(0,6);
+$('btnPartager').onclick=async()=>{
+  const url=location.origin+location.pathname+'?parrain='+monCode;
+  const txt='Viens jouer à IBIZOU ! Inscris-toi avec mon code '+monCode+' et on gagne des points tous les deux : ';
+  try{if(navigator.share){await navigator.share({title:'IBIZOU',text:txt,url});return}}catch(e){if(e.name==='AbortError')return}
+  try{await navigator.clipboard.writeText(txt+url);toast('Lien copié !')}catch(e){prompt('Copie ce lien :',url)}
+};
 function err(id,t){$(id).textContent=t;$(id).style.display='block'}
+let anonyme=false;
+$('lienAnonyme').onclick=e=>{e.preventDefault();anonyme=!anonyme;$('champsNom').style.display=anonyme?'none':'block';
+  $('lienAnonyme').textContent=anonyme?'Finalement, je mets mon nom':'Je préfère ne pas donner mon nom';
+  $('btnInscrire').textContent=anonyme?'Créer ma carte sans nom':'Créer ma carte';$('errInsc').style.display='none'};
 $('btnInscrire').onclick=async()=>{
-  const prenom=$('prenom').value.trim(),nom=$('nom').value.trim(),secret=$('secret').value.trim(),tel=$('tel').value.trim();
-  if(!prenom||!nom)return err('errInsc','Mets ton prénom et ton nom.');
+  const prenom=$('prenom').value.trim(),nom=$('nom').value.trim(),secret=$('secret').value.trim(),tel=$('tel').value.trim(),parr=$('parrain').value.trim();
+  if(!anonyme&&(!prenom||!nom))return err('errInsc','Mets ton prénom et ton nom, ou appuie sur « Je préfère ne pas donner mon nom ».');
   if(!/^[0-9]{4}$/.test(secret))return err('errInsc','Le code secret doit faire 4 chiffres.');
   $('btnInscrire').disabled=true;
-  try{const d=await rpc('ibz_inscription2',{p_prenom:prenom,p_nom:nom,p_tel:tel,p_secret:secret});monId=d[0].id;garder(monId);afficherCarte()}
+  try{const d=anonyme
+      ?await rpc('ibz_inscription_anonyme',{p_secret:secret,p_parrain:parr})
+      :await rpc('ibz_inscription3',{p_prenom:prenom,p_nom:nom,p_tel:tel,p_secret:secret,p_parrain:parr});
+    if(parr&&!d[0].parrain_ok)toast('Code copain inconnu, carte créée quand même');
+    if(anonyme)alert('Ta carte est créée ! Note bien ton code carte '+d[0].code+' et ton code secret : sans nom, ce sont les seuls moyens de la retrouver.');
+    monId=d[0].id;garder(monId);afficherCarte()}
   catch(e){err('errInsc',e.message);$('btnInscrire').disabled=false}
 };
 $('lienDeja').onclick=e=>{e.preventDefault();$('vueInscription').style.display='none';$('vueRecup').style.display='block'};
 $('lienNouveau').onclick=e=>{e.preventDefault();$('vueRecup').style.display='none';$('vueInscription').style.display='block'};
+let rMode='nom';
+function majRMode(){$('rModeNom').className=rMode==='nom'?'on':'';$('rModeCode').className=rMode==='code'?'on':'';
+  $('rChampsNom').style.display=rMode==='nom'?'block':'none';$('rChampsCode').style.display=rMode==='code'?'block':'none'}
+$('rModeNom').onclick=()=>{rMode='nom';majRMode()};$('rModeCode').onclick=()=>{rMode='code';majRMode()};
 $('btnRecup').onclick=async()=>{
-  const p=$('rPrenom').value.trim(),n=$('rNom').value.trim(),c=$('rSecret').value.trim();
-  if(!p||!n||!c)return err('errRecup','Remplis les trois cases.');
+  const p=$('rPrenom').value.trim(),n=$('rNom').value.trim(),k=$('rCode').value.trim(),c=$('rSecret').value.trim();
+  if(rMode==='nom'&&(!p||!n))return err('errRecup','Mets ton prénom et ton nom.');
+  if(rMode==='code'&&k.length<6)return err('errRecup','Mets le code de ta carte (6 caractères).');
+  if(!/^[0-9]{4}$/.test(c))return err('errRecup','Mets ton code secret à 4 chiffres.');
   $('btnRecup').disabled=true;
-  try{const id=await rpc('ibz_recuperer',{p_prenom:p,p_nom:n,p_secret:c});
+  try{const id=rMode==='nom'?await rpc('ibz_recuperer',{p_prenom:p,p_nom:n,p_secret:c}):await rpc('ibz_recuperer_code',{p_code:k,p_secret:c});
     if(!id){err('errRecup','Aucune carte trouvée avec ces informations.');$('btnRecup').disabled=false;return}
     monId=id;garder(id);afficherCarte()}
   catch(e){err('errRecup',e.message);$('btnRecup').disabled=false}
