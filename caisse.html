@@ -95,6 +95,10 @@ video{width:100%;border-radius:12px;background:#000;aspect-ratio:1;object-fit:co
 .hist summary{cursor:pointer;font-weight:800;color:#6b2bd9}
 .hl2{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid #e6dcf5;padding:7px 0;font-size:14px;font-variant-numeric:tabular-nums}
 .hl2 small{display:block;opacity:.7}
+.suppr{background:#fff;color:#c62828;border-color:#c62828;font-size:15px;margin-top:18px}
+.supprBox{margin-top:10px;background:#ffebee;border:4px solid #c62828;border-radius:14px;padding:12px;color:#2a0f4f;font-size:15px;line-height:1.4}
+.supprBox b{color:#c62828}
+.rougeF{background:#c62828;font-size:15px}
 #pad button{margin:0;font-size:26px;padding:14px 0;background:#6b3fb3}
 
 /* Mise en avant des éléments importants */
@@ -166,6 +170,11 @@ video{width:100%;border-radius:12px;background:#000;aspect-ratio:1;object-fit:co
     <button class="gris" id="btnRecup">Carte perdue ? Afficher le QR de récupération</button>
     <div id="qrRecup"></div>
     <button class="gris" id="btnFermer">Client suivant</button>
+    <button class="suppr" id="btnSuppr" type="button">🗑️ Supprimer ce client</button>
+    <div class="supprBox" id="supprBox" hidden>
+      <div id="supprTxt"></div>
+      <div class="vBt"><button class="gris" id="supprNon" type="button">Non, garder</button><button class="rougeF" id="supprOui" type="button"></button></div>
+    </div>
   </div>
 
 
@@ -320,7 +329,7 @@ function choisir(c){
   client=c;$('vueClient').style.display='block';$('qrRecup').innerHTML='';
   $('cNom').textContent=c.prenom+(c.nom?' '+c.nom:'');$('cMeta').textContent='Code '+c.code+(c.tel?' · '+c.tel:'');
   $('cSolde').textContent=c.points;montre('okMsg','');montre('errClient','');
-  enAttente=0;majValid();majCible();bonsClient();fiche();jeuClient();historique();$('vueClient').scrollIntoView({behavior:'smooth'});
+  enAttente=0;majValid();resetSuppr();majCible();bonsClient();fiche();jeuClient();historique();$('vueClient').scrollIntoView({behavior:'smooth'});
 }
 function demanderCode(d){return new Promise(res=>{
   const m=$('pad');let v='';const aff=()=>{$('padAff').textContent='●'.repeat(v.length)+'○'.repeat(4-v.length)};
@@ -394,6 +403,27 @@ async function stats(){try{const d=await rpc('ibz_resume_jour',{p_pin:PIN});if(!
   const z=$('stats');z.innerHTML='';items.forEach(([v,l])=>{const e=document.createElement('div');e.innerHTML='<b></b><span></span>';
     e.firstChild.textContent=v;e.lastChild.textContent=l;z.appendChild(e)});}catch(e){}}
 $('btnStats').onclick=stats;
+// Suppression d'un client : double confirmation
+let supprEtape=0;
+function resetSuppr(){supprEtape=0;$('supprBox').hidden=true;$('btnSuppr').hidden=false}
+$('btnSuppr').onclick=()=>{if(!client)return;supprEtape=1;$('btnSuppr').hidden=true;$('supprBox').hidden=false;
+  const nom=client.prenom+(client.nom?' '+client.nom:'');
+  $('supprTxt').innerHTML='';const t=document.createElement('div');t.innerHTML='Supprimer <b></b> ? Il a <b></b> point(s).';
+  t.children[0].textContent=nom;t.children[1].textContent=client.points;$('supprTxt').appendChild(t);
+  $('supprOui').textContent='Oui, supprimer';$('supprBox').scrollIntoView({behavior:'smooth',block:'center'})};
+$('supprNon').onclick=resetSuppr;
+$('supprOui').onclick=async()=>{const nom=client.prenom+(client.nom?' '+client.nom:'');
+  if(supprEtape===1){supprEtape=2;$('supprTxt').innerHTML='';const t=document.createElement('div');
+    t.innerHTML='⚠️ <b>Dernière confirmation.</b> La carte de <b></b>, ses points, ses bons et son historique seront effacés pour toujours.';
+    t.children[1].textContent=nom;$('supprTxt').appendChild(t);$('supprOui').textContent='🗑️ Supprimer définitivement';return}
+  $('supprOui').disabled=true;
+  try{const r=await rpc('ibz_supprimer_client',{p_pin:PIN,p_id:client.id});if(r===null)throw new Error('Code caisse incorrect');
+    resetSuppr();client=null;$('vueClient').style.display='none';montre('errScan','');
+    const ok=document.createElement('div');ok.className='ok';ok.style.display='block';ok.textContent='🗑️ '+r+' a été supprimé';
+    $('resultats').innerHTML='';$('resultats').appendChild(ok);window.scrollTo({top:0,behavior:'smooth'});liste();stats();journal();
+  }catch(e){montre('errClient',/ibz_supprimer_client/.test(e.message)||/function/.test(e.message)?'La suppression n\'est pas encore activée dans Supabase (copie le texte SQL que je t\'ai envoyé).':e.message)}
+  $('supprOui').disabled=false};
+
 // Tournée
 let tour=[],tEdit=null;
 const fD=d=>new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
