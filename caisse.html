@@ -73,6 +73,8 @@ video{width:100%;border-radius:12px;background:#000;aspect-ratio:1;object-fit:co
 .stats div{background:#f3edfb;border-radius:12px;padding:10px;text-align:center}
 .stats b{display:block;font-size:26px;color:var(--rouge)}
 .stats span{font-size:12px;opacity:.8}
+.act{display:flex;justify-content:space-between;align-items:center;gap:8px;border:2px solid var(--encre);border-radius:12px;padding:8px 10px;margin-top:8px;background:#fff8d6}
+.act button{width:auto;margin:0;padding:8px 12px;font-size:14px;background:#ff1744}
 #pad button{margin:0;font-size:26px;padding:14px 0;background:#6b3fb3}
 
 /* Mise en avant des éléments importants */
@@ -153,7 +155,9 @@ video{width:100%;border-radius:12px;background:#000;aspect-ratio:1;object-fit:co
     <div class="petitchamp"><span style="align-self:center;font-size:14px">Valable (jours)</span><input id="gJours" type="number" inputmode="numeric" value="7" min="1" max="60"></div>
     <button class="vert" id="btnOffrir">Envoyer le cadeau</button>
     <div class="ok" id="okCad"></div><div class="err" id="errCad"></div>
-    <div class="note">Le client voit une boîte cadeau en ouvrant sa carte. Un bon reste affiché sur sa carte jusqu'à ce que tu le valides ici. Des points s'ajoutent directement.</div>
+    <h2 style="margin-top:16px">Surprises en cours</h2>
+    <div id="actifs"></div>
+    <div class="note">« À tous » = les clients déjà inscrits au moment de l'envoi. Les nouveaux inscrits ne le reçoivent pas. Le client voit une boîte cadeau en ouvrant sa carte. Un bon reste affiché sur sa carte jusqu'à ce que tu le valides ici. Des points s'ajoutent directement.</div>
   </div>
 
   <div class="bloc">
@@ -216,7 +220,7 @@ async function ouvrir(p){
     if(!(await rpc('ibz_verifier_pin',{p_pin:p}))){montre('errPin','Code incorrect');return}
     PIN=p;try{localStorage.setItem('ibz_pin',p)}catch(e){}
     $('vuePin').style.display='none';$('vueCaisse').style.display='block';$('btnSortir').style.display='inline';
-    journal();liste();stats();chargerBonus();
+    journal();liste();stats();chargerBonus();actifs();
   }catch(e){montre('errPin',e.message)}
 }
 $('btnPin').onclick=()=>ouvrir($('pin').value.trim());
@@ -320,6 +324,16 @@ async function stats(){try{const d=await rpc('ibz_resume_jour',{p_pin:PIN});if(!
   const z=$('stats');z.innerHTML='';items.forEach(([v,l])=>{const e=document.createElement('div');e.innerHTML='<b></b><span></span>';
     e.firstChild.textContent=v;e.lastChild.textContent=l;z.appendChild(e)});}catch(e){}}
 $('btnStats').onclick=stats;
+async function actifs(){const z=$('actifs');z.innerHTML='';
+  try{const d=await rpc('ibz_cadeaux_actifs',{p_pin:PIN});
+    if(!d.length){z.innerHTML='<div class="meta">Aucune surprise en cours.</div>';return}
+    d.forEach(g=>{const r=document.createElement('div');r.className='act';r.innerHTML='<span><b></b><br><small></small></span><button>Arrêter</button>';
+      r.querySelector('b').textContent=g.libelle+(g.type==='points'?' (+'+g.points+' pts)':'');
+      r.querySelector('small').textContent=g.pour+' · ouvert '+g.ouverts+' fois · jusqu\'au '+new Date(g.expire).toLocaleDateString('fr-FR');
+      r.querySelector('button').onclick=async()=>{if(!confirm('Arrêter « '+g.libelle+' » ? Ceux qui ne l\'ont pas encore ouvert ne le verront plus.'))return;
+        try{const ok=await rpc('ibz_arreter_cadeau',{p_pin:PIN,p_id:g.id});if(ok===null)throw new Error('Code caisse incorrect');actifs()}catch(e){montre('errCad',e.message)}};
+      z.appendChild(r)});
+  }catch(e){}}
 async function chargerBonus(){try{$('bonusParr').value=await rpc('ibz_bonus_parrainage',{})}catch(e){}}
 $('btnBonus').onclick=async()=>{montre('okBonus','');montre('errBonus','');const v=parseInt($('bonusParr').value,10);
   if(!(v>=0))return montre('errBonus','Mets un nombre de points');
@@ -368,7 +382,7 @@ $('btnOffrir').onclick=async()=>{
   if(cible==='tous'&&!confirm('Envoyer « '+lib+' »'+(gType==='points'?' (+'+pts+' points)':'')+' à TOUS les clients ?'))return;
   try{const n=await rpc('ibz_offrir2',{p_pin:PIN,p_client:cible==='client'?client.id:null,p_libelle:lib,p_points:pts,p_jours:j,p_type:gType});
     if(n===null)throw new Error('Code caisse incorrect');
-    montre('okCad','Cadeau envoyé'+(cible==='tous'?' à '+n+' client'+(n>1?'s':''):' à '+client.prenom)+' !');
+    actifs();montre('okCad','Cadeau envoyé'+(cible==='tous'?' à '+n+' client'+(n>1?'s':''):' à '+client.prenom)+' !');
   }catch(e){montre('errCad',e.message)}
 };
 let tousClients=[];
