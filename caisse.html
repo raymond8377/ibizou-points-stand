@@ -75,6 +75,26 @@ video{width:100%;border-radius:12px;background:#000;aspect-ratio:1;object-fit:co
 .stats span{font-size:12px;opacity:.8}
 .act{display:flex;justify-content:space-between;align-items:center;gap:8px;border:2px solid var(--encre);border-radius:12px;padding:8px 10px;margin-top:8px;background:#fff8d6}
 .act button{width:auto;margin:0;padding:8px 12px;font-size:14px;background:#ff1744}
+.lot{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid #e6dcf5;padding:8px 0}
+.lot.off{opacity:.45}.lot .bt{display:flex;gap:6px}.lot .bt button{width:auto;margin:0;padding:6px 10px;font-size:13px}
+.jeuC{background:#fff3b0;border:3px solid #ffd400;border-radius:12px;padding:10px;margin-top:12px}
+.jeuC select{width:100%;font:inherit;font-size:16px;padding:10px;border:3px solid var(--encre);border-radius:10px;margin-top:6px}
+.tr{border-bottom:1px solid #e6dcf5;padding:8px 0;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.tr.off{opacity:.45}.tr .bt{display:flex;gap:6px;flex:none}.tr .bt button{width:auto;margin:0;padding:6px 10px;font-size:13px}
+.tr small{display:block;opacity:.75}
+[hidden]{display:none!important}
+.valid{margin-top:12px;background:#fff8d6;border:4px solid #2a0f4f;border-radius:16px;padding:12px;box-shadow:4px 4px 0 #2a0f4f}
+.valid.plus{border-color:#00c853}.valid.moins{border-color:#ff1744}
+.vCalc{display:flex;justify-content:center;align-items:baseline;gap:10px;font-family:'Luckiest Guy',sans-serif;font-variant-numeric:tabular-nums}
+.vA{font-size:30px;color:#6d5f86}.vOp{font-size:34px}.vEg{font-size:28px;color:#6d5f86}.vN{font-size:42px;color:#ff1744}
+.valid.plus .vOp{color:#00a63e}.valid.moins .vOp{color:#ff1744}
+.vTxt{text-align:center;font-size:15px;font-weight:700;margin:6px 0 10px}
+.vBt{display:grid;grid-template-columns:1fr 2fr;gap:8px}.vBt button{margin:0}
+#vOk{background:#00c853;font-size:20px}.valid.moins #vOk{background:#ff1744}
+.hist{margin-top:12px;background:#f6f0ff;border-radius:12px;padding:8px 10px}
+.hist summary{cursor:pointer;font-weight:800;color:#6b2bd9}
+.hl2{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid #e6dcf5;padding:7px 0;font-size:14px;font-variant-numeric:tabular-nums}
+.hl2 small{display:block;opacity:.7}
 #pad button{margin:0;font-size:26px;padding:14px 0;background:#6b3fb3}
 
 /* Mise en avant des éléments importants */
@@ -133,7 +153,14 @@ video{width:100%;border-radius:12px;background:#000;aspect-ratio:1;object-fit:co
       <button data-d="-5">−5</button><button data-d="-10">−10</button><button data-d="-20">−20</button><button data-d="-50">−50</button>
     </div>
     <button class="gris" id="btnAutre" style="margin-top:8px">Autre nombre de points…</button>
+    <div class="valid" id="valid" hidden>
+      <div class="vCalc"><span class="vA" id="vAvant">0</span><span class="vOp" id="vOp">+ 0</span><span class="vEg">=</span><span class="vN" id="vApres">0</span></div>
+      <div class="vTxt" id="vTxt"></div>
+      <div class="vBt"><button class="gris" id="vAnn" type="button">Annuler</button><button id="vOk" type="button">✅ Valider</button></div>
+    </div>
+    <details class="hist" id="hist"><summary>🕘 Historique du client</summary><div id="histListe"></div></details>
     <div id="cBons"></div>
+    <div id="cJeu"></div>
     <div class="ok" id="okMsg"></div>
     <div class="err" id="errClient"></div>
     <button class="gris" id="btnRecup">Carte perdue ? Afficher le QR de récupération</button>
@@ -173,6 +200,31 @@ video{width:100%;border-radius:12px;background:#000;aspect-ratio:1;object-fit:co
     <h2>📊 Aujourd'hui</h2>
     <div class="stats" id="stats"></div>
     <button class="gris" id="btnStats">Actualiser</button>
+  </div>
+  <div class="bloc">
+    <h2>🎰 Machine à sous (niveau Or)</h2>
+    <div class="meta">Le client la débloque une seule fois en passant Or (150 points gagnés). Un lot est toujours gagné, tiré selon ces chances. Tu peux aussi choisir le lot d'un client dans sa fiche.</div>
+    <div id="lots"></div>
+    <div class="seg" style="margin-top:10px"><button id="lBon" class="on">Bon au stand</button><button id="lPts">Des points</button></div>
+    <div class="petitchamp"><input id="lLib" placeholder="Nom du lot"><input id="lPtsVal" type="number" inputmode="numeric" min="1" placeholder="Points" style="display:none"></div>
+    <div class="petitchamp"><span style="align-self:center;font-size:15px">Chance (plus c'est haut, plus il sort)</span><input id="lChance" type="number" inputmode="numeric" min="0" value="10"></div>
+    <button class="vert" id="btnAjLot">Ajouter ce lot</button>
+    <div class="err" id="errLot"></div>
+  </div>
+  <div class="bloc">
+    <h2>📍 Ma tournée</h2>
+    <div class="meta">Les clients voient l'étape en cours et les prochaines sur leur carte, avec un bouton itinéraire.</div>
+    <div id="tourListe"></div>
+    <h2 style="margin-top:14px" id="tourTitre">Ajouter une étape</h2>
+    <input id="tVille" placeholder="Ville (ex : Toulouse)" style="margin-top:6px">
+    <input id="tLieu" placeholder="Lieu (ex : Parc des expositions)" style="margin-top:8px">
+    <input id="tAdr" placeholder="Adresse pour l'itinéraire" style="margin-top:8px">
+    <div class="petitchamp"><span style="align-self:center;font-size:14px">Du</span><input id="tDeb" type="date"></div>
+    <div class="petitchamp"><span style="align-self:center;font-size:14px">Au</span><input id="tFin" type="date"></div>
+    <textarea id="tHor" rows="3" placeholder="Horaires (une ligne par cas)" style="width:100%;margin-top:8px;font:inherit;font-size:16px;padding:10px;border:3px solid var(--encre);border-radius:10px"></textarea>
+    <button class="vert" id="btnTour">Ajouter l'étape</button>
+    <button class="gris" id="btnTourAnn" hidden>Annuler la modification</button>
+    <div class="ok" id="okTour"></div><div class="err" id="errTour"></div>
   </div>
   <div class="bloc">
     <h2>🤝 Parrainage</h2>
@@ -220,7 +272,7 @@ async function ouvrir(p){
     if(!(await rpc('ibz_verifier_pin',{p_pin:p}))){montre('errPin','Code incorrect');return}
     PIN=p;try{localStorage.setItem('ibz_pin',p)}catch(e){}
     $('vuePin').style.display='none';$('vueCaisse').style.display='block';$('btnSortir').style.display='inline';
-    journal();liste();stats();chargerBonus();actifs();
+    journal();liste();stats();chargerBonus();actifs();chargerLots();chargerTour();
   }catch(e){montre('errPin',e.message)}
 }
 $('btnPin').onclick=()=>ouvrir($('pin').value.trim());
@@ -268,7 +320,7 @@ function choisir(c){
   client=c;$('vueClient').style.display='block';$('qrRecup').innerHTML='';
   $('cNom').textContent=c.prenom+(c.nom?' '+c.nom:'');$('cMeta').textContent='Code '+c.code+(c.tel?' · '+c.tel:'');
   $('cSolde').textContent=c.points;montre('okMsg','');montre('errClient','');
-  majCible();bonsClient();fiche();$('vueClient').scrollIntoView({behavior:'smooth'});
+  enAttente=0;majValid();majCible();bonsClient();fiche();jeuClient();historique();$('vueClient').scrollIntoView({behavior:'smooth'});
 }
 function demanderCode(d){return new Promise(res=>{
   const m=$('pad');let v='';const aff=()=>{$('padAff').textContent='●'.repeat(v.length)+'○'.repeat(4-v.length)};
@@ -280,29 +332,47 @@ function demanderCode(d){return new Promise(res=>{
     if(v.length<4){v+=k;aff();if(v.length===4)setTimeout(()=>fin(v),150)}};
 });}
 let motifPad=null;
-async function mouvement(d,article){
+async function mouvement(d,article,valide){
   if(!client||occupe)return;occupe=true;montre('errClient','');montre('okMsg','');
   try{
     let code=null;
     motifPad=article?article.libelle:null;
-    if(d<0&&!confirm('Retirer '+(-d)+' points à '+client.prenom+(client.nom?' '+client.nom:'')+' pour un cadeau ?')){occupe=false;return}
+    if(d<0&&!valide&&!confirm('Retirer '+(-d)+' points à '+client.prenom+(client.nom?' '+client.nom:'')+' pour un cadeau ?')){occupe=false;return}
     const s=article
       ?await rpc('ibz_echanger',{p_pin:PIN,p_client:client.id,p_article:article.id,p_secret:code})
       :await rpc('ibz_mouvement2',{p_pin:PIN,p_id:client.id,p_delta:d,p_motif:d>0?'Points gagnés':'Cadeau au stand',p_secret:code});
     if(s===null)throw new Error('Code caisse incorrect, reverrouille et retape le code');
     if(s===-1)throw new Error('Code secret incorrect. Après 5 erreurs, la carte est bloquée 15 minutes.');
     client.points=s;$('cSolde').textContent=s;
-    montre('okMsg',d>0?('+'+d+' points ajoutés'):('🎁 '+(-d)+' points utilisés : donne-lui son cadeau !'));journal();liste();stats();fiche();
+    montre('okMsg',d>0?('✅ +'+d+' point'+(d>1?'s':'')+' ajouté'+(d>1?'s':'')+' : '+client.prenom+' a maintenant '+s+' points'):('🎁 '+(-d)+' points utilisés : donne-lui son cadeau !'));journal();liste();stats();fiche();jeuClient();
   }catch(e){montre('errClient',e.message)}
   occupe=false;
 }
-document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{const d=parseInt(b.dataset.d,10);
-  if(d<0&&client&&client.points<-d){montre('errClient','Pas assez de points ('+client.points+')');return}
-  mouvement(d)});
+// Validation : les boutons s'additionnent, puis on valide
+let enAttente=0;
+function majValid(){const v=$('valid');if(!client||!enAttente){v.hidden=true;return}
+  v.hidden=false;v.className='valid '+(enAttente>0?'plus':'moins');
+  $('vAvant').textContent=client.points;$('vOp').textContent=(enAttente>0?'+ ':'− ')+Math.abs(enAttente);
+  const ap=client.points+enAttente;$('vApres').textContent=ap;
+  $('vTxt').textContent=enAttente>0?('Ajouter '+enAttente+' point'+(enAttente>1?'s':'')+' à '+client.prenom+(client.nom?' '+client.nom:'')+' ?')
+    :(ap<0?'⚠️ Pas assez de points ('+client.points+')':'Retirer '+(-enAttente)+' points pour un cadeau ?');
+  $('vOk').disabled=ap<0;v.scrollIntoView({behavior:'smooth',block:'nearest'})}
+document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{if(!client)return;const d=parseInt(b.dataset.d,10);
+  if(enAttente&&Math.sign(enAttente)!==Math.sign(d))enAttente=0;
+  enAttente+=d;montre('okMsg','');montre('errClient','');majValid()});
 $('btnAutre').onclick=()=>{const v=prompt('Nombre de points (ex : 20 pour ajouter, -15 pour un cadeau)');
-  const n=parseInt(v,10);if(n)mouvement(n)};
-
-$('btnFermer').onclick=()=>{client=null;cible='tous';majCible();$('vueClient').style.display='none';$('recherche').value='';window.scrollTo({top:0,behavior:'smooth'})};
+  const n=parseInt(v,10);if(n){enAttente=n;majValid()}};
+$('vAnn').onclick=()=>{enAttente=0;majValid()};
+$('vOk').onclick=async()=>{const d=enAttente;if(!d)return;$('vOk').disabled=true;await mouvement(d,null,true);enAttente=0;majValid();historique()};
+async function historique(){const z=$('histListe');z.innerHTML='';if(!client)return;
+  try{const d=await rpc('ibz_historique_client',{p_pin:PIN,p_id:client.id});
+    if(!d.length){z.innerHTML='<div class="meta">Aucune opération.</div>';return}
+    d.forEach(o=>{const r=document.createElement('div');r.className='hl2';r.innerHTML='<span><b></b><small></small></span><span></span>';
+      const h=new Date(o.heure);r.querySelector('b').textContent=h.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'})+' à '+h.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+      r.querySelector('small').textContent=o.motif||'';const v=r.lastChild;v.textContent=(o.delta>0?'+':'')+o.delta+' → '+o.solde_apres;v.className=o.delta>0?'plus':(o.delta<0?'moins':'');
+      z.appendChild(r)});
+  }catch(e){}}
+$('btnFermer').onclick=()=>{client=null;enAttente=0;majValid();cible='tous';majCible();$('vueClient').style.display='none';$('recherche').value='';window.scrollTo({top:0,behavior:'smooth'})};
 $('btnRecup').onclick=()=>{
   const base=location.href.replace(/caisse\.html.*$/,'');$('qrRecup').innerHTML='';
   new QRCode($('qrRecup'),{text:base+'#id='+client.id,width:200,height:200});
@@ -324,6 +394,68 @@ async function stats(){try{const d=await rpc('ibz_resume_jour',{p_pin:PIN});if(!
   const z=$('stats');z.innerHTML='';items.forEach(([v,l])=>{const e=document.createElement('div');e.innerHTML='<b></b><span></span>';
     e.firstChild.textContent=v;e.lastChild.textContent=l;z.appendChild(e)});}catch(e){}}
 $('btnStats').onclick=stats;
+// Tournée
+let tour=[],tEdit=null;
+const fD=d=>new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+async function chargerTour(){try{tour=await rpc('ibz_tournee_tout',{p_pin:PIN})||[];const z=$('tourListe');z.innerHTML='';
+  if(!tour.length){z.innerHTML='<div class="meta">Aucune étape.</div>';return}
+  tour.forEach(t=>{const r=document.createElement('div');r.className='tr'+(t.visible?'':' off');
+    r.innerHTML='<span><b></b><small></small></span><span class="bt"><button class="gris">Modifier</button><button></button></span>';
+    r.querySelector('b').textContent=t.ville+(t.lieu?' · '+t.lieu:'');r.querySelector('small').textContent=fD(t.date_debut)+' → '+fD(t.date_fin)+(t.visible?'':' · cachée');
+    const [bm,bc]=r.querySelectorAll('.bt button');bc.textContent=t.visible?'Cacher':'Remettre';bc.className=t.visible?'gris':'vert';
+    bm.onclick=()=>{tEdit=t.id;$('tVille').value=t.ville;$('tLieu').value=t.lieu||'';$('tAdr').value=t.adresse||'';$('tDeb').value=t.date_debut;$('tFin').value=t.date_fin;$('tHor').value=t.horaires||'';
+      $('btnTour').textContent='Enregistrer la modification';$('tourTitre').textContent='Modifier l\'étape';$('btnTourAnn').hidden=false;$('tVille').scrollIntoView({behavior:'smooth',block:'center'})};
+    bc.onclick=()=>enregTour(t.id,t.ville,t.lieu,t.adresse,t.horaires,t.date_debut,t.date_fin,!t.visible);
+    z.appendChild(r)});
+}catch(e){}}
+function resetTour(){tEdit=null;['tVille','tLieu','tAdr','tDeb','tFin','tHor'].forEach(k=>$(k).value='');$('btnTour').textContent='Ajouter l\'étape';$('tourTitre').textContent='Ajouter une étape';$('btnTourAnn').hidden=true}
+async function enregTour(id,v,l,a,h,d,f,vis){montre('okTour','');montre('errTour','');
+  try{const r=await rpc('ibz_tournee_enregistrer',{p_pin:PIN,p_id:id,p_ville:v,p_lieu:l,p_adresse:a,p_horaires:h,p_debut:d||null,p_fin:f||null,p_visible:vis});
+    if(r===null)throw new Error('Code caisse incorrect');montre('okTour','Tournée mise à jour');chargerTour();return true}catch(e){montre('errTour',e.message);return false}}
+$('btnTour').onclick=async()=>{if(await enregTour(tEdit,$('tVille').value,$('tLieu').value,$('tAdr').value,$('tHor').value,$('tDeb').value,$('tFin').value,true))resetTour()};
+$('btnTourAnn').onclick=resetTour;
+
+// Machine à sous : lots
+let lots=[],lType='bon';
+function majLType(){$('lBon').className=lType==='bon'?'on':'';$('lPts').className=lType==='points'?'on':'';$('lPtsVal').style.display=lType==='points'?'block':'none'}
+$('lBon').onclick=()=>{lType='bon';majLType()};$('lPts').onclick=()=>{lType='points';majLType()};
+async function chargerLots(){try{lots=await rpc('ibz_lots',{p_pin:PIN})||[];afficherLots();jeuClient()}catch(e){}}
+function afficherLots(){const z=$('lots');z.innerHTML='';
+  const tot=lots.filter(l=>l.actif).reduce((t,l)=>t+l.chance,0);
+  if(!lots.length){z.innerHTML='<div class="meta">Aucun lot.</div>';return}
+  lots.forEach(l=>{const r=document.createElement('div');r.className='lot'+(l.actif?'':' off');
+    r.innerHTML='<span><b></b><br><small></small></span><span class="bt"><button class="gris">Modifier</button><button></button></span>';
+    r.querySelector('b').textContent=l.libelle;
+    r.querySelector('small').textContent=(l.type==='points'?'+'+l.points+' points':'Bon au stand')+' · '+(l.actif&&tot?Math.round(l.chance/tot*100)+' % de chances':'caché');
+    const [bm,bc]=r.querySelectorAll('.bt button');bc.textContent=l.actif?'Cacher':'Remettre';bc.className=l.actif?'gris':'vert';
+    bm.onclick=()=>{const n=prompt('Nom du lot',l.libelle);if(n===null)return;
+      let pts=l.points;if(l.type==='points'){pts=parseInt(prompt('Nombre de points',l.points),10);if(!(pts>0))return}
+      const ch=parseInt(prompt('Chance (ex : 10)',l.chance),10);if(!(ch>=0))return;
+      enregLot(l.id,n,l.type,pts,ch,l.actif)};
+    bc.onclick=()=>enregLot(l.id,l.libelle,l.type,l.points,l.chance,!l.actif);
+    z.appendChild(r)});
+}
+async function enregLot(id,lib,type,pts,ch,act){montre('errLot','');
+  try{const r=await rpc('ibz_lot_enregistrer',{p_pin:PIN,p_id:id,p_libelle:lib,p_type:type,p_points:pts,p_chance:ch,p_actif:act});
+    if(r===null)throw new Error('Code caisse incorrect');chargerLots()}catch(e){montre('errLot',e.message)}}
+$('btnAjLot').onclick=async()=>{const l=$('lLib').value.trim(),p=parseInt($('lPtsVal').value,10)||0,c=parseInt($('lChance').value,10);
+  if(!l)return montre('errLot','Mets un nom de lot');await enregLot(null,l,lType,p,isNaN(c)?10:c,true);$('lLib').value='';$('lPtsVal').value=''};
+async function jeuClient(){const z=$('cJeu');z.innerHTML='';if(!client)return;
+  try{const d=await rpc('ibz_jeu_client',{p_pin:PIN,p_client:client.id});if(!d.length)return;const j=d[d.length-1];
+    const box=document.createElement('div');box.className='jeuC';
+    if(j.joue_at){box.innerHTML='<b>🎰 Machine à sous déjà jouée</b><div class="meta"></div><button class="gris">Lui redonner une partie</button>';
+      box.querySelector('.meta').textContent='Gagné : '+(j.libelle_gagne||'?')+' le '+new Date(j.joue_at).toLocaleDateString('fr-FR');
+      box.querySelector('button').onclick=async()=>{if(!confirm('Redonner une partie de machine à sous à '+client.prenom+' ?'))return;
+        try{const r=await rpc('ibz_rejouer',{p_pin:PIN,p_jeu:j.id});if(r===null)throw new Error('Code caisse incorrect');montre('okMsg','Partie de machine à sous redonnée');jeuClient()}catch(e){montre('errClient',e.message)}};
+    }else{box.innerHTML='<b>🎰 Machine à sous disponible (pas encore jouée)</b><div class="meta">Choisir ce qu\'il va gagner :</div><select></select>';
+      const sel=box.querySelector('select');const o0=document.createElement('option');o0.value='';o0.textContent='Au hasard (selon les chances)';sel.appendChild(o0);
+      lots.filter(l=>l.actif).forEach(l=>{const o=document.createElement('option');o.value=l.id;o.textContent=l.libelle;if(String(j.lot_force)===String(l.id))o.selected=true;sel.appendChild(o)});
+      sel.onchange=async()=>{try{const r=await rpc('ibz_forcer_lot',{p_pin:PIN,p_jeu:j.id,p_lot:sel.value?parseInt(sel.value,10):null});
+        if(r===null)throw new Error('Code caisse incorrect');montre('okMsg',sel.value?('Il gagnera : '+sel.options[sel.selectedIndex].text):'Lot au hasard')}catch(e){montre('errClient',e.message)}};
+    }
+    z.appendChild(box);
+  }catch(e){}}
+
 async function actifs(){const z=$('actifs');z.innerHTML='';
   try{const d=await rpc('ibz_cadeaux_actifs',{p_pin:PIN});
     if(!d.length){z.innerHTML='<div class="meta">Aucune surprise en cours.</div>';return}
