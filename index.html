@@ -109,6 +109,19 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--encre)}
 .slot button.sec{background:#fff;color:var(--encre)}
 
 /* Accueil coloré */
+.ou{margin-top:14px;background:linear-gradient(135deg,#fff3b0,#ffe0ec);border:3px solid #ff1744;border-radius:16px;padding:12px;text-align:left}
+.ou h4{font-family:'Luckiest Guy',sans-serif;font-weight:400;font-size:19px;color:#ff1744;margin:0 0 8px;letter-spacing:.5px}
+.etap{background:#fff;border:2px solid #ffc2d1;border-radius:12px;padding:10px 12px;margin-top:8px;color:#2a0f4f}
+.etap.maint{border:3px solid #00c853}
+.etap .badgeM{display:inline-block;background:#00c853;color:#fff;font-weight:800;font-size:12px;padding:2px 8px;border-radius:10px;margin-bottom:4px}
+.etap .badgeP{display:inline-block;background:#7c3aed;color:#fff;font-weight:800;font-size:12px;padding:2px 8px;border-radius:10px;margin-bottom:4px}
+.etap .v{font-family:'Luckiest Guy',sans-serif;font-size:20px;color:#2a0f4f;letter-spacing:.5px}
+.etap .l{font-size:14px;font-weight:700;color:#c2185b}
+.etap .d{font-size:14px;margin-top:2px}
+.etap .h{font-size:13px;line-height:1.4;margin-top:6px;white-space:pre-line;background:#f6f0ff;border-radius:8px;padding:6px 8px}
+.etap .auj{font-size:14px;font-weight:800;color:#00a63e;margin-top:6px}
+.etap a.iti{display:block;text-align:center;margin-top:8px;background:#0077c8;color:#fff;text-decoration:none;font-weight:800;padding:10px;border-radius:10px;border:3px solid #2a0f4f}
+
 .svBtn{background:#0077c8;font-size:18px;margin:2px 0 4px}
 .gOv{position:fixed;inset:0;z-index:60;background:rgba(30,8,60,.92);overflow-y:auto;padding:max(14px,env(safe-area-inset-top,0px)) max(14px,env(safe-area-inset-right,0px)) max(20px,env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px))}
 .gBox{position:relative;max-width:380px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:12px;color:#fff}
@@ -358,6 +371,10 @@ button{background:#ff1744}
     <div id="qr"></div>
     <div class="code" id="code"></div>
     <div class="info">Montre ce QR code au stand pour gagner des points ou les échanger contre un cadeau au stand.</div>
+    <div class="ou" id="ou" hidden>
+      <h4>📍 Où trouver IBIZOU</h4>
+      <div id="ouListe"></div>
+    </div>
     <div class="sauve" id="sauve">
       <h4>📲 Garde ton appli sur ton téléphone</h4>
       <p class="sv-intro">Ajoute IBIZOU sur ton écran d'accueil : tu l'ouvres en 1 seconde, comme une vraie appli, sans rien télécharger.</p>
@@ -417,7 +434,7 @@ async function afficherCarte(){
   try{history.replaceState(null,'',location.pathname+'#id='+monId)}catch(e){}
   $('vueInscription').style.display='none';$('vueRecup').style.display='none';$('vueCarte').style.display='block';
   new QRCode($('qr'),{text:'IBZ:'+monId,width:220,height:220,correctLevel:QRCode.CorrectLevel.M});
-  await rafraichir();verifierCadeaux();bons();verifierJeu();
+  await rafraichir();verifierCadeaux();bons();verifierJeu();tournee();
   setInterval(rafraichir,4000);setInterval(verifierCadeaux,8000);setInterval(bons,8000);
 }
 async function rafraichir(){
@@ -550,6 +567,30 @@ $('gEssai').onclick=()=>{fermerGuide();if(estInstalle)return;
 document.addEventListener('visibilitychange',()=>{if(document.hidden)$('mainBas').hidden=true});
 if(estInstalle){$('sauve').hidden=true;$('svOk').hidden=false}
 function guideApresInscription(){if(estInstalle)return;let vu=null;try{vu=localStorage.getItem('ibz_guide_vu')}catch(e){}if(!vu)setTimeout(()=>ouvrirGuide(true),900)}
+
+// Tournée
+function horaireDuJour(t){const d=new Date();const j=d.getDay();
+  if(!t.horaires)return '';
+  const lignes=t.horaires.split('\n');
+  const jour=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'][j];
+  const mois=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'][d.getMonth()];
+  const net=l=>l.includes(':')?l.replace(/^[^:]*:\s*/,''):l.replace(/^tous les jours\s*(de\s*)?/i,'');
+  const exact=lignes.find(l=>l.toLowerCase().startsWith(d.getDate()+' '+mois));if(exact)return net(exact);
+  const j2=lignes.find(l=>l.toLowerCase().includes(jour));if(j2)return net(j2);
+  return net(lignes[0])}
+const fmtD=d=>new Date(d+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long'});
+async function tournee(){try{const d=await rpc('ibz_tournee_public',{});const z=$('ouListe');z.innerHTML='';
+  if(!d||!d.length){$('ou').hidden=true;return}$('ou').hidden=false;
+  d.slice(0,3).forEach((t,k)=>{const e=document.createElement('div');e.className='etap'+(t.en_cours?' maint':'');
+    e.innerHTML='<span></span><div class="v"></div><div class="l"></div><div class="d"></div><div class="auj" hidden></div><div class="h" hidden></div><a class="iti" target="_blank" rel="noopener" hidden>🗺️ Y aller (itinéraire)</a>';
+    const b=e.firstChild;b.className=t.en_cours?'badgeM':'badgeP';b.textContent=t.en_cours?'EN CE MOMENT':(k===0?'PROCHAINE ÉTAPE':'ENSUITE');
+    e.querySelector('.v').textContent=t.ville;e.querySelector('.l').textContent=t.lieu||'';
+    e.querySelector('.d').textContent=(t.en_cours?'Jusqu\'au ':'Du '+fmtD(t.date_debut)+' au ')+fmtD(t.date_fin);
+    if(t.en_cours&&t.horaires){const a=e.querySelector('.auj');a.hidden=false;a.textContent='🕐 Aujourd\'hui : '+horaireDuJour(t)}
+    if(t.horaires){const h=e.querySelector('.h');h.hidden=false;h.textContent=t.horaires}
+    if(t.adresse||t.lieu){const a=e.querySelector('a.iti');a.hidden=false;a.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(t.adresse||(t.lieu+' '+t.ville))}
+    z.appendChild(e)});
+}catch(e){}}
 // Bons cadeaux
 async function bons(){try{const d=await rpc('ibz_mes_bons',{p_id:monId});const l=$('bonsListe');l.innerHTML='';
   $('bons').style.display=d&&d.length?'block':'none';
