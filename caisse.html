@@ -138,6 +138,11 @@ body.employe .patron{display:none!important}
 @media print{@page{size:A4;margin:0}body>*{display:none!important}body>.affOv{display:block!important;position:static;padding:0;background:none}
   .affBarre{display:none!important}.affiche{max-width:none;width:210mm;height:297mm;border-radius:0;padding:12mm 12mm}
   .affTitre{font-size:30pt}.affSous{font-size:13pt}.affScan{font-size:20pt}.affPetit{font-size:10pt}.affBloc{font-size:11pt}.affBloc h3{font-size:16pt}.affEtapes{font-size:15pt}}
+.notifs{position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top,0px));z-index:80;display:grid;gap:8px;width:min(92vw,420px);pointer-events:none}
+.notif{pointer-events:auto;background:#00c853;color:#fff;border:3px solid #2a0f4f;border-radius:14px;box-shadow:4px 4px 0 #2a0f4f;padding:12px 14px;font-weight:800;font-size:16px;display:flex;justify-content:space-between;align-items:center;gap:10px;animation:notifIn .4s}
+.notif small{display:block;font-weight:600;font-size:13px;opacity:.9}
+.notif button{width:auto;margin:0;padding:6px 10px;font-size:13px;background:#fff;color:#2a0f4f}
+@keyframes notifIn{from{transform:translateY(-30px);opacity:0}}
 #pad button{margin:0;font-size:26px;padding:14px 0;background:#6b3fb3}
 
 /* Mise en avant des éléments importants */
@@ -161,6 +166,7 @@ body.employe .patron{display:none!important}
 <header><div class="logo">IBIZOU · Caisse</div><button class="lien" id="btnSortir" style="display:none">Verrouiller</button></header>
 <div class="qui" id="qui"></div>
 <div class="horsligne" id="horsligne" hidden></div>
+<div class="notifs" id="notifs"></div>
 
 <div class="bloc" id="vuePin">
   <h2>Code caisse</h2>
@@ -522,6 +528,21 @@ async function stats(){try{const d=await rpc('ibz_resume_jour',{p_pin:PIN});if(!
   const z=$('stats');z.innerHTML='';items.forEach(([v,l])=>{const e=document.createElement('div');e.innerHTML='<b></b><span></span>';
     e.firstChild.textContent=v;e.lastChild.textContent=l;z.appendChild(e)});}catch(e){}}
 $('btnStats').onclick=stats;
+// Notification nouveau client
+let idsConnus=null;
+function nouveauxClients(d){const ids=new Set(d.map(c=>c.id));
+  if(idsConnus){d.filter(c=>!idsConnus.has(c.id)).slice(0,5).forEach(c=>{
+    const n=document.createElement('div');n.className='notif';
+    n.innerHTML='<span>🎉 Nouveau client inscrit !<small></small></span><button type="button">Voir</button>';
+    n.querySelector('small').textContent=(c.nom?c.prenom+' '+c.nom:'Carte sans nom')+' · code '+c.code;
+    n.querySelector('button').onclick=()=>{choisir(c);n.remove()};
+    $('notifs').appendChild(n);setTimeout(()=>n.remove(),12000);
+    try{navigator.vibrate&&navigator.vibrate([150,80,150])}catch(e){}
+    try{const a=new (window.AudioContext||window.webkitAudioContext)();const o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);
+      o.frequency.value=880;g.gain.value=.15;o.start();o.frequency.setValueAtTime(1320,a.currentTime+.12);o.stop(a.currentTime+.3)}catch(e){}
+  })}
+  idsConnus=ids}
+
 // Page Notre histoire
 const RUB={actu:'📰 Actualité',nouveaute:'✨ Nouveauté',jeu:'🎯 Jeu',histoire:'📖 Histoire',archives:'📷 Archive'};
 let cEdit=null,cPhotoData=null;
@@ -814,7 +835,7 @@ $('btnOffrir').onclick=async()=>{
 };
 let tousClients=[];
 async function liste(){
-  try{const d=await rpc('ibz_liste_clients2',{p_pin:PIN});tousClients=d||[];afficherListe();try{localStorage.setItem('ibz_cache_clients',JSON.stringify(tousClients))}catch(e){}
+  try{const d=await rpc('ibz_liste_clients2',{p_pin:PIN});nouveauxClients(d||[]);tousClients=d||[];afficherListe();try{localStorage.setItem('ibz_cache_clients',JSON.stringify(tousClients))}catch(e){}
     $('majListe').textContent='Mis à jour à '+new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+' · se met à jour tout seul';
   }catch(e){}
 }
