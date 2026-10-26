@@ -116,6 +116,9 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--encre)}
 .ac b{display:block;font-size:15px;line-height:1.25}
 .ac p{margin:3px 0 0;font-size:13px;line-height:1.35;opacity:.85;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .ac small{display:block;font-size:11px;font-weight:800;color:#7c3aed;text-transform:uppercase;letter-spacing:.4px}
+.ac.une{flex-direction:column;gap:8px;padding:10px}
+.ac.une img{width:100%;height:auto;max-height:340px;object-fit:cover;border-width:3px}
+.ac.une b{font-size:18px}.ac.une p{-webkit-line-clamp:4;font-size:14px}
 .actusTout{display:block;text-align:center;margin-top:10px;font-weight:800;color:#7c3aed;text-decoration:none}
 
 .decouvre{display:block;text-align:center;margin-top:14px;background:#fff;color:#2a0f4f;text-decoration:none;font-weight:800;font-size:16px;padding:13px;border-radius:14px;border:3px solid #2a0f4f;box-shadow:4px 4px 0 #2a0f4f}
@@ -701,7 +704,7 @@ async function passages(){if(!monId)return;try{const d=await rpc('ibz_mes_passag
 async function actus(){try{const d=await rpc('ibz_contenu_public',{});const l=(d||[]).filter(x=>x.rubrique==='actu'||x.rubrique==='nouveaute')
     .sort((a,b)=>(a.rubrique==='actu'?0:1)-(b.rubrique==='actu'?0:1)||new Date(b.created_at)-new Date(a.created_at)||b.id-a.id).slice(0,3);
   const z=$('actusListe');z.innerHTML='';$('actus').hidden=!l.length;
-  l.forEach(x=>{const e=document.createElement('a');e.className='ac';e.href='actus.html#'+(x.rubrique==='actu'?'actu':'nouv');e.style.textDecoration='none';
+  l.forEach((x,k)=>{const e=document.createElement('a');e.className='ac'+(k===0&&x.photo?' une':'');e.href='actus.html#'+(x.rubrique==='actu'?'actu':'nouv');e.style.textDecoration='none';
     if(x.photo){const i=document.createElement('img');i.src=x.photo;i.alt='';i.loading='lazy';e.appendChild(i)}
     const t=document.createElement('div');t.innerHTML='<small></small><b></b><p></p>';
     t.querySelector('small').textContent=x.rubrique==='actu'?'Actu':'Nouveauté';t.querySelector('b').textContent=x.titre;t.querySelector('p').textContent=x.texte||'';
