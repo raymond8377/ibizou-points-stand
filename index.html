@@ -109,6 +109,15 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--encre)}
 .slot button.sec{background:#fff;color:var(--encre)}
 
 /* Accueil coloré */
+.actus{margin-top:14px;background:linear-gradient(135deg,#f3e8ff,#ffe0ec);border:3px solid #7c3aed;border-radius:16px;padding:12px;text-align:left}
+.actus h4{font-family:'Luckiest Guy',sans-serif;font-weight:400;font-size:20px;color:#7c3aed;margin:0 0 8px;letter-spacing:.5px}
+.ac{display:flex;gap:10px;background:#fff;border-radius:12px;padding:8px;margin-top:8px;color:#2a0f4f;align-items:flex-start}
+.ac img{width:76px;height:76px;object-fit:cover;border-radius:10px;flex:none;border:2px solid #2a0f4f}
+.ac b{display:block;font-size:15px;line-height:1.25}
+.ac p{margin:3px 0 0;font-size:13px;line-height:1.35;opacity:.85;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.ac small{display:block;font-size:11px;font-weight:800;color:#7c3aed;text-transform:uppercase;letter-spacing:.4px}
+.actusTout{display:block;text-align:center;margin-top:10px;font-weight:800;color:#7c3aed;text-decoration:none}
+
 .decouvre{display:block;text-align:center;margin-top:14px;background:#fff;color:#2a0f4f;text-decoration:none;font-weight:800;font-size:16px;padding:13px;border-radius:14px;border:3px solid #2a0f4f;box-shadow:4px 4px 0 #2a0f4f}
 .rgpd{margin-top:16px;display:grid;gap:8px}
 .coche{display:flex;gap:10px;align-items:flex-start;background:#f6f0ff;border:2px solid #d9c8ff;border-radius:12px;padding:10px;font-size:14px;line-height:1.35;color:#2a0f4f;cursor:pointer;margin:0}
@@ -408,6 +417,11 @@ button{background:#ff1744}
     <div id="qr"></div>
     <div class="code" id="code"></div>
     <div class="info">Montre ce QR code au stand pour gagner des points ou les échanger contre un cadeau au stand.</div>
+    <div class="actus" id="actus" hidden>
+      <h4>📰 L'actu du stand</h4>
+      <div id="actusListe"></div>
+      <a class="actusTout" href="histoire.html#actu">Toutes les actus, nouveautés et jeux →</a>
+    </div>
     <div class="top" id="top" hidden>
       <h4>🏅 Top joueurs <span id="topFoire"></span></h4>
       <ol id="topListe"></ol>
@@ -483,7 +497,7 @@ async function afficherCarte(){
   try{history.replaceState(null,'',location.pathname+'#id='+monId)}catch(e){}
   $('vueInscription').style.display='none';$('vueRecup').style.display='none';$('vueCarte').style.display='block';
   new QRCode($('qr'),{text:'IBZ:'+monId,width:220,height:220,correctLevel:QRCode.CorrectLevel.M});
-  await rafraichir();verifierCadeaux();bons();verifierJeu();tournee();concours();classement();passages();
+  await rafraichir();verifierCadeaux();bons();verifierJeu();tournee();concours();classement();passages();actus();
   setInterval(rafraichir,4000);setInterval(verifierCadeaux,8000);setInterval(bons,8000);setInterval(verifierJeu,20000);setInterval(concours,20000);setInterval(classement,30000);
 }
 async function rafraichir(){
@@ -680,6 +694,17 @@ async function passages(){if(!monId)return;try{const d=await rpc('ibz_mes_passag
   d.forEach(o=>{const r=document.createElement('div');r.className='pas';r.innerHTML='<span><b></b><small></small></span><span></span>';
     const h=new Date(o.heure);r.querySelector('b').textContent=h.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'})+' à '+h.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
     r.querySelector('small').textContent=o.motif||'';const v=r.lastChild;v.textContent=o.delta?((o.delta>0?'+':'')+o.delta+' pts'):'🎟️';v.className=o.delta>0?'p':(o.delta<0?'m':'');z.appendChild(r)});
+}catch(e){}}
+
+// Actus du stand sous le QR
+async function actus(){try{const d=await rpc('ibz_contenu_public',{});const l=(d||[]).filter(x=>x.rubrique==='actu'||x.rubrique==='nouveaute')
+    .sort((a,b)=>(a.rubrique==='actu'?0:1)-(b.rubrique==='actu'?0:1)||new Date(b.created_at)-new Date(a.created_at)||b.id-a.id).slice(0,3);
+  const z=$('actusListe');z.innerHTML='';$('actus').hidden=!l.length;
+  l.forEach(x=>{const e=document.createElement('a');e.className='ac';e.href='histoire.html#'+(x.rubrique==='actu'?'actu':'nouv');e.style.textDecoration='none';
+    if(x.photo){const i=document.createElement('img');i.src=x.photo;i.alt='';i.loading='lazy';e.appendChild(i)}
+    const t=document.createElement('div');t.innerHTML='<small></small><b></b><p></p>';
+    t.querySelector('small').textContent=x.rubrique==='actu'?'Actu':'Nouveauté';t.querySelector('b').textContent=x.titre;t.querySelector('p').textContent=x.texte||'';
+    e.appendChild(t);z.appendChild(e)});
 }catch(e){}}
 // Bons cadeaux
 async function bons(){try{const d=await rpc('ibz_mes_bons',{p_id:monId});const l=$('bonsListe');l.innerHTML='';
