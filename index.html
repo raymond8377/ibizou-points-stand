@@ -311,6 +311,79 @@ button{background:#ff1744}
 #pSecret,#rSecret{border-color:#ff1744;background:#fff8d6}
 .e3 label[for="secret"]{color:#7c3aed}
 #vueInscription #secret{border-color:#7c3aed;background:#f6f0ff}
+.fun{margin-top:14px;background:radial-gradient(circle at 50% 0,#5b21b6 0,#2a0f4f 70%);border:4px solid #ffd400;border-radius:20px;padding:14px 12px 16px;text-align:left;color:#fff;box-shadow:0 0 0 3px #2a0f4f,0 8px 22px rgba(42,15,79,.35)}
+.funTete{display:flex;align-items:center;justify-content:center;gap:8px}
+.fun h4{font-family:'Luckiest Guy',sans-serif;font-weight:400;font-size:26px;color:#ffd400;margin:0;letter-spacing:1px;text-shadow:2px 2px 0 #ff1744}
+.funBadge{font-family:'Luckiest Guy',sans-serif;font-size:12px;background:#00c853;color:#fff;padding:3px 8px;border-radius:10px;letter-spacing:1px;transform:rotate(-6deg)}
+.funIntro{font-size:14px;line-height:1.45;margin:8px 0;text-align:center;opacity:.95}
+.funVrai{display:flex;gap:8px;align-items:flex-start;background:rgba(255,212,0,.14);border:2px dashed #ffd400;border-radius:12px;padding:9px 10px;font-size:13px;line-height:1.4;margin-bottom:12px}
+.funVrai b{color:#ffd400}
+.funTabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:rgba(0,0,0,.25);padding:5px;border-radius:14px;margin-bottom:14px}
+.funTabs button{margin:0;padding:10px 6px;font-size:15px;background:transparent;color:#fff;border:0;border-radius:10px;font-weight:800;box-shadow:none;cursor:pointer;font-family:inherit}
+.funTabs button.on{background:#ffd400;color:#2a0f4f}
+.scene{display:flex;flex-direction:column;align-items:center}
+/* Roue */
+.roueBox{position:relative;width:min(100%,300px);aspect-ratio:1;margin:10px auto 0}
+#roue{position:absolute;inset:7%;width:86%;height:86%;transition:transform 5.2s cubic-bezier(.12,.72,.1,1);filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}
+.ampRoue{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,#b8860b 0 62%,#ffd400 64%,#b8860b 70%);box-shadow:inset 0 0 0 4px #2a0f4f,0 0 18px rgba(255,212,0,.5)}
+.ampRoue i{position:absolute;width:9px;height:9px;border-radius:50%;background:#fff;box-shadow:0 0 6px #fff,0 0 12px #ffd400;animation:ampC 1s infinite}
+.ampRoue i:nth-child(even){animation-delay:.5s}
+.tourne .ampRoue i{animation-duration:.18s}
+@keyframes ampC{50%{background:#ffd400;box-shadow:none;opacity:.5}}
+.pointeur{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:17px solid transparent;border-right:17px solid transparent;border-top:36px solid #ff1744;filter:drop-shadow(0 3px 0 #2a0f4f) drop-shadow(0 0 2px #fff);z-index:3}
+.hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:70px;height:70px;border-radius:50%;margin:0;padding:0;background:radial-gradient(circle at 35% 30%,#fff,#ffe9a8 60%,#ffd400);border:5px solid #2a0f4f;font-size:32px;cursor:pointer;z-index:3;box-shadow:0 4px 0 #2a0f4f}
+.hub:active{transform:translate(-50%,-46%);box-shadow:0 1px 0 #2a0f4f}
+/* Machine */
+.cab{position:relative;width:min(calc(100% - 40px),280px);background:linear-gradient(#ff1744,#b0002a);border:5px solid #ffd400;border-radius:24px 24px 16px 16px;padding:12px 12px 16px;box-shadow:0 0 0 3px #2a0f4f,0 0 24px rgba(255,23,68,.5);margin:6px 38px 0 0}
+.cabTop{text-align:center;background:#2a0f4f;border-radius:14px;padding:6px 4px;border:3px solid #ffd400}
+.cabTitre{font-family:'Luckiest Guy',sans-serif;font-size:32px;color:#ffd400;line-height:1;text-shadow:2px 2px 0 #ff1744;letter-spacing:2px}
+.cabSous{font-size:11px;color:#fff;opacity:.85;margin-top:2px}
+.cabAmp{display:flex;justify-content:space-between;margin:10px 4px}
+.cabAmp i{width:10px;height:10px;border-radius:50%;background:#ffd400;box-shadow:0 0 8px #ffd400;animation:ampC 1s infinite}
+.cabAmp i:nth-child(even){animation-delay:.5s}
+.tourne .cabAmp i{animation-duration:.18s}
+.fenetre{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:#2a0f4f;padding:7px;border-radius:12px;border:3px solid #ffd400}
+.frl{height:86px;overflow:hidden;background:linear-gradient(#e9e3f5,#fff 30%,#fff 70%,#e9e3f5);border-radius:8px;position:relative}
+.frl::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(42,15,79,.35),transparent 28%,transparent 72%,rgba(42,15,79,.35));pointer-events:none}
+.fb div{height:86px;display:flex;align-items:center;justify-content:center;font-size:48px}
+.ligneGain{position:absolute;left:2px;right:2px;top:50%;height:3px;background:rgba(255,23,68,.7);transform:translateY(-50%);pointer-events:none;border-radius:2px}
+.frl.gagne{box-shadow:0 0 0 3px #ffd400 inset,0 0 14px #ffd400}
+.levier{position:absolute;right:-34px;top:70px;width:24px;height:110px}
+.levier::before{content:"";position:absolute;left:9px;top:18px;width:7px;height:86px;background:linear-gradient(90deg,#999,#eee,#999);border-radius:4px;transform-origin:50% 100%;transition:transform .25s}
+.levier span{position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff8a9d,#ff1744 60%,#9b0020);border:2px solid #2a0f4f;transition:transform .25s}
+.levier.tire::before{transform:scaleY(-.2) translateY(-10px)}
+.levier.tire span{transform:translateY(96px)}
+/* Communs */
+.funRes{text-align:center;min-height:50px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;margin:12px 0 8px;padding:0 6px}
+.funRes.gros{font-family:'Luckiest Guy',sans-serif;font-weight:400;font-size:22px;line-height:1.15;width:100%;text-wrap:balance;color:#ffd400;text-shadow:2px 2px 0 #ff1744;animation:funPop .5s}
+@keyframes funPop{50%{transform:scale(1.15)}}
+.funBtn{width:100%;font-family:'Luckiest Guy',sans-serif;font-size:23px;letter-spacing:1.5px;padding:14px;border:3px solid #2a0f4f;border-radius:16px;background:linear-gradient(#ffe866,#ffd400 50%,#f0b400);color:#2a0f4f;box-shadow:0 5px 0 #b8860b,0 8px 14px rgba(0,0,0,.35);cursor:pointer}
+.funBtn:active{transform:translateY(4px);box-shadow:0 1px 0 #b8860b}
+.funBtn:disabled{opacity:.65}
+.funConf{position:fixed;top:-20px;width:10px;height:14px;z-index:90;animation:funTombe linear forwards;pointer-events:none}
+@keyframes funTombe{to{transform:translateY(110vh) rotate(720deg)}}
+@media (prefers-reduced-motion:reduce){.ampRoue i,.cabAmp i{animation:none}}
+.bInfo{display:flex;justify-content:space-between;width:min(100%,320px);font-size:13px;font-weight:700;margin-bottom:8px}
+.bInfo b{color:#ffd400;font-family:'Luckiest Guy',sans-serif;font-weight:400;font-size:18px;letter-spacing:1px;margin-left:3px}
+.bJeu{position:relative;width:min(100%,320px);aspect-ratio:360/600;border:4px solid #ffd400;border-radius:18px;overflow:hidden;box-shadow:0 0 0 3px #2a0f4f,0 0 22px rgba(255,79,163,.45);touch-action:none;user-select:none;-webkit-user-select:none}
+#cBouche{width:100%;height:100%;display:block;touch-action:none}
+.bAide{position:absolute;left:8%;right:8%;bottom:16%;text-align:center;background:rgba(42,15,79,.82);color:#fff;font-weight:800;font-size:14px;line-height:1.35;padding:10px;border-radius:12px;pointer-events:none;animation:bAideP 1.4s infinite}
+@keyframes bAideP{50%{transform:translateY(-6px)}}
+.funTabs3{grid-template-columns:1fr 1fr 1fr}.funTabs3 button{font-size:13px;padding:10px 2px}
+.bScores{width:min(100%,320px);display:grid;gap:10px;margin-top:12px}
+.bTit{display:block;font-family:'Luckiest Guy',sans-serif;font-size:15px;letter-spacing:1px;color:#ffd400;margin-bottom:6px}
+#bLancers{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.lc{height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Luckiest Guy',sans-serif;font-size:18px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.5);border:2px dashed rgba(255,255,255,.35)}
+.lc.lcBon{background:#fff;color:#2a0f4f;border:2px solid #ffd400}
+.lc.lcCinq{background:#ffd400;color:#ff1744;border:2px solid #fff;box-shadow:0 0 10px #ffd400}
+.lc.lcRate{background:rgba(255,23,68,.25);color:#ff8a9d;border:2px solid #ff1744}
+.bTop{background:rgba(0,0,0,.22);border-radius:14px;padding:10px 12px}
+#bTops{list-style:none;margin:0;padding:0;display:grid;gap:5px}
+#bTops li{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.1);border-radius:10px;padding:6px 10px;font-variant-numeric:tabular-nums}
+#bTops li span{width:24px;text-align:center;font-family:'Luckiest Guy',sans-serif}
+#bTops li b{flex:1;color:#ffd400;font-family:'Luckiest Guy',sans-serif;font-weight:400;font-size:17px;letter-spacing:.5px}
+#bTops li small{opacity:.75;font-size:12px}
+#bTops li.vide{opacity:.7;font-size:13px;justify-content:center}
 </style>
 </head>
 <body>
@@ -468,6 +541,51 @@ button{background:#ff1744}
       </div>
       <div class="ok2" id="okProf"></div><div class="err" id="errProf"></div>
     </details>
+<div class="fun" id="fun">
+  <div class="funTete"><span class="funBadge">GRATUIT</span><h4>Pour le fun</h4></div>
+  <p class="funIntro">Joue autant que tu veux à la bouche, à la roue et à la machine à sous : ici, c'est juste pour t'amuser, tu ne gagnes rien.</p>
+  <div class="funVrai">🎁 <span><b>Les vraies parties :</b> de temps en temps, IBIZOU t'offre une vraie partie avec un vrai lot à gagner. Elle apparaît en haut de ta carte avec un bouton doré. Reviens souvent !</span></div>
+  <div class="funTabs funTabs3" role="tablist"><button type="button" id="tBouche" class="on">🎯 Bouche</button><button type="button" id="tRoue">🎡 Roue</button><button type="button" id="tSlot">🎰 Machine</button></div>
+
+  <div id="pBouche" class="scene">
+    <div class="bInfo"><span>Balles <b id="bBalles">●●●●●</b></span><span>Score <b id="bScore">0</b></span><span>Record <b id="bRecord">0</b></span></div>
+    <div class="bJeu"><canvas id="cBouche" width="360" height="600"></canvas><div class="bAide" id="bAide">👆 Glisse ton doigt vers le haut<br>pour lancer la balle dans la bouche !</div></div>
+    <div class="funRes" id="bRes">5 balles : vise la bouche quand elle est ouverte !</div>
+    <button type="button" class="funBtn" id="bRejouer" hidden>REJOUER</button>
+    <div class="bScores">
+      <div class="bLanc"><span class="bTit">Tes 5 lancers</span><div id="bLancers"></div></div>
+      <div class="bTop"><span class="bTit">🏆 Tes meilleurs scores</span><ol id="bTops"></ol></div>
+    </div>
+  </div>
+
+  <div id="pRoue" class="scene" hidden>
+    <div class="roueBox">
+      <div class="ampRoue" id="ampRoue"></div>
+      <canvas id="roue" width="600" height="600"></canvas>
+      <div class="pointeur"></div>
+      <button type="button" class="hub" id="hub" aria-label="Faire tourner">💋</button>
+    </div>
+    <div class="funRes" id="rRes">Appuie sur le bouton pour lancer la roue !</div>
+    <button type="button" class="funBtn" id="bRoue">FAIRE TOURNER</button>
+  </div>
+
+  <div id="pSlot" class="scene" hidden>
+    <div class="cab">
+      <div class="cabTop"><div class="cabTitre">IBIZOU</div><div class="cabSous">Machine à bisous · pour le fun</div></div>
+      <div class="cabAmp"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="fenetre">
+        <div class="frl"><div class="fb" id="f0"><div>💋</div></div></div>
+        <div class="frl"><div class="fb" id="f1"><div>⭐</div></div></div>
+        <div class="frl"><div class="fb" id="f2"><div>🍒</div></div></div>
+        <div class="ligneGain"></div>
+      </div>
+      <div class="levier" id="levier"><span></span></div>
+    </div>
+    <div class="funRes" id="sRes">Appuie sur le bouton pour lancer la machine !</div>
+    <button type="button" class="funBtn" id="bSlot">LANCER</button>
+  </div>
+</div>
+
     <div class="bons" id="bons" style="display:none"><h4>🎁 Mes cadeaux à utiliser</h4><div id="bonsListe"></div></div>
     <div class="err" id="errCarte"></div>
   </div>
@@ -784,6 +902,185 @@ $('btnRecup').onclick=async()=>{
   catch(e){err('errRecup',e.message);$('btnRecup').disabled=false}
 };
 if(monId)afficherCarte();else $('vueInscription').style.display='block';
+
+// Pour le fun : roue + machine à sous, sans gain
+(function(){
+  const g=id=>document.getElementById(id);
+  const SEG=[['💋','BISOU','#ff1744','#b0002a'],['⭐','STAR','#ffb300','#e65100'],['🎉','YOUPI','#8e24aa','#4a148c'],['😜','RATÉ','#00a8e8','#01579b'],
+             ['🍀','CHANCE','#00c853','#1b5e20'],['🔥','TOP','#ff6d00','#bf360c'],['😘','BISOU','#ff4fa3','#ad1457'],['🎈','FÊTE','#2979ff','#1a237e']];
+  const MSG={'💋':'Gros bisou !','⭐':'Tu es une star !','🎉':'Youpi !','😜':'Raté… rejoue !','🍀':'Porte-bonheur !','🔥':'Trop fort !','😘':'Bisou volant !','🎈':"C'est la fête !"};
+  const N=SEG.length,cv=g('roue'),cx=cv.getContext('2d'),W=cv.width,R=W/2;let rot=0,tourne=false;
+  const amp=g('ampRoue');for(let i=0;i<20;i++){const a=i*2*Math.PI/20,e=document.createElement('i');e.style.left=(50+46.5*Math.cos(a))+'%';e.style.top=(50+46.5*Math.sin(a))+'%';e.style.transform='translate(-50%,-50%)';amp.appendChild(e)}
+  function dessine(){cx.clearRect(0,0,W,W);const pas=2*Math.PI/N;
+    for(let i=0;i<N;i++){const a0=-Math.PI/2+i*pas-pas/2,a1=a0+pas;
+      const gr=cx.createRadialGradient(R,R,R*.15,R,R,R);gr.addColorStop(0,SEG[i][2]);gr.addColorStop(1,SEG[i][3]);
+      cx.beginPath();cx.moveTo(R,R);cx.arc(R,R,R-4,a0,a1);cx.closePath();cx.fillStyle=gr;cx.fill();
+      cx.lineWidth=5;cx.strokeStyle='#ffd400';cx.stroke();
+      cx.save();cx.translate(R,R);cx.rotate((a0+a1)/2+Math.PI/2);
+      cx.textAlign='center';cx.textBaseline='middle';cx.font='66px serif';cx.fillText(SEG[i][0],0,-R*.72);
+      cx.font='bold 26px "Luckiest Guy", Arial Black, sans-serif';cx.fillStyle='#fff';cx.strokeStyle='rgba(0,0,0,.45)';cx.lineWidth=5;
+      cx.strokeText(SEG[i][1],0,-R*.5);cx.fillText(SEG[i][1],0,-R*.5);cx.restore()}
+    cx.beginPath();cx.arc(R,R,R-4,0,2*Math.PI);cx.lineWidth=8;cx.strokeStyle='#2a0f4f';cx.stroke()}
+  dessine();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(dessine);
+  function confettis(){const c=['#ff1744','#ffd400','#7c3aed','#00c853','#fff'];for(let i=0;i<50;i++){const e=document.createElement('i');e.className='funConf';e.style.left=Math.random()*100+'vw';e.style.background=c[i%5];e.style.animationDuration=(1.6+Math.random()*1.4)+'s';document.body.appendChild(e);setTimeout(()=>e.remove(),3200)}}
+  function lancerRoue(){if(tourne)return;tourne=true;g('bRoue').disabled=true;g('pRoue').classList.add('tourne');g('rRes').className='funRes';g('rRes').textContent='Ça tourne…';
+    const k=Math.floor(Math.random()*N),tours=5+Math.floor(Math.random()*3);
+    rot=rot-(rot%360)+tours*360+(360-k*360/N)+(Math.random()-.5)*(260/N);cv.style.transform='rotate('+rot+'deg)';
+    setTimeout(()=>{g('pRoue').classList.remove('tourne');g('rRes').className='funRes gros';g('rRes').textContent=SEG[k][0]+' '+MSG[SEG[k][0]];
+      if(SEG[k][0]!=='😜')confettis();try{navigator.vibrate&&navigator.vibrate(120)}catch(e){}
+      tourne=false;g('bRoue').disabled=false;g('bRoue').textContent='ENCORE !'},5300)}
+  g('bRoue').onclick=lancerRoue;g('hub').onclick=lancerRoue;
+  const SYM=['💋','⭐','🍒','💎','🎁','👄','🍀'];
+  g('bSlot').onclick=()=>{g('bSlot').disabled=true;g('pSlot').classList.add('tourne');g('sRes').className='funRes';g('sRes').textContent='Ça tourne…';
+    document.querySelectorAll('.frl').forEach(r=>r.classList.remove('gagne'));
+    const lv=g('levier');lv.classList.add('tire');setTimeout(()=>lv.classList.remove('tire'),400);
+    const fin=Math.random()<.3?Array(3).fill(SYM[Math.floor(Math.random()*SYM.length)]):[0,1,2].map(()=>SYM[Math.floor(Math.random()*SYM.length)]);
+    const dur=[2100,3000,4100];
+    for(let i=0;i<3;i++){const b=g('f'+i),n=[12,16,22][i];b.innerHTML='';
+      for(let j=0;j<n;j++){const d=document.createElement('div');d.textContent=j===n-1?fin[i]:SYM[Math.floor(Math.random()*SYM.length)];b.appendChild(d)}
+      b.style.transition='none';b.style.transform='translateY(0)';void b.offsetWidth;
+      b.style.transition='transform '+dur[i]+'ms cubic-bezier(.25,.65,.3,1)';b.style.transform='translateY(-'+((n-1)*86)+'px)'}
+    setTimeout(()=>{g('pSlot').classList.remove('tourne');const trois=fin[0]===fin[1]&&fin[1]===fin[2],deux=fin[0]===fin[1]||fin[1]===fin[2]||fin[0]===fin[2];
+      if(trois){document.querySelectorAll('.frl').forEach(r=>r.classList.add('gagne'));confettis()}
+      g('sRes').className='funRes'+(trois?' gros':'');g('sRes').textContent=trois?fin[0]+' JACKPOT ! '+fin[0]:(deux?'Presque ! Encore un essai ?':'Pas cette fois, rejoue !');
+      try{navigator.vibrate&&navigator.vibrate(trois?[100,60,100,60,200]:80)}catch(e){}
+      g('bSlot').disabled=false;g('bSlot').textContent='REJOUER'},dur[2]+150)};
+  window.funConfettis=confettis;
+  function tab(k){['Bouche','Roue','Slot'].forEach(n=>{g('p'+n).hidden=n!==k;g('t'+n).className=n===k?'on':''})}
+  ['Bouche','Roue','Slot'].forEach(n=>g('t'+n).onclick=()=>tab(n));
+})();
+
+// Mini-jeu : lance la balle dans la bouche (pour le fun)
+(function(){
+  const g=id=>document.getElementById(id);const cv=g('cBouche');if(!cv)return;const c=cv.getContext('2d');
+  const W=360,H=600,BR=10,PR=6,MOUTH_Y=78,PLAT_T=140,SLOT_T=438,SLOT_B=520,BASE_Y=566;
+  const VALS=[5,3,2,1,1,2,3,5],COLS=['#ff3d57','#ff8a3d','#ffd23d','#3ddc84','#38c6ff','#ffd23d','#ff8a3d','#ff3d57'];
+  const PL=24,PRt=W-24,SW=(PRt-PL)/8;
+  const pegs=[];for(let r=0;r<6;r++){const y=190+r*40,n=r%2?6:7,off=r%2?SW*0.65:SW*0.15;for(let i=0;i<n;i++)pegs.push({x:PL+off+i*((PRt-PL-2*off)/(n-1)),y})}
+  let lancers=[],tops=[];try{tops=JSON.parse(localStorage.getItem('ibz_bouche_tops')||'[]')}catch(e){}
+  let t=0,balles=5,score=0,dansLe5=0,etat='attente',ball=null,swipe=null,fin=false,message='',msgT=0,record=0,parts=[];
+  try{record=+localStorage.getItem('ibz_bouche_record')||0}catch(e){}
+  g('bRecord').textContent=record;
+  function mouth(){return{x:W/2+Math.sin(t*0.014)*90,open:0.55+0.45*Math.sin(t*0.045),w:116}}
+  function majListe(){const z=g('bLancers');if(!z)return;z.innerHTML='';for(let i=0;i<5;i++){const e=document.createElement('span');const v=lancers[i];
+      e.className='lc'+(v===undefined?'':v===0?' lcRate':v===5?' lcCinq':' lcBon');e.textContent=v===undefined?(i+1):(v===0?'✗':'+'+v);z.appendChild(e)}
+    const l=g('bTops');if(!l)return;l.innerHTML='';if(!tops.length){l.innerHTML='<li class="vide">Pas encore de partie</li>';return}
+    tops.forEach((s,i)=>{const li=document.createElement('li');li.innerHTML='<span></span><b></b><small></small>';li.children[0].textContent=['🥇','🥈','🥉','4','5'][i];
+      li.children[1].textContent=s.p+' pts';li.children[2].textContent=s.d;l.appendChild(li)})}
+  function majInfo(){g('bBalles').textContent='●'.repeat(balles)+'○'.repeat(5-balles);g('bScore').textContent=score}
+  function pos(e){const r=cv.getBoundingClientRect();const p=e.touches?e.touches[0]:e;return{x:(p.clientX-r.left)*W/r.width,y:(p.clientY-r.top)*H/r.height,t:performance.now()}}
+  function down(e){if(etat!=='attente'||fin)return;e.preventDefault();swipe={a:pos(e),b:pos(e)}}
+  function move(e){if(!swipe)return;e.preventDefault();swipe.b=pos(e)}
+  function up(e){if(!swipe)return;e.preventDefault();const{a,b}=swipe;swipe=null;const dy=b.y-a.y,dx=b.x-a.x;
+    if(dy>-25)return;g('bAide').style.display='none';
+    const dt=Math.max(60,b.t-a.t),v=Math.min(16,Math.max(7,-dy/dt*9));const ang=Math.atan2(dx,-dy);
+    ball={x:W/2,y:BASE_Y,vx:Math.sin(ang)*v*1.15,vy:-Math.cos(ang)*v,s:1,phase:'vol'};etat='vol';balles--;majInfo()}
+  cv.addEventListener('pointerdown',down);cv.addEventListener('pointermove',move);window.addEventListener('pointerup',up);
+  function eclat(x,y,col){for(let i=0;i<14;i++)parts.push({x,y,vx:(Math.random()-.5)*6,vy:(Math.random()-.8)*6,v:40,col})}
+  function annonce(m){message=m;msgT=70}
+  function physique(){
+    const m=mouth();
+    if(ball&&ball.phase==='vol'){ball.x+=ball.vx;ball.y+=ball.vy;ball.s=Math.max(.55,ball.s-.006);
+      if(ball.x<BR||ball.x>W-BR)ball.vx*=-1;
+      if(ball.y<=MOUTH_Y+8){const dans=Math.abs(ball.x-m.x)<m.w*0.4&&m.open>0.35;
+        if(dans){ball={x:m.x,y:PLAT_T+6,vx:(Math.random()-.5)*1.5,vy:1,s:.85,phase:'chute'};eclat(m.x,MOUTH_Y,'#ff4fa3');annonce('💋 Dans la bouche !')}
+        else{lancers.push(0);majListe();ball.phase='rate';ball.vy=3;ball.vx*=.3;annonce(m.open>0.35?'Raté, à côté !':'Bouche fermée !')}}
+      if(ball.y>H+20){ball=null;suite()}}
+    else if(ball&&ball.phase==='rate'){ball.vy+=.35;ball.x+=ball.vx;ball.y+=ball.vy;ball.s=Math.min(1,ball.s+.01);if(ball.y>H+20){ball=null;suite()}}
+    else if(ball&&ball.phase==='chute'){ball.vy+=.22;ball.vx*=.995;ball.x+=ball.vx;ball.y+=ball.vy;
+      for(const p of pegs){const dx=ball.x-p.x,dy=ball.y-p.y,d=Math.hypot(dx,dy),mn=BR*ball.s+PR;
+        if(d<mn){const nx=dx/d,ny=dy/d;ball.x=p.x+nx*mn;ball.y=p.y+ny*mn;const vn=ball.vx*nx+ball.vy*ny;
+          if(vn<0){ball.vx-=1.5*vn*nx;ball.vy-=1.5*vn*ny;ball.vx+=(Math.random()-.5)*1.2}}}
+      if(ball.x<PL+BR){ball.x=PL+BR;ball.vx=Math.abs(ball.vx)*.6}if(ball.x>PRt-BR){ball.x=PRt-BR;ball.vx=-Math.abs(ball.vx)*.6}
+      if(ball.y>SLOT_T+10){const k=Math.min(7,Math.max(0,Math.floor((ball.x-PL)/SW)));const v=VALS[k];score+=v;if(v===5)dansLe5++;lancers.push(v);majListe();
+        eclat(PL+SW*k+SW/2,SLOT_T+30,COLS[k]);annonce('+'+v+(v===5?' ⭐':''));majInfo();
+        ball={x:PL+SW*k+SW/2,y:SLOT_T+40,phase:'pose',s:.85,k,tm:40}}}
+    else if(ball&&ball.phase==='pose'){if(--ball.tm<=0){ball=null;suite()}}
+    parts=parts.filter(p=>(p.x+=p.vx,p.y+=p.vy,p.vy+=.2,--p.v>0));
+  }
+  function suite(){if(balles>0){etat='attente';return}
+    fin=true;etat='fin';const r=g('bRes');let txt=score+' points !';
+    if(dansLe5===5)txt='⭐ JEU BONUS : 5 balles dans le 5 ! ⭐';
+    tops.push({p:score,d:new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'short'})});tops.sort((a,b)=>b.p-a.p);tops=tops.slice(0,5);try{localStorage.setItem('ibz_bouche_tops',JSON.stringify(tops))}catch(e){};majListe();
+    if(score>record){record=score;try{localStorage.setItem('ibz_bouche_record',record)}catch(e){};g('bRecord').textContent=record;txt+=' 🏆 Nouveau record !'}
+    r.className='funRes gros';r.textContent=txt;g('bRejouer').hidden=false;
+    if(typeof window.funConfettis==='function'&&score>=12)window.funConfettis()}
+  g('bRejouer').onclick=()=>{balles=5;score=0;dansLe5=0;lancers=[];majListe();fin=false;etat='attente';majInfo();g('bRes').className='funRes';g('bRes').textContent='5 balles : vise la bouche quand elle est ouverte !';g('bRejouer').hidden=true};
+  function rr(x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+  function dessin(){
+    const m=mouth();
+    const fond=c.createLinearGradient(0,0,0,H);fond.addColorStop(0,'#3b0d6b');fond.addColorStop(1,'#1d0638');c.fillStyle=fond;c.fillRect(0,0,W,H);
+    for(let i=0;i<14;i++){c.fillStyle=(Math.floor(t/12)+i)%2?'#ffd400':'#fff';c.globalAlpha=.8;c.beginPath();c.arc(14+i*25.5,10,4,0,7);c.fill()}c.globalAlpha=1;
+    // plateau
+    rr(PL-6,PLAT_T-14,PRt-PL+12,SLOT_B-PLAT_T+20,12);c.fillStyle='rgba(255,255,255,.93)';c.fill();c.lineWidth=5;c.strokeStyle='#ff4fa3';c.shadowColor='#ff4fa3';c.shadowBlur=14;c.stroke();c.shadowBlur=0;
+    // flèches en zigzag
+    {const fl=(x0,y0,amp,sens,col1,col2)=>{const pts=[];for(let k=0;k<=40;k++){const f=k/40;pts.push([x0+sens*f*34+Math.sin(f*Math.PI*3)*amp,y0+f*150])}
+        const gr=c.createLinearGradient(0,y0,0,y0+150);gr.addColorStop(0,col1);gr.addColorStop(1,col2);
+        c.lineCap='round';c.lineJoin='round';
+        c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.lineWidth=13;c.strokeStyle='rgba(42,15,79,.18)';c.stroke();
+        c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.lineWidth=9;c.strokeStyle=gr;c.stroke();
+        const [ax,ay]=pts[pts.length-1],[bx,by]=pts[pts.length-4],an=Math.atan2(ay-by,ax-bx);
+        c.save();c.translate(ax,ay);c.rotate(an);c.beginPath();c.moveTo(14,0);c.lineTo(-6,-12);c.lineTo(-2,0);c.lineTo(-6,12);c.closePath();c.fillStyle=col2;c.fill();c.lineWidth=2;c.strokeStyle='rgba(42,15,79,.35)';c.stroke();c.restore();
+        c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p[0]-2,p[1]):c.moveTo(p[0]-2,p[1]));c.lineWidth=2;c.strokeStyle='rgba(255,255,255,.55)';c.stroke()};
+      fl(84,200,16,1,'#ffb347','#ff3d8b');fl(180,195,13,0,'#ffe259','#ff7a3d');fl(276,200,16,-1,'#ffb347','#ff3d8b')}
+    for(const p of pegs){c.beginPath();c.arc(p.x,p.y,PR,0,7);c.fillStyle='#2a0f4f';c.fill();c.beginPath();c.arc(p.x-2,p.y-2,2,0,7);c.fillStyle='#8b6fc1';c.fill()}
+    for(let k=0;k<8;k++){const x=PL+k*SW;const gr=c.createLinearGradient(0,SLOT_T,0,SLOT_B);gr.addColorStop(0,COLS[k]);gr.addColorStop(1,'rgba(255,255,255,.6)');
+      rr(x+2,SLOT_T,SW-4,SLOT_B-SLOT_T,8);c.fillStyle=gr;c.fill();
+      c.fillStyle='#fff';c.strokeStyle='#2a0f4f';c.lineWidth=4;c.font='26px "Luckiest Guy", Arial Black, sans-serif';c.textAlign='center';c.textBaseline='top';
+      c.strokeText(VALS[k],x+SW/2,SLOT_T+6);c.fillText(VALS[k],x+SW/2,SLOT_T+6);
+      c.font='14px serif';c.fillText('★',x+SW/2,SLOT_T+40);c.fillText('★',x+SW/2,SLOT_T+60)}
+    // bouche
+    {const w=m.w*1.25,gap=4+m.open*48,hu=26,hl=22;c.save();c.translate(m.x,MOUTH_Y);
+      const L=-w/2,R=w/2,ui=-gap*0.4,li=gap*0.6;
+      // intérieur
+      c.beginPath();c.moveTo(L,0);c.bezierCurveTo(L*0.5,ui-2,R*0.5,ui-2,R,0);c.bezierCurveTo(R*0.5,li+2,L*0.5,li+2,L,0);c.closePath();
+      c.fillStyle='#3d0010';c.fill();c.save();c.clip();
+      // dents du haut
+      c.fillStyle='#fff';c.beginPath();c.moveTo(L*0.62,ui);c.bezierCurveTo(L*0.3,ui+gap*0.3+4,R*0.3,ui+gap*0.3+4,R*0.62,ui);c.lineTo(R*0.62,ui-6);c.lineTo(L*0.62,ui-6);c.closePath();c.fill();
+      c.strokeStyle='rgba(200,200,210,.9)';c.lineWidth=1.2;for(let k=-2;k<=2;k++){c.beginPath();c.moveTo(k*w*0.1,ui);c.lineTo(k*w*0.1,ui+gap*0.22);c.stroke()}
+      // langue
+      const lg=c.createRadialGradient(0,li-4,2,0,li,w*0.3);lg.addColorStop(0,'#ff9ac6');lg.addColorStop(1,'#e0408a');
+      c.fillStyle=lg;c.beginPath();c.ellipse(0,li+2,w*0.26,gap*0.5+3,0,0,7);c.fill();
+      c.strokeStyle='rgba(160,20,80,.6)';c.lineWidth=2;c.beginPath();c.moveTo(0,li-gap*0.45);c.lineTo(0,li-4);c.stroke();
+      c.restore();
+      const rouge=(y0,y1)=>{const gr=c.createLinearGradient(0,y0,0,y1);gr.addColorStop(0,'#ff4d6a');gr.addColorStop(.55,'#e8102e');gr.addColorStop(1,'#a8001c');return gr};
+      // lèvre du haut (arc de Cupidon)
+      c.beginPath();c.moveTo(L,0);
+      c.bezierCurveTo(L*0.8,ui-hu*0.55,L*0.45,ui-hu*1.05,L*0.2,ui-hu);
+      c.bezierCurveTo(L*0.08,ui-hu*0.98,L*0.04,ui-hu*0.72,0,ui-hu*0.7);
+      c.bezierCurveTo(R*0.04,ui-hu*0.72,R*0.08,ui-hu*0.98,R*0.2,ui-hu);
+      c.bezierCurveTo(R*0.45,ui-hu*1.05,R*0.8,ui-hu*0.55,R,0);
+      c.bezierCurveTo(R*0.55,ui+1,R*0.2,ui-3,0,ui);c.bezierCurveTo(L*0.2,ui-3,L*0.55,ui+1,L,0);c.closePath();
+      c.fillStyle=rouge(ui-hu,ui);c.fill();c.lineWidth=3;c.strokeStyle='#2a0f4f';c.stroke();
+      // lèvre du bas
+      c.beginPath();c.moveTo(L,0);c.bezierCurveTo(L*0.55,li+1,L*0.2,li+3,0,li+2);c.bezierCurveTo(R*0.2,li+3,R*0.55,li+1,R,0);
+      c.bezierCurveTo(R*0.75,li+hl*0.9,R*0.35,li+hl*1.25,0,li+hl*1.25);c.bezierCurveTo(L*0.35,li+hl*1.25,L*0.75,li+hl*0.9,L,0);c.closePath();
+      c.fillStyle=rouge(li,li+hl*1.25);c.fill();c.lineWidth=3;c.strokeStyle='#2a0f4f';c.stroke();
+      // reflets
+      c.fillStyle='rgba(255,255,255,.75)';c.beginPath();c.ellipse(L*0.42,ui-hu*0.62,9,3.5,-0.35,0,7);c.fill();
+      c.beginPath();c.ellipse(R*0.32,ui-hu*0.66,5,2.5,0.3,0,7);c.fill();
+      c.beginPath();c.ellipse(L*0.25,li+hl*0.7,12,4,0.08,0,7);c.fill();
+      c.fillStyle='rgba(255,255,255,.45)';c.beginPath();c.ellipse(R*0.3,li+hl*0.75,7,3,-0.1,0,7);c.fill();
+      // coins
+      c.fillStyle='#2a0f4f';c.beginPath();c.arc(L+1,0,3,0,7);c.arc(R-1,0,3,0,7);c.fill();
+      c.restore()}
+    if(m.open>.35){c.fillStyle='rgba(0,200,83,.9)';c.font='bold 12px system-ui';c.textAlign='center';c.fillText('OUVERTE !',m.x,MOUTH_Y+62)}
+    // viseur
+    if(swipe){c.strokeStyle='rgba(255,212,0,.8)';c.setLineDash([6,6]);c.lineWidth=3;c.beginPath();c.moveTo(W/2,BASE_Y);c.lineTo(W/2+(swipe.b.x-swipe.a.x)*1.6,BASE_Y+(swipe.b.y-swipe.a.y)*1.6);c.stroke();c.setLineDash([])}
+    // balle posée
+    if(etat==='attente'&&!fin){c.fillStyle='rgba(255,212,0,.25)';c.beginPath();c.arc(W/2,BASE_Y,BR+10+Math.sin(t*.1)*3,0,7);c.fill();balleD(W/2,BASE_Y,1)}
+    if(ball)balleD(ball.x,ball.y,ball.s);
+    for(const p of parts){c.globalAlpha=p.v/40;c.fillStyle=p.col;c.fillRect(p.x,p.y,5,5)}c.globalAlpha=1;
+    if(msgT>0){msgT--;c.globalAlpha=Math.min(1,msgT/20);c.font='28px "Luckiest Guy", Arial Black, sans-serif';c.textAlign='center';c.textBaseline='middle';
+      c.lineWidth=6;c.strokeStyle='#2a0f4f';c.strokeText(message,W/2,300);c.fillStyle='#ffd400';c.fillText(message,W/2,300);c.globalAlpha=1}
+  }
+  function balleD(x,y,s){const r=BR*s;const gr=c.createRadialGradient(x-r*.4,y-r*.4,1,x,y,r);gr.addColorStop(0,'#fff59d');gr.addColorStop(.5,'#e6ee45');gr.addColorStop(1,'#ff5a1f');
+    c.beginPath();c.arc(x,y,r,0,7);c.fillStyle=gr;c.fill();c.lineWidth=1.5;c.strokeStyle='rgba(42,15,79,.5)';c.stroke();
+    c.strokeStyle='rgba(255,255,255,.85)';c.lineWidth=1.6;c.beginPath();c.arc(x-r*1.1,y,r*.9,-.9,.9);c.stroke();c.beginPath();c.arc(x+r*1.1,y,r*.9,Math.PI-.9,Math.PI+.9);c.stroke()}
+  function boucle(){t++;physique();dessin();requestAnimationFrame(boucle)}
+  majInfo();majListe();boucle();
+})();
+
 </script>
 </body>
 </html>
