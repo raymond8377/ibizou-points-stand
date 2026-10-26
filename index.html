@@ -109,6 +109,39 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--encre)}
 .slot button.sec{background:#fff;color:var(--encre)}
 
 /* Accueil coloré */
+.decouvre{display:block;text-align:center;margin-top:14px;background:#fff;color:#2a0f4f;text-decoration:none;font-weight:800;font-size:16px;padding:13px;border-radius:14px;border:3px solid #2a0f4f;box-shadow:4px 4px 0 #2a0f4f}
+.rgpd{margin-top:16px;display:grid;gap:8px}
+.coche{display:flex;gap:10px;align-items:flex-start;background:#f6f0ff;border:2px solid #d9c8ff;border-radius:12px;padding:10px;font-size:14px;line-height:1.35;color:#2a0f4f;cursor:pointer;margin:0}
+.coche input{width:22px;height:22px;flex:none;margin:0;accent-color:#7c3aed}
+.coche a{color:#7c3aed;font-weight:700}
+.piedConf{text-align:center;font-size:12px;margin-top:14px}.piedConf a{color:#fff;opacity:.85}
+.top{margin-top:14px;background:linear-gradient(135deg,#ede7ff,#e0f2ff);border:3px solid #7c3aed;border-radius:16px;padding:12px;text-align:left}
+.top h4{font-family:'Luckiest Guy',sans-serif;font-weight:400;font-size:20px;color:#7c3aed;margin:0 0 6px;letter-spacing:.5px}
+.top h4 span{font-size:14px;color:#2a0f4f}
+.top ol{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.top li{display:flex;align-items:center;gap:10px;background:#fff;border-radius:10px;padding:7px 10px;font-size:15px;color:#2a0f4f;font-variant-numeric:tabular-nums}
+.top li .rg{width:28px;font-family:'Luckiest Guy',sans-serif;font-size:18px;text-align:center}
+.top li .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+.top li .pt{font-weight:800;color:#ff1744}
+.top li.moi{background:#fff3b0;border:2px solid #ffd400}
+.top li.sep{background:none;justify-content:center;padding:0;color:#7c3aed}
+.topMoi{margin:8px 0 0;font-size:14px;font-weight:700;color:#2a0f4f;text-align:center}
+.passages{margin-top:14px;background:#f6f0ff;border:2px solid #d9c8ff;border-radius:14px;padding:10px 12px;text-align:left}
+.passages summary{cursor:pointer;font-weight:800;color:#6b2bd9;font-size:16px}
+.pas{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid #e6dcf5;padding:8px 0;font-size:14px;color:#2a0f4f;font-variant-numeric:tabular-nums}
+.pas small{display:block;opacity:.7}.pas .p{color:#00a63e;font-weight:800}.pas .m{color:#ff1744;font-weight:800}
+
+.concours{margin-top:14px;background:linear-gradient(135deg,#fff3b0,#ffd6a5);border:3px solid #ff9100;border-radius:16px;padding:12px;text-align:left}
+.concours h4{font-family:'Luckiest Guy',sans-serif;font-weight:400;font-size:20px;color:#e65100;margin:0 0 6px;letter-spacing:.5px}
+.cc{background:#fff;border:2px solid #ffcc80;border-radius:12px;padding:10px 12px;margin-top:8px;color:#2a0f4f}
+.cc .ct{font-family:'Luckiest Guy',sans-serif;font-size:19px;letter-spacing:.5px}
+.cc .cl{font-size:15px;font-weight:800;color:#ff1744;margin-top:2px}
+.cc .cf{font-size:13px;opacity:.8;margin-top:2px}
+.cc button{margin-top:10px;background:linear-gradient(90deg,#ff9100,#ff1744);font-size:19px}
+.cc .cok{margin-top:10px;background:#e3fcec;border:2px solid #00c853;border-radius:10px;padding:8px;text-align:center;font-weight:800;color:#00a63e}
+.cc.gagne{border:3px solid #ffd400;background:#fffbe0;animation:brille 1.2s infinite}
+.cc .cg{margin-top:8px;font-weight:800;text-align:center}
+
 .ou{margin-top:14px;background:linear-gradient(135deg,#fff3b0,#ffe0ec);border:3px solid #ff1744;border-radius:16px;padding:12px;text-align:left}
 .ou h4{font-family:'Luckiest Guy',sans-serif;font-weight:400;font-size:19px;color:#ff1744;margin:0 0 8px;letter-spacing:.5px}
 .etap{background:#fff;border:2px solid #ffc2d1;border-radius:12px;padding:10px 12px;margin-top:8px;color:#2a0f4f}
@@ -290,7 +323,7 @@ button{background:#ff1744}
 <div class="mainBas" id="mainBas" hidden>Appuie ici<br>👇</div>
 
 <div class="slotOv" id="slotOv"><div class="slot">
-  <div class="slotTitre">IBIZOU</div><div class="slotSous">Machine à bisous · niveau Or</div>
+  <div class="slotTitre">IBIZOU</div><div class="slotSous" id="slotSous">Machine à bisous · niveau Or</div>
   <div class="ampoules"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
   <div class="rouleaux"><div class="rl"><div class="bande" id="r0"></div></div><div class="rl"><div class="bande" id="r1"></div></div><div class="rl"><div class="bande" id="r2"></div></div></div>
   <div class="slotRes" id="slotRes">Tente ta chance, un lot est garanti !</div>
@@ -329,6 +362,10 @@ button{background:#ff1744}
     <input id="secret" class="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="new-password" placeholder="• • • •">
     <p class="aide">💡 Choisis un code facile à retenir. Il protège tes points et sert à retrouver ta carte.</p>
 
+    <div class="rgpd">
+      <label class="coche"><input type="checkbox" id="cAccepte"><span>J'accepte que IBIZOU garde ces informations pour ma carte de points. <a href="confidentialite.html" target="_blank" rel="noopener">En savoir plus</a></span></label>
+      <label class="coche"><input type="checkbox" id="cMoins15"><span>J'ai moins de 15 ans et <b>un parent est d'accord</b>.</span></label>
+    </div>
     <button id="btnInscrire">C'est parti ! 🚀</button>
     <div class="err" id="errInsc"></div>
 
@@ -371,6 +408,16 @@ button{background:#ff1744}
     <div id="qr"></div>
     <div class="code" id="code"></div>
     <div class="info">Montre ce QR code au stand pour gagner des points ou les échanger contre un cadeau au stand.</div>
+    <div class="top" id="top" hidden>
+      <h4>🏅 Top joueurs <span id="topFoire"></span></h4>
+      <ol id="topListe"></ol>
+      <p class="topMoi" id="topMoi"></p>
+    </div>
+    <details class="passages" id="passages"><summary>🕘 Mes passages</summary><div id="pasListe"></div></details>
+    <div class="concours" id="concours" hidden>
+      <h4>🏆 Concours IBIZOU</h4>
+      <div id="concListe"></div>
+    </div>
     <div class="ou" id="ou" hidden>
       <h4>📍 Où trouver IBIZOU</h4>
       <div id="ouListe"></div>
@@ -407,6 +454,8 @@ button{background:#ff1744}
     <div class="bons" id="bons" style="display:none"><h4>🎁 Mes cadeaux à utiliser</h4><div id="bonsListe"></div></div>
     <div class="err" id="errCarte"></div>
   </div>
+  <a class="decouvre" href="histoire.html">📖 Découvre IBIZOU : histoire, nouveautés, jeux</a>
+  <p class="piedConf"><a href="confidentialite.html">Confidentialité et mes données</a></p>
 </div>
 <script>
 const SB_URL='https://cytgdpeoxhxempnewrep.supabase.co';
@@ -434,8 +483,8 @@ async function afficherCarte(){
   try{history.replaceState(null,'',location.pathname+'#id='+monId)}catch(e){}
   $('vueInscription').style.display='none';$('vueRecup').style.display='none';$('vueCarte').style.display='block';
   new QRCode($('qr'),{text:'IBZ:'+monId,width:220,height:220,correctLevel:QRCode.CorrectLevel.M});
-  await rafraichir();verifierCadeaux();bons();verifierJeu();tournee();
-  setInterval(rafraichir,4000);setInterval(verifierCadeaux,8000);setInterval(bons,8000);
+  await rafraichir();verifierCadeaux();bons();verifierJeu();tournee();concours();classement();passages();
+  setInterval(rafraichir,4000);setInterval(verifierCadeaux,8000);setInterval(bons,8000);setInterval(verifierJeu,20000);setInterval(concours,20000);setInterval(classement,30000);
 }
 async function rafraichir(){
   try{
@@ -443,7 +492,7 @@ async function rafraichir(){
     if(!d||!d.length){$('errCarte').textContent='Carte introuvable. Demande au stand.';$('errCarte').style.display='block';return}
     const c=d[0];$('errCarte').style.display='none';
     $('bonjour').textContent='Salut '+c.prenom+(c.nom?' '+c.nom:'')+' !';$('code').textContent=c.code;
-    if(dernier!==null&&c.points!==dernier){
+    if(dernier!==null&&c.points!==dernier){if(typeof passages==="function"){passages();classement()}
       const p=$('points');p.classList.remove('pop');void p.offsetWidth;p.classList.add('pop');
       toast(c.points>dernier?'+'+(c.points-dernier)+' points !':'Bonne partie !');
       if(navigator.vibrate)navigator.vibrate(120);
@@ -485,7 +534,9 @@ $('btnProfSave').onclick=async()=>{
 const SYM=['💋','👄','💄','💎','⭐','🍒','🎁'];
 let jeuId=null,slotFini=false;
 async function verifierJeu(){if(!monId)return;
-  try{const d=await rpc('ibz_jeu_dispo',{p_id:monId});jeuId=d&&d.length?d[0].id:null;$('jeuBtn').style.display=jeuId?'block':'none'}catch(e){}}
+  try{const d=await rpc('ibz_jeu_dispo',{p_id:monId});jeuId=d&&d.length?d[0].id:null;$('jeuBtn').style.display=jeuId?'block':'none';
+    if(jeuId){const or=d[0].niveau==='Or';$('jeuBtn').textContent=or?'🎰 Niveau Or débloqué ! Joue à la machine à sous':'🎁 IBIZOU t\'offre une partie de machine à sous !';
+      $('slotSous').textContent=or?'Machine à bisous · niveau Or':'Machine à bisous · partie offerte'}}catch(e){}}
 function remplir(i,fin){const b=$('r'+i);b.innerHTML='';const n=[14,20,30][i];
   for(let k=0;k<n;k++){const e=document.createElement('div');e.textContent=k===n-1?fin:SYM[Math.floor(Math.random()*SYM.length)];b.appendChild(e)}
   b.style.transition='none';b.style.transform='translateY(0)';return n}
@@ -591,6 +642,45 @@ async function tournee(){try{const d=await rpc('ibz_tournee_public',{});const z=
     if(t.adresse||t.lieu){const a=e.querySelector('a.iti');a.hidden=false;a.href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(t.adresse||(t.lieu+' '+t.ville))}
     z.appendChild(e)});
 }catch(e){}}
+
+// Concours
+const fmtFin=d=>{const x=new Date(d);return x.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})+' à '+x.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})};
+let dejaFete={};
+async function concours(){if(!monId)return;try{const d=await rpc('ibz_concours_client',{p_id:monId});const z=$('concListe');z.innerHTML='';
+  if(!d||!d.length){$('concours').hidden=true;return}$('concours').hidden=false;
+  d.forEach(k=>{const e=document.createElement('div');e.className='cc'+(k.gagne?' gagne':'');
+    e.innerHTML='<div class="ct"></div><div class="cl"></div><div class="cf"></div>';
+    e.querySelector('.ct').textContent=k.titre;e.querySelector('.cl').textContent='🎁 À gagner : '+k.lot;
+    if(!k.tire){e.querySelector('.cf').textContent='Tirage au sort le '+fmtFin(k.fin)+' · '+k.participants+' participant'+(k.participants>1?'s':'');
+      if(k.participe){const o=document.createElement('div');o.className='cok';o.textContent='✅ Tu participes ! Bonne chance 🍀';e.appendChild(o)}
+      else{const b=document.createElement('button');b.type='button';b.textContent='🙋 Je participe !';
+        b.onclick=async()=>{b.disabled=true;try{await rpc('ibz_participer',{p_id:monId,p_concours:k.id});toast('Tu participes au concours !');confettis();concours()}catch(err){toast(err.message);b.disabled=false}};
+        e.appendChild(b)}}
+    else{e.querySelector('.cf').textContent='Tirage effectué';const g=document.createElement('div');g.className='cg';
+      if(k.gagne){g.textContent='🎉 BRAVO, TU AS GAGNÉ ! Ton cadeau est dans « Mes cadeaux à utiliser ». Montre ta carte au stand.';
+        if(!dejaFete[k.id]){dejaFete[k.id]=1;confettis();if(navigator.vibrate)navigator.vibrate([200,100,200])}}
+      else g.textContent='🏆 Gagnant : '+(k.gagnant||'?')+(k.participe?' · Pas de chance cette fois, retente au prochain concours !':'');
+      e.appendChild(g)}
+    z.appendChild(e)});
+}catch(e){}}
+
+// Classement + mes passages
+async function classement(){if(!monId)return;try{const d=await rpc('ibz_classement',{p_id:monId});const l=$('topListe');l.innerHTML='';
+  if(!d||!d.length){$('top').hidden=true;return}$('top').hidden=false;
+  $('topFoire').textContent=d[0].foire?'· '+d[0].foire:'· ce mois-ci';
+  const med=['🥇','🥈','🥉'];let prev=0;
+  d.forEach(r=>{if(r.rang>prev+1&&prev>=10){const s=document.createElement('li');s.className='sep';s.textContent='⋯';l.appendChild(s)}prev=r.rang;
+    const li=document.createElement('li');if(r.moi)li.className='moi';li.innerHTML='<span class="rg"></span><span class="nm"></span><span class="pt"></span>';
+    li.children[0].textContent=med[r.rang-1]||r.rang;li.children[1].textContent=r.moi?r.nom+' (toi)':r.nom;li.children[2].textContent=r.points+' pts';l.appendChild(li)});
+  const m=d.find(r=>r.moi);$('topMoi').textContent=m?(m.rang===1?'👑 Tu es premier ! Garde ta place !':'Tu es '+m.rang+'e. Encore '+(d.find(r=>r.rang===m.rang-1)||{points:m.points}).points+' pts pour la place du dessus… ou plus !'):'Gagne des points au stand pour entrer dans le classement !';
+  if(m&&m.rang>1){const au=d.filter(r=>r.rang<m.rang).pop();if(au)$('topMoi').textContent='Tu es '+m.rang+'e. Encore '+(au.points-m.points+1)+' pts pour passer devant '+au.nom+' !'}
+}catch(e){}}
+async function passages(){if(!monId)return;try{const d=await rpc('ibz_mes_passages',{p_id:monId});const z=$('pasListe');z.innerHTML='';
+  if(!d||!d.length){z.innerHTML='<div class="pas">Aucun passage pour le moment.</div>';return}
+  d.forEach(o=>{const r=document.createElement('div');r.className='pas';r.innerHTML='<span><b></b><small></small></span><span></span>';
+    const h=new Date(o.heure);r.querySelector('b').textContent=h.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'})+' à '+h.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    r.querySelector('small').textContent=o.motif||'';const v=r.lastChild;v.textContent=o.delta?((o.delta>0?'+':'')+o.delta+' pts'):'🎟️';v.className=o.delta>0?'p':(o.delta<0?'m':'');z.appendChild(r)});
+}catch(e){}}
 // Bons cadeaux
 async function bons(){try{const d=await rpc('ibz_mes_bons',{p_id:monId});const l=$('bonsListe');l.innerHTML='';
   $('bons').style.display=d&&d.length?'block':'none';
@@ -637,10 +727,11 @@ $('btnInscrire').onclick=async()=>{
   const prenom=$('prenom').value.trim(),nom=$('nom').value.trim(),secret=$('secret').value.trim(),tel=$('tel').value.trim(),parr=$('parrain').value.trim();
   if(!anonyme&&(!prenom||!nom))return err('errInsc','Mets ton prénom et ton nom, ou appuie sur « Je préfère ne pas donner mon nom ».');
   if(!/^[0-9]{4}$/.test(secret))return err('errInsc','Le code secret doit faire 4 chiffres.');
+  if(!$('cAccepte').checked)return err('errInsc','Coche la case « J\'accepte… » pour créer ta carte.');
   $('btnInscrire').disabled=true;
   try{const d=anonyme
-      ?await rpc('ibz_inscription_anonyme',{p_secret:secret,p_parrain:parr})
-      :await rpc('ibz_inscription3',{p_prenom:prenom,p_nom:nom,p_tel:tel,p_secret:secret,p_parrain:parr});
+      ?await rpc('ibz_inscription4',{p_prenom:'',p_nom:'',p_tel:'',p_secret:secret,p_parrain:parr,p_anonyme:true,p_accepte:true,p_moins15:$('cMoins15').checked})
+      :await rpc('ibz_inscription4',{p_prenom:prenom,p_nom:nom,p_tel:tel,p_secret:secret,p_parrain:parr,p_anonyme:false,p_accepte:true,p_moins15:$('cMoins15').checked});
     if(parr&&!d[0].parrain_ok)toast('Code copain inconnu, carte créée quand même');
     if(anonyme)alert('Ta carte est créée ! Note bien ton code carte '+d[0].code+' et ton code secret : sans nom, ce sont les seuls moyens de la retrouver.');
     monId=d[0].id;garder(monId);afficherCarte();guideApresInscription()}
