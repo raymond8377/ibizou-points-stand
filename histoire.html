@@ -38,6 +38,7 @@ body{margin:0;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;backgrou
 .s-nouv .it{border-color:#b9f6ca;background:#f1fff5}.s-jeux .it{border-color:#b3e5fc;background:#f0faff}
 .devise{font-family:'Luckiest Guy',sans-serif;text-align:center;color:var(--rouge);font-size:20px;margin:18px 0 2px;letter-spacing:.5px}
 .banniere{width:100%;display:block;margin:-4px 0 10px}
+.lienAutre{display:block;text-align:center;color:var(--encre);font-weight:800;text-decoration:none;background:#fff;border:3px solid var(--encre);border-radius:14px;padding:13px;box-shadow:4px 4px 0 var(--encre);font-size:16px}
 .retour{display:block;text-align:center;color:#fff;font-weight:800;text-decoration:none;background:var(--rouge);border:3px solid var(--encre);border-radius:14px;padding:14px;box-shadow:4px 4px 0 var(--encre);font-size:17px}
 .zoom{position:fixed;inset:0;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;z-index:9;padding:16px}
 .zoom img{max-width:100%;max-height:80vh;border-radius:10px}.zoom p{color:#fff;text-align:center}
@@ -48,14 +49,11 @@ body{margin:0;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;backgrou
   <h1>Une histoire de famille depuis plusieurs générations</h1>
   <p>🎪 Des chapiteaux du cirque aux grandes fêtes foraines de France.</p>
 </header>
-<nav class="nav"><a href="#hist">📖 Histoire</a><a href="#actu">📰 Actualités</a><a href="#nouv">✨ Nouveautés</a><a href="#jeux">🎯 Nos jeux</a><a href="#arch">📷 Archives</a></nav>
+<nav class="nav"><a href="#hist">📖 Histoire</a><a href="#arch">📷 Archives</a><a href="actus.html">📰 Actus & jeux →</a></nav>
 <section class="sec s-hist" id="hist"><h2>📖 L'histoire d'IBIZOU</h2><div class="frise" id="l-histoire"><p class="vide">L'histoire de la famille arrive bientôt.</p></div>
 <p class="devise">IBIZOU — Un héritage, une famille, une passion.</p></section>
-<section class="sec s-actu" id="actu"><h2>📰 Actualités du stand</h2><div class="liste" id="l-actu"><p class="vide">Bientôt des nouvelles du stand…</p></div></section>
-<section class="sec s-nouv" id="nouv"><h2>✨ Les nouveautés</h2><div class="liste" id="l-nouveaute"><p class="vide">Les nouveautés arrivent bientôt.</p></div></section>
-<section class="sec s-jeux" id="jeux"><img class="banniere" src="banniere.jpg" alt="IBIZOU Bip Bop Houla"><h2>🎯 Nos jeux</h2><div class="liste" id="l-jeu"><p class="vide">Présentation des jeux bientôt.</p></div></section>
-
 <section class="sec s-arch" id="arch"><h2>📷 Archives de la famille</h2><div class="galerie" id="l-archives"><p class="vide">Les photos d'archives arrivent bientôt.</p></div></section>
+<a class="lienAutre" href="actus.html">📰 Voir l'actu du stand, les nouveautés et les jeux</a>
 <a class="retour" href="./">💋 Retour à ma carte de points</a>
 </div>
 <div class="zoom" id="zoom" hidden><div><img id="zImg" alt=""><p id="zTxt"></p></div></div>
@@ -68,13 +66,13 @@ $('zoom').onclick=()=>$('zoom').hidden=true;
 (async()=>{try{const r=await fetch(SB_URL+'/rest/v1/rpc/ibz_contenu_public',{method:'POST',headers:{apikey:SB_KEY,'Content-Type':'application/json'},body:'{}'});
   const d=await r.json();if(!Array.isArray(d))return;
   const par={};d.forEach(x=>(par[x.rubrique]=par[x.rubrique]||[]).push(x));
-  ['actu','nouveaute','jeu'].forEach(k=>{const l=par[k];if(!l)return;const z=$('l-'+k);z.innerHTML='';
+  ['actu','nouveaute','jeu'].forEach(k=>{const l=par[k];const z=$('l-'+k);if(!l||!z)return;z.innerHTML='';
     l.sort((a,b)=>k==='actu'?(new Date(b.created_at)-new Date(a.created_at)||b.id-a.id):a.id-b.id).forEach(x=>{const it=el('article','it');
       if(k==='actu')it.appendChild(el('div','dt',new Date(x.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})));
       it.appendChild(el('h3',null,x.titre));if(x.texte)it.appendChild(el('p',null,x.texte));if(x.photo)it.appendChild(img(x.photo,x.titre));z.appendChild(it)})});
-  if(par.histoire){const z=$('l-histoire');z.innerHTML='';par.histoire.sort((a,b)=>a.id-b.id).forEach(x=>{
+  if(par.histoire&&$('l-histoire')){const z=$('l-histoire');z.innerHTML='';par.histoire.sort((a,b)=>a.id-b.id).forEach(x=>{
     const ev=el('div','ev');if(x.annee)ev.appendChild(el('div','an',x.annee));ev.appendChild(el('h3',null,x.titre));if(x.texte)ev.appendChild(el('p',null,x.texte));if(x.photo)ev.appendChild(img(x.photo,x.titre));z.appendChild(ev)})}
-  if(par.archives){const z=$('l-archives');z.innerHTML='';par.archives.sort((a,b)=>a.id-b.id).forEach(x=>{
+  if(par.archives&&$('l-archives')){const z=$('l-archives');z.innerHTML='';par.archives.sort((a,b)=>a.id-b.id).forEach(x=>{
     const f=el('figure','photo');f.style.margin='0';if(x.photo)f.appendChild(img(x.photo,(x.annee?x.annee+' · ':'')+x.titre+(x.texte?' : '+x.texte:'')));f.appendChild(el('b',null,x.titre));if(x.annee||x.texte)f.appendChild(el('small',null,[x.annee,x.texte].filter(Boolean).join(' · ')));z.appendChild(f)})}
 }catch(e){}})();
 </script></body></html>

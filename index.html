@@ -420,7 +420,7 @@ button{background:#ff1744}
     <div class="actus" id="actus" hidden>
       <h4>📰 L'actu du stand</h4>
       <div id="actusListe"></div>
-      <a class="actusTout" href="histoire.html#actu">Toutes les actus, nouveautés et jeux →</a>
+      <a class="actusTout" href="actus.html">Toutes les actus, nouveautés et jeux →</a>
     </div>
     <div class="top" id="top" hidden>
       <h4>🏅 Top joueurs <span id="topFoire"></span></h4>
@@ -468,7 +468,8 @@ button{background:#ff1744}
     <div class="bons" id="bons" style="display:none"><h4>🎁 Mes cadeaux à utiliser</h4><div id="bonsListe"></div></div>
     <div class="err" id="errCarte"></div>
   </div>
-  <a class="decouvre" href="histoire.html">📖 Découvre IBIZOU : histoire, nouveautés, jeux</a>
+  <a class="decouvre" href="actus.html">📰 L'actu du stand, les nouveautés et les jeux</a>
+  <a class="decouvre" href="histoire.html">📖 Notre histoire de famille</a>
   <p class="piedConf"><a href="confidentialite.html">Confidentialité et mes données</a></p>
 </div>
 <script>
@@ -700,7 +701,7 @@ async function passages(){if(!monId)return;try{const d=await rpc('ibz_mes_passag
 async function actus(){try{const d=await rpc('ibz_contenu_public',{});const l=(d||[]).filter(x=>x.rubrique==='actu'||x.rubrique==='nouveaute')
     .sort((a,b)=>(a.rubrique==='actu'?0:1)-(b.rubrique==='actu'?0:1)||new Date(b.created_at)-new Date(a.created_at)||b.id-a.id).slice(0,3);
   const z=$('actusListe');z.innerHTML='';$('actus').hidden=!l.length;
-  l.forEach(x=>{const e=document.createElement('a');e.className='ac';e.href='histoire.html#'+(x.rubrique==='actu'?'actu':'nouv');e.style.textDecoration='none';
+  l.forEach(x=>{const e=document.createElement('a');e.className='ac';e.href='actus.html#'+(x.rubrique==='actu'?'actu':'nouv');e.style.textDecoration='none';
     if(x.photo){const i=document.createElement('img');i.src=x.photo;i.alt='';i.loading='lazy';e.appendChild(i)}
     const t=document.createElement('div');t.innerHTML='<small></small><b></b><p></p>';
     t.querySelector('small').textContent=x.rubrique==='actu'?'Actu':'Nouveauté';t.querySelector('b').textContent=x.titre;t.querySelector('p').textContent=x.texte||'';
