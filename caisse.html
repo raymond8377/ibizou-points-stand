@@ -741,7 +741,7 @@ function afficherLots(){const z=$('lots');z.innerHTML='';
   lots.forEach(l=>{const r=document.createElement('div');r.className='lot'+(l.actif?'':' off');
     r.innerHTML='<span><b></b><br><small></small></span><span class="bt"><button class="gris">Modifier</button><button></button></span>';
     r.querySelector('b').textContent=l.libelle;
-    r.querySelector('small').textContent=(l.type==='points'?'+'+l.points+' points':'Bon au stand')+' · '+(l.actif&&tot?Math.round(l.chance/tot*100)+' % de chances':'caché');
+    r.querySelector('small').textContent=(l.type==='points'?'+'+l.points+' points':'Bon au stand')+' · '+(l.actif&&l.chance===0?'seulement quand tu le choisis':(l.actif&&tot?Math.round(l.chance/tot*100)+' % de chances':'caché'));
     const [bm,bc]=r.querySelectorAll('.bt button');bc.textContent=l.actif?'Cacher':'Remettre';bc.className=l.actif?'gris':'vert';
     bm.onclick=()=>{const n=prompt('Nom du lot',l.libelle);if(n===null)return;
       let pts=l.points;if(l.type==='points'){pts=parseInt(prompt('Nombre de points',l.points),10);if(!(pts>0))return}
