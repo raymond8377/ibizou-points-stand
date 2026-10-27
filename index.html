@@ -184,11 +184,65 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--encre)}
 .gX{position:absolute;top:0;right:0;width:40px;height:40px;padding:0;margin:0;border-radius:50%;background:#fff;color:#2a0f4f;font-size:18px;box-shadow:none}
 .gBravo{font-family:'Luckiest Guy',sans-serif;font-size:22px;color:#00e676;text-shadow:2px 2px 0 #2a0f4f;margin-top:6px}
 .gTitre{font-family:'Luckiest Guy',sans-serif;font-weight:400;font-size:24px;line-height:1.15;text-align:center;color:#ffd400;text-shadow:2px 2px 0 #2a0f4f;margin:4px 44px 0;text-wrap:balance}
-.gOv .os{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.gOv .os{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;width:100%}
+.gOv .os button{font-size:14px!important;padding:8px 4px!important;line-height:1.15}
+.gOv .os button small{display:block;white-space:nowrap;font-size:11px;font-weight:600;opacity:.75}
 .gOv .os button,.gOv .nav button{margin:0;font-size:16px;padding:10px;background:#fff;color:#2a0f4f}
 .gOv .os button.on{background:#ffd400}
 .gOv .gtel{width:min(200px,52vw);height:auto}
 .gEssai{background:#00c853;font-size:19px}
+.gSimple{width:100%;display:flex;flex-direction:column;gap:10px}
+.gs{display:flex;align-items:center;gap:12px;background:#fff;color:#2a0f4f;border-radius:18px;padding:12px 14px;border:3px solid #ffd400}
+.gs .n{flex:none;width:38px;height:38px;border-radius:50%;background:#ff1744;color:#fff;font-family:'Luckiest Guy',sans-serif;font-size:22px;display:flex;align-items:center;justify-content:center}
+.gs .t{font-size:17px;font-weight:700;line-height:1.3}
+.gs .t small{display:block;font-weight:500;font-size:14px;color:#5b4a75;margin-top:3px}
+.gs .bt{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 10px;margin:0 2px;border-radius:10px;background:#eef0f3;border:2px solid #2a0f4f;font-size:20px;font-weight:900;vertical-align:middle;line-height:1}
+.gs .mot{display:inline-block;background:#ffd400;border-radius:8px;padding:1px 7px;margin-top:2px}
+.gs.fin{border-color:#00c853}.gs.fin .n{background:#00c853}
+.gs{flex-direction:column;align-items:stretch}
+.gsH{display:flex;align-items:center;gap:12px}
+.gs .t small{display:block}
+.vr{position:relative;margin-top:10px;border-radius:14px;overflow:hidden;border:2px solid #d0d0d6;background:#fff;color:#000;text-align:left}
+.vr.ios{font-family:-apple-system,'SF Pro Text','Helvetica Neue',Arial,sans-serif}
+.vr.and{font-family:Roboto,'Google Sans',Arial,sans-serif}
+.vPage{height:56px;display:flex;align-items:center;justify-content:center;background:linear-gradient(#7b3fd1,#4a1a8c);color:#fff;font-size:13px;opacity:.85}
+.cible{position:relative;outline:3px solid #ff1744;outline-offset:2px;border-radius:10px;animation:vPulse 1.2s infinite}
+@keyframes vPulse{50%{outline-color:rgba(255,23,68,.25)}}
+@media (prefers-reduced-motion:reduce){.cible{animation:none}}
+.vDoigt{position:absolute;right:-6px;bottom:-30px;font-size:26px;z-index:3;pointer-events:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))}
+.iBar{display:flex;justify-content:space-around;align-items:center;height:52px;background:#f7f7f8;border-top:1px solid #d8d8dc;color:#007aff;padding-bottom:6px}
+.iBar .ic{width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:24px}
+.iSheet{background:#f2f2f7;padding:8px}
+.iRow{display:flex;justify-content:space-between;align-items:center;background:#fff;padding:11px 12px;font-size:15px;border-bottom:1px solid #e5e5ea}
+.iRow:first-child{border-radius:10px 10px 0 0}.iRow:last-child{border-radius:0 0 10px 10px;border-bottom:0}
+.iRow span{font-size:17px;color:#333;display:flex}
+.iRow.cible{border-radius:8px;z-index:2}
+.iRow .vDoigt{right:44px;bottom:-26px}
+.cBar{display:flex;align-items:center;height:52px;padding:0 10px;background:#f7f7f8;border-bottom:1px solid #e0e0e0}
+.cAdr{flex:1;display:flex;align-items:center;justify-content:space-between;background:#e9e9ee;border-radius:12px;padding:4px 4px 4px 12px;font-size:13px;color:#222}
+.cAdr .ic{width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:#1a73e8}
+.cAdr .vDoigt{right:-4px;bottom:-30px}
+.iBar .vDoigt{bottom:auto;top:-30px;right:-22px;transform:rotate(180deg)}
+.iHead{display:flex;justify-content:space-between;align-items:center;padding:12px;font-size:14px;background:#f7f7f8;border-bottom:1px solid #e5e5ea}
+.iHead b{font-size:14px}.bleu{color:#007aff}.gras{font-weight:700}
+.iHead .cible{padding:2px 6px}
+.iApp{display:flex;gap:10px;align-items:center;padding:12px;font-size:15px}
+.iApp small{display:block;color:#8e8e93;font-size:12px}
+.vIco{width:40px;height:40px;border-radius:10px;background:#4a1a8c;display:flex;align-items:center;justify-content:center;font-size:22px}
+.aBar{display:flex;align-items:center;gap:8px;height:52px;padding:0 8px;background:#fff;border-bottom:1px solid #e0e0e0;color:#444}
+.aIc{width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700}
+.aAdr{flex:1;min-width:0;background:#f1f3f4;border-radius:20px;padding:8px 12px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.aTab{width:20px;height:20px;border:2px solid #444;border-radius:5px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.aMenu{background:#fff;padding:4px 0;box-shadow:inset 0 0 0 1px #eee}
+.aIcs{display:flex;justify-content:space-around;padding:8px 6px;font-size:19px;color:#444;border-bottom:1px solid #eee}
+.aRow{padding:11px 16px;font-size:15px;color:#202124}
+.aRow.cible{border-radius:6px;margin:0 6px}
+.aRow .vDoigt{right:20px;bottom:-24px}
+.vr.fonce{background:rgba(0,0,0,.45);padding:16px 14px}
+.aDlg{background:#fff;border-radius:22px;padding:18px 18px 12px;font-size:16px;color:#202124}
+.aApp{display:flex;gap:10px;align-items:center;margin:14px 0;font-size:15px}
+.aBtns{display:flex;justify-content:flex-end;gap:22px;color:#1a73e8;font-weight:600;font-size:15px}
+.aBtns .cible{padding:2px 8px}
 .mainBas{position:fixed;z-index:55;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(6px + env(safe-area-inset-bottom,0px));text-align:center;font-family:'Luckiest Guy',sans-serif;font-size:16px;color:#2a0f4f;background:#ffd400;border:3px solid #2a0f4f;border-radius:14px;padding:6px 10px;line-height:1.1;animation:rebond .8s infinite;box-shadow:3px 3px 0 #2a0f4f}
 .mainBas.gauche{right:auto;left:50%;transform:translateX(-50%)}
 /* téléphone */
@@ -411,12 +465,9 @@ button{background:#ff1744}
   <button class="gX" id="gX" type="button" aria-label="Fermer">✕</button>
   <div class="gBravo" id="gBravo" hidden>🎉 Bravo, ta carte est créée !</div>
   <h3 class="gTitre">Mets IBIZOU sur ton écran d'accueil</h3>
-  <div class="os"><button id="bIos" type="button" class="on">🍎 iPhone</button><button id="bAnd" type="button">🤖 Android</button></div>
-  <div class="gtel"><div class="ecran" id="ecran"></div></div>
-  <div class="gpoints" id="gpoints"></div>
-  <div class="etape"><span class="num" id="gnum">1</span><p id="gtxt"></p></div>
-  <div class="nav"><button id="gprec" type="button">◀</button><button id="gsuiv" type="button">Étape suivante ▶</button></div>
-  <button class="gEssai" id="gEssai" type="button" hidden>👍 J'essaie maintenant</button>
+  <div class="os"><button id="bIos" type="button" class="on">🍎 iPhone<small>Safari</small></button><button id="bChr" type="button">🍎 iPhone<small>Chrome</small></button><button id="bAnd" type="button">🤖 Android<small>Chrome, Samsung</small></button></div>
+  <div class="gSimple" id="gSimple"></div>
+  <button class="gEssai" id="gEssai" type="button">👍 J'essaie maintenant</button>
 </div></div>
 <div class="mainBas" id="mainBas" hidden>Appuie ici<br>👇</div>
 
@@ -756,14 +807,35 @@ const ETAPES={
 
 const estInstalle=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
 const estAndroid=/android/i.test(navigator.userAgent||'');
-let gos=estAndroid?'and':'ios',gi=0;
-function grendu(){const e=ETAPES[gos],st=e[gi];$('ecran').innerHTML=st.h;$('gtxt').innerHTML=st.t;$('gnum').textContent=gi===e.length-1?'✓':gi+1;
-  $('gpoints').innerHTML=e.map((_,k)=>'<i class="'+(k===gi?'on':'')+'"></i>').join('');
-  $('gprec').disabled=gi===0;const fin=gi===e.length-1;$('gsuiv').textContent=fin?'Revoir ↺':'Étape suivante ▶';$('gEssai').hidden=!fin}
-function gchoisir(o){gos=o;gi=0;$('bIos').className=o==='ios'?'on':'';$('bAnd').className=o==='and'?'on':'';grendu()}
-$('bIos').onclick=()=>gchoisir('ios');$('bAnd').onclick=()=>gchoisir('and');
-$('gsuiv').onclick=()=>{gi=(gi+1)%ETAPES[gos].length;grendu()};
-$('gprec').onclick=()=>{if(gi>0){gi--;grendu()}};
+let gos=estAndroid?'and':(/CriOS/i.test(navigator.userAgent||'')?'chr':'ios'),gi=0;
+const SV_SHARE='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5"/><path d="M8 10H6a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1h-2"/></svg>';
+const SV_PLUS='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8.5v7M8.5 12h7"/></svg>';
+const DOIGT='<span class="vDoigt">👆</span>';
+const SIMPLE={
+ ios:[
+  {t:'Appuie sur le bouton <b>Partager</b> en bas de l\'écran.<small>Si tu ne le vois pas, appuie d\'abord sur <b>•••</b> en bas à droite.</small>',
+   v:'<div class="vr ios"><div class="vPage">IBIZOU · ta carte</div><div class="iBar"><span class="ic">‹</span><span class="ic">›</span><span class="ic cible">'+SV_SHARE+DOIGT+'</span><span class="ic">📖</span><span class="ic">⧉</span></div></div>'},
+  {t:'Fais glisser vers le haut et appuie sur <b>Sur l\'écran d\'accueil</b>.',
+   v:'<div class="vr ios"><div class="iSheet"><div class="iRow">Copier<span>⧉</span></div><div class="iRow">Ajouter aux favoris<span>📖</span></div><div class="iRow">Ajouter à la liste de lecture<span>👓</span></div><div class="iRow cible">Sur l\'écran d\'accueil<span>'+SV_PLUS+'</span>'+DOIGT+'</div><div class="iRow">Rechercher dans la page<span>🔍</span></div></div></div>'},
+  {t:'Appuie sur <b>Ajouter</b> en haut à droite.',
+   v:'<div class="vr ios"><div class="iHead"><span class="bleu">Annuler</span><b>Sur l\'écran d\'accueil</b><span class="bleu gras cible">Ajouter'+DOIGT+'</span></div><div class="iApp"><span class="vIco">💋</span><div><b>IBIZOU</b><small>raymond8377.github.io</small></div></div></div>'}
+ ],
+ chr:[
+  {t:'Appuie sur le bouton <b>Partager</b> en haut à droite, dans la barre d\'adresse.<small>Si tu ne le vois pas : appuie sur <b>•••</b> en bas à droite, puis sur <b>Partager</b>.</small>',
+   v:'<div class="vr ios"><div class="cBar"><span class="cAdr">🔒 raymond8377.github.io<span class="ic cible">'+SV_SHARE+DOIGT+'</span></span></div><div class="vPage">IBIZOU · ta carte</div></div>'},
+  null,null
+ ],
+ and:[
+  {t:'Appuie sur les <b>3 petits points ⋮</b> en haut à droite.<small>Sur un <b>Samsung</b>, c\'est le bouton <b>≡</b> en bas à droite.</small>',
+   v:'<div class="vr and"><div class="aBar"><span class="aIc">⌂</span><span class="aAdr">🔒 raymond8377.github.io</span><span class="aTab">1</span><span class="aIc cible">⋮'+DOIGT+'</span></div><div class="vPage">IBIZOU · ta carte</div></div>'},
+  {t:'Appuie sur <b>Ajouter à l\'écran d\'accueil</b>.<small>Parfois c\'est écrit <b>Installer l\'application</b>. Sur Samsung : <b>Ajouter page à</b> puis <b>Écran d\'accueil</b>.</small>',
+   v:'<div class="vr and"><div class="aMenu"><div class="aIcs"><span>→</span><span>☆</span><span>⤓</span><span>ⓘ</span><span>↻</span></div><div class="aRow">Historique</div><div class="aRow">Partager…</div><div class="aRow">Traduire…</div><div class="aRow cible">Ajouter à l\'écran d\'accueil'+DOIGT+'</div><div class="aRow">Paramètres</div></div></div>'},
+  {t:'Appuie sur <b>Ajouter</b>.',
+   v:'<div class="vr and fonce"><div class="aDlg"><b>Ajouter à l\'écran d\'accueil</b><div class="aApp"><span class="vIco">💋</span>IBIZOU</div><div class="aBtns"><span>Annuler</span><span class="cible">Ajouter'+DOIGT+'</span></div></div></div>'}
+ ]};
+function grendu(){const l=SIMPLE[gos].map((e,k)=>e||SIMPLE.ios[k]);$('gSimple').innerHTML=l.map((e,k)=>'<div class="gs"><div class="gsH"><span class="n">'+(k+1)+'</span><div class="t">'+e.t+'</div></div>'+e.v+'</div>').join('')+'<div class="gs fin"><div class="gsH"><span class="n">✓</span><div class="t">C\'est fini ! L\'icône <b>IBIZOU 💋</b> est sur ton écran.</div></div></div>'}
+function gchoisir(o){gos=o;gi=0;$('bIos').className=o==='ios'?'on':'';$('bChr').className=o==='chr'?'on':'';$('bAnd').className=o==='and'?'on':'';grendu()}
+$('bIos').onclick=()=>gchoisir('ios');$('bChr').onclick=()=>gchoisir('chr');$('bAnd').onclick=()=>gchoisir('and');
 function ouvrirGuide(bravo){$('gBravo').hidden=!bravo;gchoisir(gos);$('gOv').hidden=false;try{localStorage.setItem('ibz_guide_vu','1')}catch(e){}}
 function fermerGuide(){$('gOv').hidden=true}
 $('gX').onclick=fermerGuide;
