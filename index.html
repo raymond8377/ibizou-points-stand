@@ -152,6 +152,19 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--encre)}
 .passages{margin-top:14px;background:#f6f0ff;border:2px solid #d9c8ff;border-radius:14px;padding:10px 12px;text-align:left}
 .passages summary{cursor:pointer;font-weight:800;color:#6b2bd9;font-size:16px}
 .pas{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid #e6dcf5;padding:8px 0;font-size:14px;color:#2a0f4f;font-variant-numeric:tabular-nums}
+.fid{background:#f3ecfd;border:3px solid #ffd400;border-radius:18px;padding:12px;margin:12px 0;text-align:left;color:#2a0f4f}
+.fidT{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.fidT h3{font-family:'Luckiest Guy',sans-serif;font-weight:400;font-size:20px;margin:0;color:#4a1a8c;letter-spacing:.5px}
+.fidT small{font-weight:800;color:#ff1744;font-variant-numeric:tabular-nums}
+.fidCases{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:10px 0 8px}
+.fidCase{aspect-ratio:1;max-width:100%;border-radius:12px;border:2px dashed #b9a6dc;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px}
+.fidCase svg{width:70%;height:auto}
+.fidCase.plein{border:2px solid #ff1744;background:#fff0f3}
+.fidCase.neuf{animation:fidTampon .55s ease-out}
+.fidCase.der{border:2px solid #ffd400;background:#fffbe0}
+@keyframes fidTampon{0%{transform:scale(1.6) rotate(-12deg);opacity:0}70%{transform:scale(.92)}100%{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.fidCase.neuf{animation:none}}
+.fidRegle{font-size:13px;line-height:1.45;margin:4px 0 0;color:#4b3a6b}
 .garantie{background:#e9fbef;border:3px solid #00c853;border-radius:18px;padding:12px 14px;margin:12px 0;color:#0b3d1f;text-align:left}
 .gaT{font-family:'Luckiest Guy',sans-serif;font-size:21px;letter-spacing:.5px;color:#00873a}
 .garantie ul{margin:6px 0 0;padding-left:18px;font-size:14.5px;line-height:1.4}
@@ -585,6 +598,11 @@ button{background:#ff1744}
     <div id="qr"></div>
     <div class="code" id="code"></div>
     <div class="info">Montre ce QR code au stand pour gagner des points ou les échanger contre un cadeau au stand.</div>
+    <div class="fid" id="fid" hidden>
+      <div class="fidT"><h3>Ma carte fidélité</h3><small id="fidCompte"></small></div>
+      <div class="fidCases" id="fidCases"></div>
+      <p class="fidRegle" id="fidRegle"></p>
+    </div>
     <div class="actus" id="actus" hidden>
       <h4>📰 L'actu du stand</h4>
       <div id="actusListe"></div>
@@ -722,7 +740,7 @@ async function afficherCarte(){
   $('vueInscription').style.display='none';$('vueRecup').style.display='none';$('vueCarte').style.display='block';
   new QRCode($('qr'),{text:'IBZ:'+monId,width:220,height:220,correctLevel:QRCode.CorrectLevel.M});
   await rafraichir();verifierCadeaux();bons();verifierJeu();tournee();concours();classement();passages();actus();
-  setInterval(rafraichir,4000);setInterval(verifierCadeaux,8000);setInterval(bons,8000);setInterval(verifierJeu,20000);setInterval(concours,20000);setInterval(classement,30000);
+  fidelite();setInterval(rafraichir,4000);setInterval(verifierCadeaux,8000);setInterval(bons,8000);setInterval(verifierJeu,20000);setInterval(concours,20000);setInterval(classement,30000);
 }
 async function rafraichir(){
   try{
@@ -730,7 +748,7 @@ async function rafraichir(){
     if(!d||!d.length){$('errCarte').textContent='Carte introuvable. Demande au stand.';$('errCarte').style.display='block';return}
     const c=d[0];$('errCarte').style.display='none';
     $('bonjour').textContent='Salut '+c.prenom+(c.nom?' '+c.nom:'')+' !';$('code').textContent=c.code;
-    if(dernier!==null&&c.points!==dernier){if(typeof passages==="function"){passages();classement()}
+    if(dernier!==null&&c.points!==dernier){if(typeof passages==="function"){passages();classement()}fidelite();
       const p=$('points');p.classList.remove('pop');void p.offsetWidth;p.classList.add('pop');
       recu(c.points);
       if(navigator.vibrate)navigator.vibrate(120);
@@ -968,6 +986,17 @@ async function actus(){try{const d=await rpc('ibz_contenu_public',{});const l=(d
     e.appendChild(t);z.appendChild(e)});
 }catch(e){}}
 // Bons cadeaux
+const FID_BOUCHE='<svg viewBox="0 0 40 24" aria-hidden="true"><path d="M2 12 C8 2 14 3 20 7 C26 3 32 2 38 12 C32 22 8 22 2 12Z" fill="#ff1744"/><path d="M5 12 C12 10 28 10 35 12" stroke="#b0002a" stroke-width="2" fill="none"/></svg>';
+let fidPrec=null;
+async function fidelite(){if(!monId)return;try{const d=await rpc('ibz_fid_client',{p_id:monId});if(!d||!d.length)return;const f=d[0],tot=f.total||10;
+  $('fid').hidden=false;$('fidCompte').textContent=f.cases+' / '+tot;
+  $('fidRegle').innerHTML='Chaque <b>10 € joués</b> = 1 case + <b>'+(f.points_case||2)+' points</b> ajoutés à tes points.<br>Carte pleine = <b></b> 🎁';
+  $('fidRegle').querySelector('b:last-of-type').textContent=f.cadeau||'10 € de jeu offerts';
+  const z=$('fidCases');z.innerHTML='';
+  for(let i=0;i<tot;i++){const c=document.createElement('div');const plein=i<f.cases;
+    c.className='fidCase'+(plein?' plein':'')+(!plein&&i===tot-1?' der':'')+(plein&&fidPrec!==null&&i>=fidPrec?' neuf':'');
+    c.innerHTML=plein?FID_BOUCHE:(i===tot-1?'🎁':'');z.appendChild(c)}
+  fidPrec=f.cases}catch(e){}}
 async function bons(){try{const d=await rpc('ibz_mes_bons',{p_id:monId});const l=$('bonsListe');l.innerHTML='';
   $('bons').style.display=d&&d.length?'block':'none';
   (d||[]).forEach(b=>{const e=document.createElement('div');e.textContent='🎟️ '+b.libelle;l.appendChild(e)})}catch(e){}}

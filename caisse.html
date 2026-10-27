@@ -150,6 +150,17 @@ body.employe .patron{display:none!important}
 .nom{font-size:26px}
 .grille button{background:#00c853;font-size:22px;box-shadow:3px 3px 0 var(--encre)}
 .grille.retire button{background:#ff1744}
+.fidC{margin-top:14px;background:#fff8d6;border:3px solid #ffd400;border-radius:16px;padding:10px 12px}
+.fidC h2{margin:0 0 6px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.fidC h2 small{font-size:15px;color:#ff1744;font-variant-numeric:tabular-nums}
+.fidMini{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-bottom:8px}
+.fidMini i{aspect-ratio:1;border-radius:6px;border:2px dashed #c9b37a;background:#fff}
+.fidMini i.p{background:#ff1744;border:2px solid #b0002a}
+.grille.fidG{grid-template-columns:repeat(5,1fr)}
+.grille.fidG button{background:#ffd400;color:#2a0f4f;font-size:17px}
+.fidV{margin-top:10px;font-weight:800;color:#2a0f4f}
+.fidV .vBt{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.fidV .vBt button{margin:0}
 .ok{background:#00c853;color:#fff;font-size:20px;border:3px solid var(--encre)}
 .err{background:#ff1744;color:#fff;font-size:17px;border:3px solid var(--encre)}
 .bon{background:#ffd400;border-color:#ff1744}
@@ -198,6 +209,12 @@ body.employe .patron{display:none!important}
     <h2>Donner des points</h2>
     <div class="grille">
       <button data-d="1">+1</button><button data-d="3">+3</button><button data-d="5">+5</button><button data-d="10">+10</button>
+    </div>
+    <div class="fidC">
+      <h2>💋 Carte fidélité <small id="fCompte"></small></h2>
+      <div class="fidMini" id="fMini"></div>
+      <div class="grille fidG"><button data-e="10">10 €</button><button data-e="20">20 €</button><button data-e="30">30 €</button><button data-e="40">40 €</button><button data-e="50">50 €</button></div>
+      <div class="fidV" id="fValid" hidden><div id="fTxt"></div><div class="vBt"><button class="gris" id="fAnn" type="button">Annuler</button><button id="fOk" type="button">✅ Valider</button></div></div>
     </div>
     <h2 style="margin-top:14px">🎁 Utiliser les points pour un cadeau</h2>
     <div class="grille retire">
@@ -450,11 +467,27 @@ async function chercher(cle,direct){
 $('btnChercher').onclick=()=>{const v=$('recherche').value.trim();if(v)chercher(v)};
 $('recherche').onkeydown=e=>{if(e.key==='Enter')$('btnChercher').click()};
 
+let fAttente=0,fInfo=null;
+async function fidCaisse(){if(!client)return;try{const d=await rpc('ibz_fid_client',{p_id:client.id});fInfo=d&&d[0];if(!fInfo)return;
+  const t=fInfo.total||10;$('fCompte').textContent=fInfo.cases+' / '+t;$('fMini').innerHTML=Array.from({length:t},(_,i)=>'<i class="'+(i<fInfo.cases?'p':'')+'"></i>').join('')}catch(e){}}
+function fMaj(){const v=$('fValid');if(!client||!fAttente){v.hidden=true;return}v.hidden=false;
+  const n=fAttente/10,ppc=(fInfo&&fInfo.points_case)||2,t=(fInfo&&fInfo.total)||10,c=(fInfo&&fInfo.cases)||0;
+  $('fTxt').textContent=fAttente+' € joués par '+client.prenom+' : '+n+' case'+(n>1?'s':'')+' et +'+(n*ppc)+' points'+(c+n>=t?' · carte pleine, bon de 10 € offert 🎁':'')+' ?';
+  v.scrollIntoView({behavior:'smooth',block:'nearest'})}
+document.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>{if(!client)return;fAttente=parseInt(b.dataset.e,10);montre('okMsg','');montre('errClient','');fMaj()});
+$('fAnn').onclick=()=>{fAttente=0;fMaj()};
+$('fOk').onclick=async()=>{const e=fAttente;if(!e||!client||occupe)return;occupe=true;$('fOk').disabled=true;montre('errClient','');
+  try{const cle='fid-'+client.id+'-'+Date.now();const r=await rpc('ibz_fidelite',{p_pin:PIN,p_client:client.id,p_euros:e,p_cle:cle});
+    if(!r||!r.length)throw new Error('Code caisse incorrect, reverrouille et retape le code');const x=r[0];
+    client.points=x.points;$('cSolde').textContent=x.points;
+    montre('okMsg','✅ Carte fidélité : +'+x.ajout+' points pour '+client.prenom+(x.cartes?' · 🎁 carte pleine, bon « 10 € de jeu offerts » créé':'')+' (carte : '+x.cases+' / '+((fInfo&&fInfo.total)||10)+')');
+    fAttente=0;fMaj();fidCaisse();bonsClient();journal();historique()}catch(e){montre('errClient',e.message)}
+  $('fOk').disabled=false;occupe=false};
 function choisir(c){
   client=c;$('vueClient').style.display='block';$('qrRecup').innerHTML='';
   $('cNom').textContent=c.prenom+(c.nom?' '+c.nom:'');$('cMeta').textContent='Code '+c.code+(c.tel?' · '+c.tel:'');
   $('cSolde').textContent=c.points;montre('okMsg','');montre('errClient','');
-  enAttente=0;majValid();resetSuppr();majCible();majP();bonsClient();fiche();jeuClient();historique();$('vueClient').scrollIntoView({behavior:'smooth'});
+  enAttente=0;majValid();fAttente=0;fMaj();fidCaisse();resetSuppr();majCible();majP();bonsClient();fiche();jeuClient();historique();$('vueClient').scrollIntoView({behavior:'smooth'});
 }
 function demanderCode(d){return new Promise(res=>{
   const m=$('pad');let v='';const aff=()=>{$('padAff').textContent='●'.repeat(v.length)+'○'.repeat(4-v.length)};
