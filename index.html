@@ -152,6 +152,21 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--encre)}
 .passages{margin-top:14px;background:#f6f0ff;border:2px solid #d9c8ff;border-radius:14px;padding:10px 12px;text-align:left}
 .passages summary{cursor:pointer;font-weight:800;color:#6b2bd9;font-size:16px}
 .pas{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid #e6dcf5;padding:8px 0;font-size:14px;color:#2a0f4f;font-variant-numeric:tabular-nums}
+.garantie{background:#e9fbef;border:3px solid #00c853;border-radius:18px;padding:12px 14px;margin:12px 0;color:#0b3d1f;text-align:left}
+.gaT{font-family:'Luckiest Guy',sans-serif;font-size:21px;letter-spacing:.5px;color:#00873a}
+.garantie ul{margin:6px 0 0;padding-left:18px;font-size:14.5px;line-height:1.4}
+.garantie li{margin:3px 0}
+.recuOv{position:fixed;inset:0;z-index:70;background:rgba(30,8,60,.82);display:flex;align-items:center;justify-content:center;padding:18px}
+.recuOv[hidden]{display:none}
+.recu{width:100%;max-width:340px;background:#fff;border-radius:22px;padding:18px 18px 14px;text-align:center;color:#2a0f4f;box-shadow:0 14px 40px rgba(0,0,0,.4);border:4px solid #ffd400}
+.recu h3{font-family:'Luckiest Guy',sans-serif;font-weight:400;font-size:24px;margin:0 0 4px;color:#4a1a8c}
+.recu .rH{font-size:13px;opacity:.7;margin-bottom:10px}
+.recu .rL{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;background:#f6f1fd;margin:6px 0;text-align:left;font-size:15px}
+.recu .rL b{font-family:'Luckiest Guy',sans-serif;font-weight:400;font-size:22px;white-space:nowrap}
+.recu .rL b.p{color:#00a63e}.recu .rL b.m{color:#ff1744}
+.recu .rS{margin:12px 0 6px;font-size:16px}.recu .rS b{font-size:20px}
+.recu .rN{font-size:12.5px;opacity:.75;margin:8px 0 12px}
+.recu button{width:100%;margin:0}
 .pas small{display:block;opacity:.7}.pas .p{color:#00a63e;font-weight:800}.pas .m{color:#ff1744;font-weight:800}
 
 .concours{margin-top:14px;background:linear-gradient(135deg,#fff3b0,#ffd6a5);border:3px solid #ff9100;border-radius:16px;padding:12px;text-align:left}
@@ -461,6 +476,13 @@ button{background:#ff1744}
   <button id="btnOuvrir">Ouvrir</button>
 </div></div>
 <div class="toast" id="toast"></div>
+<div class="recuOv" id="recuOv" hidden><div class="recu" role="dialog" aria-live="assertive">
+  <h3>📲 Ta carte a bougé</h3><div class="rH" id="recuH"></div>
+  <div id="recuL"></div>
+  <div class="rS">Tu as maintenant <b id="recuS"></b> points</div>
+  <div class="rN">C'est noté pour toujours dans ton historique.</div>
+  <button id="recuOk" type="button">OK, j'ai vu ✅</button>
+</div></div>
 <div class="gOv" id="gOv" hidden><div class="gBox">
   <button class="gX" id="gX" type="button" aria-label="Fermer">✕</button>
   <div class="gBravo" id="gBravo" hidden>🎉 Bravo, ta carte est créée !</div>
@@ -573,7 +595,16 @@ button{background:#ff1744}
       <ol id="topListe"></ol>
       <p class="topMoi" id="topMoi"></p>
     </div>
-    <details class="passages" id="passages"><summary>🕘 Mes passages</summary><div id="pasListe"></div></details>
+    <div class="garantie">
+      <div class="gaT">🛡️ Garantie IBIZOU</div>
+      <ul>
+        <li><b>Tes points t'appartiennent</b> et ne disparaissent jamais d'une foire à l'autre.</li>
+        <li>Ils ne sont retirés <b>que quand TU choisis un cadeau</b>, devant toi.</li>
+        <li>À chaque changement, <b>ton téléphone te prévient</b> tout de suite.</li>
+        <li>Tout est écrit dans <b>ton historique</b>, et personne ne peut l'effacer.</li>
+      </ul>
+    </div>
+    <details class="passages" id="passages"><summary>🕘 Mon historique (tous mes points)</summary><div id="pasListe"></div></details>
     <div class="concours" id="concours" hidden>
       <h4>🏆 Concours IBIZOU</h4>
       <div id="concListe"></div>
@@ -701,7 +732,7 @@ async function rafraichir(){
     $('bonjour').textContent='Salut '+c.prenom+(c.nom?' '+c.nom:'')+' !';$('code').textContent=c.code;
     if(dernier!==null&&c.points!==dernier){if(typeof passages==="function"){passages();classement()}
       const p=$('points');p.classList.remove('pop');void p.offsetWidth;p.classList.add('pop');
-      toast(c.points>dernier?'+'+(c.points-dernier)+' points !':'Bonne partie !');
+      recu(c.points);
       if(navigator.vibrate)navigator.vibrate(120);
     }
     dernier=c.points;$('points').textContent=c.points;
@@ -910,6 +941,15 @@ async function classement(){if(!monId)return;try{const d=await rpc('ibz_classeme
   const m=d.find(r=>r.moi);$('topMoi').textContent=m?(m.rang===1?'👑 Tu es premier ! Garde ta place !':'Tu es '+m.rang+'e. Encore '+(d.find(r=>r.rang===m.rang-1)||{points:m.points}).points+' pts pour la place du dessus… ou plus !'):'Gagne des points au stand pour entrer dans le classement !';
   if(m&&m.rang>1){const au=d.filter(r=>r.rang<m.rang).pop();if(au)$('topMoi').textContent='Tu es '+m.rang+'e. Encore '+(au.points-m.points+1)+' pts pour passer devant '+au.nom+' !'}
 }catch(e){}}
+let recuDepuis=Date.now()-5000;
+async function recu(solde){try{const d=await rpc('ibz_mes_passages',{p_id:monId})||[];
+  const n=d.filter(o=>new Date(o.heure).getTime()>recuDepuis&&o.delta);if(!n.length)return;
+  recuDepuis=Math.max(...n.map(o=>new Date(o.heure).getTime()));
+  const h=new Date(n[0].heure);$('recuH').textContent='Le '+h.toLocaleDateString('fr-FR',{day:'numeric',month:'long'})+' à '+h.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  const z=$('recuL');z.innerHTML='';n.slice(0,4).forEach(o=>{const r=document.createElement('div');r.className='rL';r.innerHTML='<span></span><b></b>';
+    r.firstChild.textContent=o.motif||'Points';const b=r.lastChild;b.textContent=(o.delta>0?'+':'−')+Math.abs(o.delta);b.className=o.delta>0?'p':'m';z.appendChild(r)});
+  $('recuS').textContent=solde;$('recuOv').hidden=false}catch(e){}}
+$('recuOk').onclick=()=>{$('recuOv').hidden=true};
 async function passages(){if(!monId)return;try{const d=await rpc('ibz_mes_passages',{p_id:monId});const z=$('pasListe');z.innerHTML='';
   if(!d||!d.length){z.innerHTML='<div class="pas">Aucun passage pour le moment.</div>';return}
   d.forEach(o=>{const r=document.createElement('div');r.className='pas';r.innerHTML='<span><b></b><small></small></span><span></span>';
