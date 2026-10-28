@@ -153,6 +153,9 @@ body.employe .patron{display:none!important}
 .grille.retire button{background:#ff1744}
 #vueClient.fin{position:relative}#vueClient.fin::after{content:"✅ C'est fait · client suivant…";position:sticky;bottom:12px;display:block;margin-top:10px;text-align:center;background:#00c853;color:#fff;font-weight:800;padding:10px;border-radius:12px}
 #vueClient.fin .grille,#vueClient.fin .fidC,#vueClient.fin #btnAutre{pointer-events:none;opacity:.45}
+#cBons:not(:empty){background:#fff3b0;border:3px solid #ffd400;border-radius:14px;padding:10px 12px;margin:10px 0 14px;animation:bonsPop .5s ease-out}
+@keyframes bonsPop{0%{transform:scale(.96);box-shadow:0 0 0 6px rgba(255,212,0,.6)}100%{transform:none;box-shadow:none}}
+@media (prefers-reduced-motion:reduce){#cBons:not(:empty){animation:none}}
 .fidC{margin-top:14px;background:#fff8d6;border:3px solid #ffd400;border-radius:16px;padding:10px 12px}
 .fidC h2{margin:0 0 6px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .fidC h2 small{font-size:15px;color:#ff1744;font-variant-numeric:tabular-nums}
@@ -228,6 +231,7 @@ body.employe .patron{display:none!important}
     <div class="meta" id="cNiveau" style="font-weight:700;opacity:.9"></div>
     <div class="solde" id="cSolde">0</div>
     <div class="unite">POINTS</div>
+    <div id="cBons"></div>
     <h2>Donner des points</h2>
     <div class="grille">
       <button data-d="1">+1</button><button data-d="3">+3</button><button data-d="5">+5</button><button data-d="10">+10</button>
@@ -249,7 +253,6 @@ body.employe .patron{display:none!important}
       <div class="vBt"><button class="gris" id="vAnn" type="button">Annuler</button><button id="vOk" type="button">✅ Valider</button></div>
     </div>
     <details class="hist" id="hist"><summary>🕘 Historique du client</summary><div id="histListe"></div></details>
-    <div id="cBons"></div>
     <div id="cJeu"></div>
     <div class="ok" id="okMsg"></div>
     <div class="err" id="errClient"></div>
@@ -881,7 +884,7 @@ async function fiche(){$('cFiche').textContent='';$('cNiveau').textContent='';if
   }catch(e){}}
 async function bonsClient(){const z=$('cBons');z.innerHTML='';if(!client)return;
   try{const d=await rpc('ibz_bons_client',{p_pin:PIN,p_id:client.id});
-    if(d.length){const h=document.createElement('h2');h.style.marginTop='14px';h.textContent='🎟️ Bons cadeaux';z.appendChild(h)}
+    if(d.length){const h=document.createElement('h2');h.style.margin='0 0 6px';h.textContent='🎟️ '+d.length+' bon'+(d.length>1?'s':'')+' à utiliser';z.appendChild(h)}
     d.forEach(b=>{const r=document.createElement('div');r.className='bon';r.innerHTML='<span></span><button>Utiliser</button>';
       r.children[0].textContent=b.libelle;
       r.children[1].onclick=async()=>{if(!confirm('Valider « '+b.libelle+' » pour '+client.prenom+' ?'))return;
