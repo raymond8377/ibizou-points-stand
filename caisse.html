@@ -963,14 +963,14 @@ $('btnEnCours').onclick=()=>{$('encOv').hidden=false;document.body.style.overflo
 $('encFermer').onclick=()=>{$('encOv').hidden=true;document.body.style.overflow=''};
 $('encOv').onclick=e=>{if(e.target===$('encOv'))$('encFermer').onclick()};
 let trs=[];
-async function transferts(){try{trs=await rpc('ibz_transferts_attente',{p_pin:PIN})||[];const z=$('trListe');z.innerHTML='';
+async function transferts(){try{trs=await rpc('ibz_transferts_attente2',{p_pin:PIN})||[];const z=$('trListe');z.innerHTML='';
   trs.forEach(t=>{const r=document.createElement('div');r.className='sg trf';
     r.innerHTML='<div class="sgT"></div><div class="meta"></div><div class="sgB"><button class="non" type="button">❌ Refuser</button><button type="button">✅ Valider</button></div>';
-    r.querySelector('.sgT').textContent='🤝 '+t.de_nom+' veut envoyer '+t.points+' points à '+t.vers_nom+(t.vers_nom.endsWith('.')?'':'.');
+    const quoi=t.sorte==='points'?t.points+' points':t.sorte==='bon'?'le cadeau « '+(t.libelle||'')+' »':'une partie de machine à sous';r.querySelector('.sgT').textContent='🤝 '+t.de_nom+' veut envoyer '+quoi+' à '+t.vers_nom+(t.vers_nom.endsWith('.')?'':'.');
     r.querySelector('.meta').textContent=t.de_nom+' a '+t.de_points+' points · demandé le '+new Date(t.quand).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
     const go=async ok=>{r.querySelectorAll('button').forEach(b=>b.disabled=true);montre('okSugg','');montre('errSugg','');
       try{const x=await rpc('ibz_transfert_traiter',{p_pin:PIN,p_transfert:t.id,p_ok:ok});if(x===null)throw new Error('Code caisse incorrect');
-        montre('okSugg',ok?'✅ '+t.points+' points envoyés de '+t.de_nom+' à '+t.vers_nom+'.':'Envoi refusé.');transferts();journal();liste()}
+        montre('okSugg',ok?'✅ Envoi validé : '+t.de_nom+' → '+t.vers_nom+'.':'Envoi refusé.');transferts();journal();liste()}
       catch(e){montre('errSugg',e.message);r.querySelectorAll('button').forEach(b=>b.disabled=false)}};
     const [n,o]=r.querySelectorAll('.sgB button');n.onclick=()=>go(false);o.onclick=()=>go(true);z.appendChild(r)});
   majSugg()}catch(e){}}

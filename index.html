@@ -604,6 +604,11 @@ button{background:#ff1744}
 .envNote{font-family:'Mali','Nunito',sans-serif;font-weight:600;font-size:13px;line-height:1.4;margin:10px 0 0;color:#fff6e0;background:rgba(0,0,0,.12);border-radius:12px;padding:8px 10px}
 .okEnv{margin-top:8px;background:#e9fbef;border:2px solid #00c853;border-radius:12px;padding:8px 10px;font-size:14px;color:#0b5a2b}
 .envoi .err{background:#fff;border-radius:12px;padding:6px 10px}
+.envChoix{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:4px 0 2px}
+.envChoix button{margin:0;padding:9px 4px;font-size:15px;background:rgba(255,255,255,.2);color:#fff;border:2px solid rgba(255,255,255,.6);box-shadow:none;border-radius:12px}
+.envChoix button.on{background:#fff;color:#e65100;border-color:#7a2a00}
+.envoi select{width:100%;font-family:'Nunito',sans-serif;font-weight:800;font-size:16px;padding:12px;border-radius:14px;border:3px solid #7a2a00;background:#fff;color:#2a0f4f}
+.envVide{font-size:13.5px;margin:6px 0 0;color:#fff6e0}
 .envL{display:flex;justify-content:space-between;align-items:center;gap:8px;background:#fff;color:#2a0f4f;border-radius:12px;padding:8px 10px;margin-top:8px;font-size:14px}
 .envL small{display:block;color:#6d5d8a}
 .envL button{width:auto;margin:0;padding:6px 10px;font-size:13px;background:#fff;color:#c62828;border:2px solid #c62828;box-shadow:none}
@@ -815,15 +820,17 @@ input,select,textarea{font-family:'Nunito',sans-serif}
     </div>
     <div class="petit sv-ok" id="svOk" hidden>✅ Appli bien installée sur ton téléphone !</div>
     <div class="envoi" id="blocEnvoi">
-      <div class="envT"><span class="envI" aria-hidden="true"><svg viewBox="0 0 64 64"><rect x="4" y="14" width="30" height="20" rx="4" fill="#fff" stroke="#7a2a00" stroke-width="2.5"/><rect x="4" y="19" width="30" height="4" fill="#ff9100"/><rect x="30" y="34" width="30" height="20" rx="4" fill="#ffd84a" stroke="#7a2a00" stroke-width="2.5"/><rect x="30" y="39" width="30" height="4" fill="#ff1744"/><path d="M38 12c8 0 14 5 15 13" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/><path d="m48 23 5 4 4-6" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 52c4 3 9 4 13 2" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"/></svg></span><div><span class="envSur">Partage</span><h4>Envoyer des points</h4><small>à un ami ou à quelqu'un de ta famille</small></div></div>
+      <div class="envT"><span class="envI" aria-hidden="true"><svg viewBox="0 0 64 64"><rect x="4" y="14" width="30" height="20" rx="4" fill="#fff" stroke="#7a2a00" stroke-width="2.5"/><rect x="4" y="19" width="30" height="4" fill="#ff9100"/><rect x="30" y="34" width="30" height="20" rx="4" fill="#ffd84a" stroke="#7a2a00" stroke-width="2.5"/><rect x="30" y="39" width="30" height="4" fill="#ff1744"/><path d="M38 12c8 0 14 5 15 13" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/><path d="m48 23 5 4 4-6" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 52c4 3 9 4 13 2" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"/></svg></span><div><span class="envSur">Partage</span><h4>Envoyer à un ami</h4><small>des points, un cadeau ou une partie, à un ami ou à ta famille</small></div></div>
+      <div class="envChoix" role="group" aria-label="Quoi envoyer"><button type="button" data-s="points" class="on">⭐ Points</button><button type="button" data-s="bon">🎟️ Cadeau</button><button type="button" data-s="machine">🎰 Partie</button></div>
       <label for="envCode">Code carte de la personne</label>
       <input id="envCode" maxlength="6" autocapitalize="characters" autocomplete="off" placeholder="Ex : K7MP2Q" style="text-transform:uppercase;letter-spacing:3px">
-      <label for="envPts">Combien de points ?</label>
-      <input id="envPts" type="number" inputmode="numeric" min="1" max="500" placeholder="Ex : 10">
+      <div id="envBlocPts"><label for="envPts">Combien de points ?</label>
+      <input id="envPts" type="number" inputmode="numeric" min="1" max="500" placeholder="Ex : 10"></div>
+      <div id="envBlocObj" hidden><label for="envObj" id="envObjLab">Quel cadeau ?</label><select id="envObj"></select><p class="envVide" id="envVide" hidden></p></div>
       <label for="envSecret">Ton code secret (4 chiffres)</label>
       <input id="envSecret" class="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••">
-      <button id="btnEnvoi" type="button">Envoyer les points</button>
-      <p class="envNote">IBIZOU vérifie et valide l'envoi au stand. Tes points partent seulement à ce moment-là.</p>
+      <button id="btnEnvoi" type="button">Envoyer</button>
+      <p class="envNote">IBIZOU vérifie et valide l'envoi au stand. Rien ne part avant ce moment-là.</p>
       <div class="err" id="errEnvoi"></div><div class="okEnv" id="okEnvoi" hidden></div>
       <div id="envListe"></div>
     </div>
@@ -1176,20 +1183,27 @@ async function recu(solde){try{const d=await rpc('ibz_mes_passages',{p_id:monId}
     r.firstChild.textContent=o.motif||'Points';const b=r.lastChild;b.textContent=(o.delta>0?'+':'−')+Math.abs(o.delta);b.className=o.delta>0?'p':'m';z.appendChild(r)});
   $('recuS').textContent=solde;$('recuOv').hidden=false}catch(e){}}
 $('recuOk').onclick=()=>{$('recuOv').hidden=true};
+let envSorte='points';
+async function envObjets(){const sel=$('envObj');sel.innerHTML='';$('envVide').hidden=true;if(envSorte==='points')return;
+  try{const d=envSorte==='bon'?await rpc('ibz_mes_bons_envoyables',{p_id:monId}):await rpc('ibz_mes_parties',{p_id:monId});
+    (d||[]).forEach(o=>{const op=document.createElement('option');op.value=o.id;op.textContent=o.libelle;sel.appendChild(op)});
+    if(!d||!d.length){$('envVide').textContent=envSorte==='bon'?'Tu n\'as pas de cadeau à envoyer pour l\'instant.':'Tu n\'as pas de partie de machine à sous à envoyer pour l\'instant.';$('envVide').hidden=false}}catch(e){}}
+document.querySelectorAll('.envChoix button').forEach(b=>b.onclick=()=>{envSorte=b.dataset.s;document.querySelectorAll('.envChoix button').forEach(x=>x.classList.toggle('on',x===b));
+  $('envBlocPts').hidden=envSorte!=='points';$('envBlocObj').hidden=envSorte==='points';$('envObjLab').textContent=envSorte==='bon'?'Quel cadeau ?':'Quelle partie ?';envObjets()});
 const ENV_ST={attente:'⏳ en attente au stand',ok:'✅ envoyés',refuse:'❌ refusé par IBIZOU',annule:'annulé'};
-async function envois(){if(!monId)return;try{const d=await rpc('ibz_mes_transferts',{p_id:monId})||[];const z=$('envListe');z.innerHTML='';
+async function envois(){if(!monId)return;try{const d=await rpc('ibz_mes_transferts2',{p_id:monId})||[];const z=$('envListe');z.innerHTML='';
   d.forEach(t=>{const r=document.createElement('div');r.className='envL';r.innerHTML='<span><b></b><small></small></span>';
-    r.querySelector('b').textContent=t.points+' pts → '+t.autre;r.querySelector('small').textContent=ENV_ST[t.statut]||t.statut;
+    r.querySelector('b').textContent=(t.sorte==='points'?t.points+' pts':t.sorte==='bon'?'🎟️ '+(t.libelle||'Cadeau'):'🎰 Partie')+' → '+t.autre;r.querySelector('small').textContent=ENV_ST[t.statut]||t.statut;
     if(t.statut==='attente'){const b=document.createElement('button');b.type='button';b.textContent='Annuler';
       b.onclick=async()=>{try{await rpc('ibz_transfert_annuler',{p_id:monId,p_transfert:t.id});envois()}catch(e){}};r.appendChild(b)}
     z.appendChild(r)})}catch(e){}}
 $('btnEnvoi').onclick=async()=>{const code=$('envCode').value.trim().toUpperCase(),pts=parseInt($('envPts').value,10),sec=$('envSecret').value.trim();
   $('errEnvoi').style.display='none';$('okEnvoi').hidden=true;
   const err=t=>{$('errEnvoi').textContent=t;$('errEnvoi').style.display='block'};
-  if(code.length!==6)return err('Le code carte fait 6 caractères (ex : K7MP2Q).');if(!(pts>0))return err('Mets un nombre de points.');if(!/^\d{4}$/.test(sec))return err('Tape ton code secret à 4 chiffres.');
+  const obj=parseInt($('envObj').value,10);if(code.length!==6)return err('Le code carte fait 6 caractères (ex : K7MP2Q).');if(envSorte==='points'&&!(pts>0))return err('Mets un nombre de points.');if(envSorte!=='points'&&!obj)return err(envSorte==='bon'?'Choisis un cadeau.':'Choisis une partie.');if(!/^\d{4}$/.test(sec))return err('Tape ton code secret à 4 chiffres.');
   $('btnEnvoi').disabled=true;
-  try{const nom=await rpc('ibz_transfert_demander',{p_id:monId,p_secret:sec,p_code:code,p_points:pts});
-    $('okEnvoi').textContent='👍 Demande envoyée : '+pts+' points pour '+nom+'. IBIZOU va valider au stand.';$('okEnvoi').hidden=false;
+  try{const nom=await rpc('ibz_transfert_demander2',{p_id:monId,p_secret:sec,p_code:code,p_sorte:envSorte,p_points:envSorte==='points'?pts:0,p_objet:envSorte==='points'?null:obj});
+    $('okEnvoi').textContent='👍 Demande envoyée : '+(envSorte==='points'?pts+' points':envSorte==='bon'?'ton cadeau':'ta partie')+' pour '+nom+'. IBIZOU va valider au stand.';envObjets();$('okEnvoi').hidden=false;
     $('envCode').value='';$('envPts').value='';$('envSecret').value='';envois()}
   catch(e){err(e.message)}
   $('btnEnvoi').disabled=false};
