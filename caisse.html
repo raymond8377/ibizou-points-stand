@@ -46,6 +46,7 @@ video{width:100%;border-radius:12px;background:#000;aspect-ratio:1;object-fit:co
 .cad{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .cad button{margin:0;padding:12px 4px;font-size:14px;background:#ffc23d;color:var(--encre)}
 .cad button.on{outline:4px solid var(--rouge)}
+.cad .cadMachine{grid-column:1/-1;background:#7c3aed;color:#fff}
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
 .seg button{margin:0;padding:10px;font-size:14px;background:#e6dcf5;color:var(--encre)}
 .seg button.on{background:#6b3fb3;color:#fff}
@@ -270,7 +271,9 @@ body.employe .patron{display:none!important}
       <button data-l="Partie gratuite" data-t="bon">Partie gratuite</button>
       <button data-l="5 balles offertes" data-t="bon">5 balles offertes</button>
       <button data-l="10 points offerts" data-p="10" data-t="points">10 points</button>
+      <button data-l="Partie de machine à sous" data-t="machine" class="cadMachine">🎰 Machine à sous</button>
     </div>
+    <div class="meta" id="infoMachine" style="display:none;margin-top:6px">🎰 Le client joue tout de suite sur son téléphone en ouvrant son cadeau. Ce qu'il gagne arrive dans ses points ou ses bons.</div>
     <div class="seg" style="margin-top:10px"><button id="tBon" class="on">Bon cadeau</button><button id="tPts">Des points</button></div>
     <div class="petitchamp"><input id="gLib" placeholder="Nom du cadeau"><input id="gPts" type="number" inputmode="numeric" min="1" max="100" placeholder="Points" style="display:none"></div>
     <div class="petitchamp"><span style="align-self:center;font-size:14px">Valable (jours)</span><input id="gJours" type="number" inputmode="numeric" value="7" min="1" max="60"></div>
@@ -840,7 +843,7 @@ async function actifs(){const z=$('actifs');z.innerHTML='';
   try{const d=await rpc('ibz_cadeaux_actifs',{p_pin:PIN});
     if(!d.length){z.innerHTML='<div class="meta">Aucune surprise en cours.</div>';return}
     d.forEach(g=>{const r=document.createElement('div');r.className='act';r.innerHTML='<span><b></b><br><small></small></span><button>Arrêter</button>';
-      r.querySelector('b').textContent=g.libelle+(g.type==='points'?' (+'+g.points+' pts)':'');
+      r.querySelector('b').textContent=(g.type==='machine'?'🎰 ':'')+g.libelle+(g.type==='points'?' (+'+g.points+' pts)':'');
       r.querySelector('small').textContent=g.pour+' · ouvert '+g.ouverts+' fois · jusqu\'au '+new Date(g.expire).toLocaleDateString('fr-FR');
       r.querySelector('button').onclick=async()=>{if(!confirm('Arrêter « '+g.libelle+' » ? Ceux qui ne l\'ont pas encore ouvert ne le verront plus.'))return;
         try{const ok=await rpc('ibz_arreter_cadeau',{p_pin:PIN,p_id:g.id});if(ok===null)throw new Error('Code caisse incorrect');actifs()}catch(e){montre('errCad',e.message)}};
@@ -859,8 +862,8 @@ function majCible(){$('cibleTous').className=cible==='tous'?'on':'';$('cibleClie
 $('cibleTous').onclick=()=>{cible='tous';majCible()};
 $('cibleClient').onclick=()=>{if(!client){montre('errCad','Scanne ou cherche d\'abord un client');return}cible='client';montre('errCad','');majCible()};
 let gType='bon';
-function majType(){$('tBon').className=gType==='bon'?'on':'';$('tPts').className=gType==='points'?'on':'';$('gPts').style.display=gType==='points'?'block':'none'}
-$('tBon').onclick=()=>{gType='bon';majType()};$('tPts').onclick=()=>{gType='points';majType()};
+function majType(){$('tBon').className=gType==='bon'?'on':'';$('tPts').className=gType==='points'?'on':'';$('gPts').style.display=gType==='points'?'block':'none';$('infoMachine').style.display=gType==='machine'?'block':'none'}
+$('tBon').onclick=()=>{gType='bon';document.querySelectorAll('.cad button').forEach(x=>x.classList.remove('on'));majType()};$('tPts').onclick=()=>{gType='points';document.querySelectorAll('.cad button').forEach(x=>x.classList.remove('on'));majType()};
 document.querySelectorAll('.cad button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.cad button').forEach(x=>x.classList.remove('on'));
   b.classList.add('on');$('gLib').value=b.dataset.l;gType=b.dataset.t;$('gPts').value=b.dataset.p||'';majType()});
 async function fiche(){$('cFiche').textContent='';$('cNiveau').textContent='';if(!client)return;
@@ -888,7 +891,7 @@ async function bonsClient(){const z=$('cBons');z.innerHTML='';if(!client)return;
   }catch(e){}}
 $('btnOffrir').onclick=async()=>{
   montre('okCad','');montre('errCad','');
-  const lib=$('gLib').value.trim(),pts=gType==='bon'?1:parseInt($('gPts').value,10),j=parseInt($('gJours').value,10)||7;
+  const lib=$('gLib').value.trim(),pts=gType!=='points'?1:parseInt($('gPts').value,10),j=parseInt($('gJours').value,10)||7;
   if(!lib||!(pts>0)){montre('errCad','Choisis un cadeau, ou mets un nom'+(gType==='points'?' et des points':''));return}
   if(cible==='client'&&!client){montre('errCad','Aucun client affiché');return}
   if(cible==='tous'&&!confirm('Envoyer « '+lib+' »'+(gType==='points'?' (+'+pts+' points)':'')+' à TOUS les clients ?'))return;

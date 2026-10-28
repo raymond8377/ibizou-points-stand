@@ -1048,6 +1048,8 @@ $('btnOuvrir').onclick=async()=>{
   if(cadeauOuvert){$('cadeau').style.display='none';cadeauEnCours=null;verifierCadeaux();return}
   $('btnOuvrir').disabled=true;
   try{const r=(await rpc('ibz_ouvrir_cadeau2',{p_id:monId,p_cadeau:cadeauEnCours.id}))[0];
+    if(r.type==='machine'){$('cadeau').style.display='none';cadeauEnCours=null;cadeauOuvert=false;$('btnOuvrir').disabled=false;
+      jeuId=r.quantite;$('slotSous').textContent='Machine à bisous · partie offerte';$('jeuBtn').onclick();verifierCadeaux();return}
     cadeauOuvert=true;$('cEmo').textContent='🎉';$('cEmo').className='emo ouvert';
     $('cTitre').textContent=r.libelle;
     $('cTexte').textContent=r.type==='bon'?'Montre ta carte au stand pour en profiter !':('+'+r.quantite+(r.quantite>1?' points ajoutés':' point ajouté')+' sur ta carte !');
