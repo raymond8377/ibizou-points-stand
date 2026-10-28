@@ -164,6 +164,12 @@ body.employe .patron{display:none!important}
 .sg .sgB{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .sg .sgB button{margin:0;padding:10px;font-size:16px}
 .sg .sgB .non{background:#e9e3f3;color:var(--encre)}
+.encOuvrir{display:flex;width:100%;align-items:center;gap:8px;text-align:left;font-size:18px;color:var(--encre);background:#fff;border:0;box-shadow:none;margin:0 0 14px;padding:16px}
+.encOuvrir span{color:#7c3aed;font-size:15px}.encOuvrir b{margin-left:auto;color:#7c3aed;font-size:16px}
+.encOv{position:fixed;inset:0;z-index:80;background:rgba(30,8,60,.75);overflow-y:auto;padding:max(12px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) max(20px,env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
+.encOv[hidden]{display:none}.encOv .enc{max-width:640px;margin:0 auto}
+.encHaut{display:flex;align-items:center;gap:8px;position:sticky;top:-16px;background:#fff;padding:6px 0;z-index:2}.encHaut h2{flex:1;margin:0}
+.encX{width:44px;height:44px;margin:0;padding:0;border-radius:50%;font-size:20px;background:#efe6fb;color:var(--encre);flex:none}
 .enc h2{display:flex;justify-content:space-between;align-items:baseline}.enc h2 small{color:#7c3aed}
 .encF{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}
 .encF button{margin:0;padding:8px 2px;font-size:13px;background:#efe6fb;color:var(--encre)}.encF button.on{background:#7c3aed;color:#fff}
@@ -249,14 +255,15 @@ body.employe .patron{display:none!important}
     <div id="suggListe"></div>
     <div class="ok" id="okSugg"></div><div class="err" id="errSugg"></div>
   </div>
-  <div class="bloc patron enc" id="blocEnCours">
-    <h2>📋 Cadeaux en cours <small id="encN"></small></h2>
+  <button type="button" class="bloc patron encOuvrir" id="btnEnCours">📋 Cadeaux en cours <span id="encN2"></span><b>Ouvrir ›</b></button>
+  <div class="encOv" id="encOv" hidden><div class="bloc patron enc" id="blocEnCours">
+    <div class="encHaut"><h2>📋 Cadeaux en cours <small id="encN"></small></h2><button type="button" class="encX" id="encFermer" aria-label="Fermer">✕</button></div>
     <div class="meta">Tous les cadeaux que tu as donnés et pas encore utilisés (boîtes cadeaux, bons, machine à sous, fin de foire…). Les automatiques n'y sont pas : bienvenue, anniversaire, niveau Or, parrainage.</div>
     <div class="encF" id="encF"><button type="button" data-f="tout" class="on">Tout</button><button type="button" data-f="cadeau">🎁 Boîtes</button><button type="button" data-f="bon">🎟️ Bons</button><button type="button" data-f="machine">🎰 Machine</button></div>
     <input id="encQ" placeholder="Chercher un client ou un cadeau" autocomplete="off">
     <div id="encListe"></div>
     <div class="ok" id="okEnc"></div><div class="err" id="errEnc"></div>
-  </div>
+  </div></div>
   <div class="bloc attente" id="attente"><div>📷</div><b>Scanne un client</b><span>ou cherche-le à gauche : sa fiche s'ouvrira ici</span></div>
   <div class="bloc client" id="vueClient">
     <div class="nom" id="cNom"></div>
@@ -895,7 +902,7 @@ const ENC_ICO={cadeau:'🎁',bon:'🎟️',machine:'🎰'};
 async function enCours(){try{encs=await rpc('ibz_en_cours',{p_pin:PIN})||[];afficherEnCours()}catch(e){}}
 function afficherEnCours(){const z=$('encListe');z.innerHTML='';const q=($('encQ').value||'').toLowerCase();
   const l=encs.filter(x=>(encFiltre==='tout'||x.sorte===encFiltre)&&(!q||(x.client+' '+x.libelle).toLowerCase().includes(q)));
-  $('encN').textContent=encs.length?encs.length+' en cours':'';
+  $('encN').textContent=encs.length?encs.length+' en cours':'';$('encN2').textContent=encs.length?'('+encs.length+')':'';
   if(!l.length){z.innerHTML='<div class="meta" style="margin-top:8px">Rien en cours ici.</div>';return}
   l.slice(0,60).forEach(x=>{const r=document.createElement('div');r.className='ec';
     r.innerHTML='<div class="ecH"><span class="ecI"></span><div class="ecT"><b></b><small class="c"></small><small class="d"></small></div></div><div class="ecB"><button type="button" class="mod">✏️ Modifier</button><button type="button" class="ret">🗑️ Retirer</button></div>';
@@ -918,6 +925,9 @@ function afficherEnCours(){const z=$('encListe');z.innerHTML='';const q=($('encQ
     z.appendChild(r)})}
 document.querySelectorAll('#encF button').forEach(b=>b.onclick=()=>{encFiltre=b.dataset.f;document.querySelectorAll('#encF button').forEach(x=>x.classList.toggle('on',x===b));afficherEnCours()});
 $('encQ').oninput=afficherEnCours;
+$('btnEnCours').onclick=()=>{$('encOv').hidden=false;document.body.style.overflow='hidden';enCours()};
+$('encFermer').onclick=()=>{$('encOv').hidden=true;document.body.style.overflow=''};
+$('encOv').onclick=e=>{if(e.target===$('encOv'))$('encFermer').onclick()};
 let suggs=[];
 async function suggestions(){try{const d=await rpc('ibz_suggestions',{p_pin:PIN});suggs=d||[];const z=$('suggListe');z.innerHTML='';
   $('blocSugg').hidden=!suggs.length;$('suggN').textContent=suggs.length?suggs.length+' idée'+(suggs.length>1?'s':''):'';
