@@ -180,6 +180,7 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--encre)}
   .tablette #vueCarte .points{font-size:110px}
   .tablette .carte:not(#vueCarte){max-width:560px;margin-left:auto;margin-right:auto}
 }
+.topCadeau{margin:0 0 8px;text-align:center;font-family:system-ui,sans-serif;font-size:14px;font-weight:800;color:#2a0f4f;background:#fff3b0;border-radius:10px;padding:6px 8px}
 .garantie{background:#e9fbef;border:3px solid #00c853;border-radius:18px;padding:12px 14px;margin:12px 0;color:#0b3d1f;text-align:left}
 .gaT{font-family:'Luckiest Guy',sans-serif;font-size:21px;letter-spacing:.5px;color:#00873a}
 .garantie ul{margin:6px 0 0;padding-left:18px;font-size:14.5px;line-height:1.4}
@@ -628,6 +629,7 @@ button{background:#ff1744}
       <a class="actusTout" href="actus.html">Toutes les actus, nouveautés et jeux →</a>
     </div>
     <div class="top" id="top" hidden>
+      <p class="topCadeau">🎁 Les <b>5 premiers du classement</b> gagneront un cadeau à la fin de la foire, à récupérer au stand <b>dès 2 jours avant la fin</b> !</p>
       <h4>🏅 Top joueurs <span id="topFoire"></span></h4>
       <ol id="topListe"></ol>
       <p class="topMoi" id="topMoi"></p>
@@ -1020,7 +1022,7 @@ let fidPrec=null;
 async function fidelite(){if(!monId)return;try{const d=await rpc('ibz_fid_client',{p_id:monId});if(!d||!d.length)return;const f=d[0],tot=f.total||10;
   $('fid').hidden=false;$('fidCompte').textContent=f.cases+' / '+tot;
   $('fidRegle').innerHTML='Chaque <b>10 € joués</b> = 1 case + <b>'+(f.points_case||2)+' points</b> ajoutés à tes points.<br>Carte pleine = <b></b> 🎁';
-  $('fidRegle').querySelector('b:last-of-type').textContent=f.cadeau||'10 € de jeu offerts';
+  $('fidRegle').querySelector('b:last-of-type').textContent=(f.cadeau||'10 € de jeu offerts')+' ou 30 points';
   const z=$('fidCases');z.innerHTML='';
   for(let i=0;i<tot;i++){const c=document.createElement('div');const plein=i<f.cases;
     c.className='fidCase'+(plein?' plein':'')+(!plein&&i===tot-1?' der':'')+(plein&&fidPrec!==null&&i>=fidPrec?' neuf':'');

@@ -156,6 +156,14 @@ body.employe .patron{display:none!important}
 #cBons:not(:empty){background:#fff3b0;border:3px solid #ffd400;border-radius:14px;padding:10px 12px;margin:10px 0 14px;animation:bonsPop .5s ease-out}
 @keyframes bonsPop{0%{transform:scale(.96);box-shadow:0 0 0 6px rgba(255,212,0,.6)}100%{transform:none;box-shadow:none}}
 @media (prefers-reduced-motion:reduce){#cBons:not(:empty){animation:none}}
+.sugg h2{display:flex;justify-content:space-between;align-items:baseline}.sugg h2 small{color:#ff1744}
+.sg{border:3px solid #ffd400;background:#fffbe6;border-radius:14px;padding:10px 12px;margin-top:10px;font-family:system-ui,sans-serif;color:var(--encre)}
+.sg .sgT{font-weight:800;font-size:15px;line-height:1.35}
+.sg .sgC{display:grid;grid-template-columns:minmax(0,1fr) 84px;gap:6px;margin-top:8px}
+.sg .sgC input{margin:0;padding:8px 10px;font-size:15px}
+.sg .sgB{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.sg .sgB button{margin:0;padding:10px;font-size:16px}
+.sg .sgB .non{background:#e9e3f3;color:var(--encre)}
 .fidC{margin-top:14px;background:#fff8d6;border:3px solid #ffd400;border-radius:16px;padding:10px 12px}
 .fidC h2{margin:0 0 6px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .fidC h2 small{font-size:15px;color:#ff1744;font-variant-numeric:tabular-nums}
@@ -165,6 +173,8 @@ body.employe .patron{display:none!important}
 .grille.fidG{grid-template-columns:repeat(5,1fr)}
 .grille.fidG button{background:#ffd400;color:#2a0f4f;font-size:17px}
 .fidV{margin-top:10px;font-weight:800;color:#2a0f4f}
+.fpT{margin-top:10px;font-size:15px}.fpC{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}.fpC button{margin:0;padding:9px 4px;font-size:15px;background:#fff;color:var(--encre)}.fpC button.on{background:#7c3aed;color:#fff}
+.fidV input{margin:6px 0 0;width:100%;font-size:16px}
 .fidV .vBt{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .fidV .vBt button{margin:0}
 .ok{background:#00c853;color:#fff;font-size:20px;border:3px solid var(--encre)}
@@ -223,6 +233,12 @@ body.employe .patron{display:none!important}
     <div class="err" id="errScan"></div>
   </div>
 
+  <div class="bloc patron sugg" id="blocSugg" hidden>
+    <h2>💡 Suggestions <small id="suggN"></small></h2>
+    <div class="meta">Des idées de cadeaux. Rien n'est donné sans ton ✅ : tu peux changer le cadeau avant de valider.</div>
+    <div id="suggListe"></div>
+    <div class="ok" id="okSugg"></div><div class="err" id="errSugg"></div>
+  </div>
   <div class="bloc attente" id="attente"><div>📷</div><b>Scanne un client</b><span>ou cherche-le à gauche : sa fiche s'ouvrira ici</span></div>
   <div class="bloc client" id="vueClient">
     <div class="nom" id="cNom"></div>
@@ -240,7 +256,7 @@ body.employe .patron{display:none!important}
       <h2>💋 Carte fidélité <small id="fCompte"></small></h2>
       <div class="fidMini" id="fMini"></div>
       <div class="grille fidG"><button data-e="10">10 €</button><button data-e="20">20 €</button><button data-e="30">30 €</button><button data-e="40">40 €</button><button data-e="50">50 €</button></div>
-      <div class="fidV" id="fValid" hidden><div id="fTxt"></div><div class="vBt"><button class="gris" id="fAnn" type="button">Annuler</button><button id="fOk" type="button">✅ Valider</button></div></div>
+      <div class="fidV" id="fValid" hidden><div id="fTxt"></div><div id="fPlein" hidden><div class="fpT">🎁 Carte pleine ! Cadeau pour <span id="fPrenom"></span> :</div><div class="fpC"><button type="button" id="fChBon" class="on">🎟️ Bon cadeau</button><button type="button" id="fChPts">⭐ Des points</button></div><input id="fCadeau" maxlength="40" aria-label="Nom du cadeau"><input id="fPts" type="number" inputmode="numeric" min="1" max="200" value="30" aria-label="Points offerts" hidden></div><div class="vBt"><button class="gris" id="fAnn" type="button">Annuler</button><button id="fOk" type="button">✅ Valider</button></div></div>
     </div>
     <h2 style="margin-top:14px">🎁 Utiliser les points pour un cadeau</h2>
     <div class="grille retire">
@@ -449,7 +465,7 @@ async function ouvrir(p){
     let role='patron';try{const q=(await rpc('ibz_qui',{p_pin:p}))[0];if(q){role=q.role;$('qui').textContent='👤 Connecté : '+q.nom+(q.role==='patron'?' (patron)':' (employé)')}}catch(e){}
     document.body.classList.toggle('employe',role==='employe');
     journal();liste();stats();viderFile();majBandeau();
-    if(role==='patron'){chargerBonus();actifs();chargerLots();chargerTour();chargerConc();bilan();chargerEmp();chargerCont()}
+    if(role==='patron'){suggestions();setInterval(suggestions,300000);chargerBonus();actifs();chargerLots();chargerTour();chargerConc();bilan();chargerEmp();chargerCont()}
   }catch(e){montre('errPin',e.message)}
 }
 $('btnPin').onclick=()=>ouvrir($('pin').value.replace(/[\s\/.\-]/g,''));
@@ -503,22 +519,26 @@ async function fidCaisse(){if(!client)return;try{const d=await rpc('ibz_fid_clie
   const t=fInfo.total||10;$('fCompte').textContent=fInfo.cases+' / '+t;$('fMini').innerHTML=Array.from({length:t},(_,i)=>'<i class="'+(i<fInfo.cases?'p':'')+'"></i>').join('')}catch(e){}}
 function fMaj(){const v=$('fValid');if(!client||!fAttente){v.hidden=true;return}v.hidden=false;
   const n=fAttente/10,ppc=(fInfo&&fInfo.points_case)||2,t=(fInfo&&fInfo.total)||10,c=(fInfo&&fInfo.cases)||0;
-  $('fTxt').textContent=fAttente+' € joués par '+client.prenom+' : '+n+' case'+(n>1?'s':'')+' et +'+(n*ppc)+' points'+(c+n>=t?' · carte pleine, bon de 10 € offert 🎁':'')+' ?';
+  $('fTxt').textContent=fAttente+' € joués par '+client.prenom+' : '+n+' case'+(n>1?'s':'')+' et +'+(n*ppc)+' points ?';
+  const plein=c+n>=t;$('fPlein').hidden=!plein;if(plein){$('fPrenom').textContent=client.prenom;if(!$('fCadeau').dataset.touche)$('fCadeau').value=(fInfo&&fInfo.cadeau)||'10 € de jeu offerts'}
   v.scrollIntoView({behavior:'smooth',block:'nearest'})}
 document.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>{if(!client)return;fAttente=parseInt(b.dataset.e,10);montre('okMsg','');montre('errClient','');fMaj()});
 $('fAnn').onclick=()=>{fAttente=0;fMaj()};
+$('fCadeau').oninput=()=>{$('fCadeau').dataset.touche='1'};
+let fChoix='bon';function fChoisir(c){fChoix=c;$('fChBon').className=c==='bon'?'on':'';$('fChPts').className=c==='pts'?'on':'';$('fCadeau').hidden=c!=='bon';$('fPts').hidden=c!=='pts'}
+$('fChBon').onclick=()=>fChoisir('bon');$('fChPts').onclick=()=>fChoisir('pts');
 $('fOk').onclick=async()=>{const e=fAttente;if(!e||!client||occupe)return;occupe=true;$('fOk').disabled=true;montre('errClient','');
-  try{const cle='fid-'+client.id+'-'+Date.now();const r=await rpc('ibz_fidelite',{p_pin:PIN,p_client:client.id,p_euros:e,p_cle:cle});
+  try{const cle='fid-'+client.id+'-'+Date.now();const plein=!$('fPlein').hidden;const r=await rpc('ibz_fidelite',{p_pin:PIN,p_client:client.id,p_euros:e,p_cle:cle,p_cadeau:plein&&fChoix==='bon'?$('fCadeau').value.trim():null,p_cadeau_points:plein&&fChoix==='pts'?(parseInt($('fPts').value,10)||30):0});
     if(!r||!r.length)throw new Error('Code caisse incorrect, reverrouille et retape le code');const x=r[0];
     client.points=x.points;$('cSolde').textContent=x.points;
-    montre('okMsg','✅ Carte fidélité : +'+x.ajout+' points pour '+client.prenom+(x.cartes?' · 🎁 carte pleine, bon « 10 € de jeu offerts » créé':'')+' (carte : '+x.cases+' / '+((fInfo&&fInfo.total)||10)+')');
-    fAttente=0;fMaj();fidCaisse();bonsClient();journal();historique();fermerBientot()}catch(e){montre('errClient',e.message)}
+    montre('okMsg','✅ Carte fidélité : +'+x.ajout+' points pour '+client.prenom+(x.cartes?(fChoix==='pts'?' · 🎁 carte pleine : +'+(parseInt($('fPts').value,10)||30)+' points offerts':' · 🎁 carte pleine, bon « '+($('fCadeau').value.trim()||'10 € de jeu offerts')+' » créé'):'')+' (carte : '+x.cases+' / '+((fInfo&&fInfo.total)||10)+')');
+    fAttente=0;delete $('fCadeau').dataset.touche;fChoisir('bon');$('fPts').value=30;fMaj();fidCaisse();bonsClient();journal();historique();fermerBientot()}catch(e){montre('errClient',e.message)}
   $('fOk').disabled=false;occupe=false};
 function choisir(c){
   client=c;$('vueClient').style.display='block';$('qrRecup').innerHTML='';
   $('cNom').textContent=c.prenom+(c.nom?' '+c.nom:'');$('cMeta').textContent='Code '+c.code+(c.tel?' · '+c.tel:'');
   $('cSolde').textContent=c.points;montre('okMsg','');montre('errClient','');
-  clearTimeout(tFermer);$('vueClient').classList.remove('fin');reveil();enAttente=0;majValid();fAttente=0;fMaj();fidCaisse();resetSuppr();majCible();majP();bonsClient();fiche();jeuClient();historique();$('vueClient').scrollIntoView({behavior:'smooth'});
+  clearTimeout(tFermer);$('vueClient').classList.remove('fin');reveil();enAttente=0;majValid();fAttente=0;delete $('fCadeau').dataset.touche;fChoisir('bon');$('fPts').value=30;fMaj();fidCaisse();resetSuppr();majCible();majP();bonsClient();fiche();jeuClient();historique();$('vueClient').scrollIntoView({behavior:'smooth'});
 }
 function demanderCode(d){return new Promise(res=>{
   const m=$('pad');let v='';const aff=()=>{$('padAff').textContent='●'.repeat(v.length)+'○'.repeat(4-v.length)};
@@ -852,6 +872,19 @@ async function actifs(){const z=$('actifs');z.innerHTML='';
         try{const ok=await rpc('ibz_arreter_cadeau',{p_pin:PIN,p_id:g.id});if(ok===null)throw new Error('Code caisse incorrect');actifs()}catch(e){montre('errCad',e.message)}};
       z.appendChild(r)});
   }catch(e){}}
+let suggs=[];
+async function suggestions(){try{const d=await rpc('ibz_suggestions',{p_pin:PIN});suggs=d||[];const z=$('suggListe');z.innerHTML='';
+  $('blocSugg').hidden=!suggs.length;$('suggN').textContent=suggs.length?suggs.length+' idée'+(suggs.length>1?'s':''):'';
+  suggs.forEach(g=>{const r=document.createElement('div');r.className='sg';
+    r.innerHTML='<div class="sgT"></div><div class="sgC"><input aria-label="Cadeau"><input type="number" inputmode="numeric" min="1" max="100" aria-label="Points"></div><div class="sgB"><button class="non" type="button">❌ Non</button><button type="button">✅ Offrir</button></div>';
+    r.querySelector('.sgT').textContent=g.texte;const [lib,pts]=r.querySelectorAll('input');lib.value=g.libelle;pts.value=g.points||'';
+    if(g.type_cadeau!=='points'){pts.style.display='none';r.querySelector('.sgC').style.gridTemplateColumns='1fr'}
+    if(g.type_cadeau==='machine')lib.readOnly=true;
+    const go=async ok=>{montre('okSugg','');montre('errSugg','');r.querySelectorAll('button').forEach(b=>b.disabled=true);
+      try{const x=await rpc('ibz_suggestion_traiter',{p_pin:PIN,p_client:g.client_id,p_cle:g.cle,p_ok:ok,p_libelle:lib.value.trim()||g.libelle,p_type:g.type_cadeau,p_points:parseInt(pts.value,10)||g.points||1});
+        if(x===null)throw new Error('Code caisse incorrect');montre('okSugg',ok?'🎁 Cadeau envoyé à '+g.nom+' : il le verra en ouvrant son appli.':'Suggestion ignorée.');suggestions();actifs()}
+      catch(e){montre('errSugg',e.message);r.querySelectorAll('button').forEach(b=>b.disabled=false)}};
+    const [bNon,bOk]=r.querySelectorAll('.sgB button');bNon.onclick=()=>go(false);bOk.onclick=()=>go(true);z.appendChild(r)})}catch(e){}}
 async function chargerBonus(){try{$('bonusParr').value=await rpc('ibz_bonus_parrainage',{})}catch(e){}}
 $('btnBonus').onclick=async()=>{montre('okBonus','');montre('errBonus','');const v=parseInt($('bonusParr').value,10);
   if(!(v>=0))return montre('errBonus','Mets un nombre de points');

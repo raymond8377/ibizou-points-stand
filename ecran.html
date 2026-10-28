@@ -41,6 +41,7 @@ body{background:radial-gradient(circle at 30% 20%,#8b46e0 0%,var(--violet) 40%,v
 .liste li.or{background:#fff3b0;border:3px solid var(--jaune)}.liste li.ar{background:#eceff3}.liste li.br{background:#fbe3cf}
 .liste li.flash{animation:flash 1.6s ease-out}
 @keyframes flash{0%{background:var(--vert);color:#fff}100%{}}
+.cadeauTop{margin-top:8px;background:#fff3b0;border-radius:12px;padding:6px 10px;text-align:center;font-weight:800;font-size:clamp(16px,2.4vh,20px);color:var(--encre)}
 .vide{color:#7a6a96;font-size:18px;margin-top:20px;text-align:center}
 .bandeau{flex:none;display:flex;align-items:center;gap:14px;background:var(--jaune);color:var(--encre);border-radius:16px;padding:8px 14px;border:4px solid var(--encre);overflow:hidden}
 .bandeau b{font-family:var(--titre);font-weight:400;font-size:20px;white-space:nowrap;color:var(--rouge)}
@@ -68,6 +69,7 @@ body{background:radial-gradient(circle at 30% 20%,#8b46e0 0%,var(--violet) 40%,v
   </section>
   <section class="droite">
     <h2>🏆 Les champions <small id="foire">de la foire</small></h2>
+    <div class="cadeauTop">🎁 Les 5 premiers gagneront un cadeau à la fin de la foire, à récupérer dès 2 jours avant la fin !</div>
     <ol class="liste" id="liste"></ol>
   </section>
 </div>
