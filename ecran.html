@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2a0f4f">
+<title>IBIZOU · Écran du stand</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+/* Écran public du stand : tablette en paysage tournée vers les clients.
+   Gauche = gros QR pour s'inscrire ; droite = classement de la foire ; bas = bandeau d'actu ; plein écran = « Bravo » à chaque gain. */
+:root{--violet:#4a1a8c;--nuit:#1e0840;--encre:#2a0f4f;--rouge:#ff1744;--jaune:#ffd400;--vert:#00c853;--blanc:#fff;--lilas:#efe6fb;
+  --titre:'Luckiest Guy','Arial Black',sans-serif;--texte:'Nunito',system-ui,sans-serif;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:radial-gradient(circle at 30% 20%,#8b46e0 0%,var(--violet) 40%,var(--nuit) 100%) var(--nuit);color:var(--blanc);font-family:var(--texte);overflow:hidden;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) max(12px,env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px}
+.ampoules{position:fixed;left:0;right:0;top:6px;display:flex;justify-content:space-around;pointer-events:none}
+.ampoules i{width:10px;height:10px;border-radius:50%;background:var(--jaune);box-shadow:0 0 10px var(--jaune);animation:clign 1.2s infinite}
+.ampoules i:nth-child(even){animation-delay:.6s;background:#fff;box-shadow:0 0 10px #fff}
+@keyframes clign{50%{opacity:.35}}
+.grille{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:20px}
+.gauche{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;min-width:0}
+.titre{width:min(420px,90%);height:auto;filter:drop-shadow(0 6px 10px rgba(0,0,0,.4))}
+.qrCadre{background:var(--blanc);border:7px solid var(--rouge);outline:7px solid var(--jaune);border-radius:24px;padding:14px 14px 8px;transform:rotate(-2deg);box-shadow:0 16px 34px rgba(0,0,0,.45)}
+#qr{width:min(34vh,260px);height:min(34vh,260px)}#qr img,#qr canvas{width:100%!important;height:100%!important}
+.scanne{font-family:var(--titre);color:var(--rouge);font-size:clamp(22px,4vh,34px);letter-spacing:2px;margin-top:4px}
+.offre{font-family:var(--titre);font-size:clamp(24px,4.6vh,40px);color:var(--jaune);text-shadow:3px 3px 0 var(--rouge);line-height:1.05}
+.puces{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.puces span{background:rgba(255,255,255,.14);border:2px solid rgba(255,212,0,.6);border-radius:999px;padding:5px 12px;font-weight:800;font-size:15px}
+.droite{background:var(--blanc);color:var(--encre);border-radius:26px;border:5px solid var(--encre);box-shadow:8px 8px 0 rgba(0,0,0,.35);padding:16px 20px;display:flex;flex-direction:column;min-height:0;min-width:0}
+.droite h2{font-family:var(--titre);font-weight:400;font-size:clamp(24px,4vh,34px);margin:0;color:var(--violet);display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.droite h2 small{font-family:var(--texte);font-size:15px;color:#7a6a96;font-weight:800}
+.liste{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;overflow:hidden}
+.liste li{display:grid;grid-template-columns:52px minmax(0,1fr) auto;align-items:center;gap:10px;background:var(--lilas);border-radius:14px;padding:6px 12px;font-size:clamp(17px,2.7vh,22px);font-weight:800}
+.liste li .rg{font-family:var(--titre);font-size:clamp(20px,3.2vh,28px);text-align:center;color:var(--violet)}
+.liste li .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.liste li .pt{font-family:var(--titre);font-weight:400;color:var(--rouge);font-variant-numeric:tabular-nums;white-space:nowrap}
+.liste li.or{background:#fff3b0;border:3px solid var(--jaune)}.liste li.ar{background:#eceff3}.liste li.br{background:#fbe3cf}
+.liste li.flash{animation:flash 1.6s ease-out}
+@keyframes flash{0%{background:var(--vert);color:#fff}100%{}}
+.vide{color:#7a6a96;font-size:18px;margin-top:20px;text-align:center}
+.bandeau{flex:none;display:flex;align-items:center;gap:14px;background:var(--jaune);color:var(--encre);border-radius:16px;padding:8px 14px;border:4px solid var(--encre);overflow:hidden}
+.bandeau b{font-family:var(--titre);font-weight:400;font-size:20px;white-space:nowrap;color:var(--rouge)}
+.defile{flex:1;min-width:0;overflow:hidden;white-space:nowrap;font-weight:800;font-size:19px}
+.defile span{display:inline-block;padding-left:100%;animation:defile 28s linear infinite}
+@keyframes defile{to{transform:translateX(-100%)}}
+.bravo{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(20,4,45,.82);text-align:center}
+.bravo[hidden]{display:none}
+.bravo .b1{font-family:var(--titre);font-size:clamp(40px,10vh,90px);color:var(--jaune);text-shadow:5px 5px 0 var(--rouge);animation:pop .6s cubic-bezier(.2,1.6,.4,1)}
+.bravo .b2{font-family:var(--titre);font-size:clamp(60px,16vh,150px);color:var(--vert);text-shadow:5px 5px 0 var(--encre);animation:pop .6s .15s cubic-bezier(.2,1.6,.4,1) both}
+.bravo .b3{font-size:clamp(18px,3vh,26px);font-weight:800}
+@keyframes pop{0%{transform:scale(.2);opacity:0}100%{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.ampoules i,.defile span,.bravo .b1,.bravo .b2{animation:none}.defile span{padding-left:0}}
+@media (max-width:760px){body{overflow:auto}.grille{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="ampoules" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+<div class="grille">
+  <section class="gauche">
+    <img class="titre" src="appli-ibizou.png" alt="L'appli smartphone IBIZOU">
+    <div class="offre">Inscris-toi et gagne<br>15 points !</div>
+    <div class="qrCadre"><div id="qr"></div><div class="scanne">SCANNE-MOI</div></div>
+    <div class="puces"><span>100 % gratuit</span><span>Rien à télécharger</span><span>Pas de perdant</span></div>
+  </section>
+  <section class="droite">
+    <h2>🏆 Les champions <small id="foire">de la foire</small></h2>
+    <ol class="liste" id="liste"></ol>
+  </section>
+</div>
+<div class="bandeau"><b>L'ACTU</b><div class="defile"><span id="actu">Fini les tickets papier : tes points sont sur ton téléphone · Carte fidélité : 10 cases = 10 € de jeu offerts · Pas de perdant au Jeu des Bouches !</span></div></div>
+<div class="bravo" id="bravo" hidden><div class="b1" id="bNom"></div><div class="b2" id="bPts"></div><div class="b3">Tes points sont déjà sur ton téléphone 📱</div></div>
+<script>
+const SB_URL='https://cytgdpeoxhxempnewrep.supabase.co';
+const SB_KEY='sb_publishable_5nYZv-C8Bfc7AErue3h9-g_D8OUnOOW';
+const $=id=>document.getElementById(id);
+async function rpc(fn,args){const r=await fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'apikey':SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(args||{})});
+  if(!r.ok)throw new Error(fn);return r.json()}
+try{new QRCode($('qr'),{text:'https://raymond8377.github.io/ibizou-points-stand/',width:260,height:260,colorDark:'#2a0f4f',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M})}catch(e){}
+let avant={};
+async function classement(){try{const d=await rpc('ibz_classement',{p_id:null});const z=$('liste');
+  if(!d||!d.length){z.innerHTML='<li class="vide" style="display:block;background:none">Joue au stand pour être le premier du classement !</li>';return}
+  if(d[0].foire)$('foire').textContent=d[0].foire;
+  z.innerHTML='';d.slice(0,10).forEach(o=>{const li=document.createElement('li');li.className=o.rang===1?'or':o.rang===2?'ar':o.rang===3?'br':'';
+    li.innerHTML='<span class="rg"></span><span class="nm"></span><span class="pt"></span>';
+    li.children[0].textContent=o.rang===1?'🥇':o.rang===2?'🥈':o.rang===3?'🥉':o.rang;li.children[1].textContent=o.nom;li.children[2].textContent=o.points+' pts';
+    if(avant[o.nom]!==undefined&&avant[o.nom]!==o.points)li.classList.add('flash');z.appendChild(li)});
+  avant={};d.forEach(o=>avant[o.nom]=o.points)}catch(e){}}
+async function actus(){try{const d=await rpc('ibz_contenu_public',{});const a=(d||[]).filter(x=>x.rubrique==='actu'||x.rubrique==='nouveaute').slice(0,6).map(x=>x.titre).filter(Boolean);
+  if(a.length)$('actu').textContent=a.join('  ·  ')+'  ·  Inscris-toi et gagne 15 points !'}catch(e){}}
+let depuis=new Date().toISOString(),file=[],enCours=false;
+async function fil(){try{const d=await rpc('ibz_ecran_fil',{p_depuis:depuis});if(d&&d.length){depuis=d[d.length-1].quand;file.push(...d);montrer()}}catch(e){}}
+function montrer(){if(enCours||!file.length)return;enCours=true;const o=file.shift();
+  $('bNom').textContent='Bravo '+o.nom+' !';$('bPts').textContent='+'+o.points+' points';$('bravo').hidden=false;
+  setTimeout(()=>{$('bravo').hidden=true;enCours=false;classement();setTimeout(montrer,600)},4500)}
+classement();actus();setInterval(classement,20000);setInterval(actus,300000);setInterval(fil,4000);
+try{navigator.wakeLock&&navigator.wakeLock.request('screen').catch(()=>{})}catch(e){}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){try{navigator.wakeLock&&navigator.wakeLock.request('screen').catch(()=>{})}catch(e){}}});
+</script>
+</body>
+</html>
