@@ -14,7 +14,7 @@ if(/android/i.test(navigator.userAgent||'')){const l=document.createElement('lin
 <meta name="apple-mobile-web-app-title" content="IBIZOU">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@600;700;800;900&family=Mali:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root{--rouge:#e3241b;--bordeaux:#4a1a8c;--creme:#fff5e6;--or:#ffc23d;--encre:#2a0f4f}
@@ -495,6 +495,110 @@ button{background:#ff1744}
 #bTops li b{flex:1;color:#ffd400;font-family:'Luckiest Guy',sans-serif;font-weight:400;font-size:17px;letter-spacing:.5px}
 #bTops li small{opacity:.75;font-size:12px}
 #bTops li.vide{opacity:.7;font-size:13px;justify-content:center}
+/* ===== Encart « Grand prix de la foire » ===== */
+.prix{position:relative;overflow:hidden;margin:0 0 12px;border-radius:18px;padding:30px 12px 12px;text-align:center;color:#fff;
+  background:linear-gradient(160deg,#ff1744 0%,#c4002f 55%,#7a0020 100%);border:4px solid #ffd84a;box-shadow:0 0 0 3px #7a4a00,0 8px 18px rgba(0,0,0,.25)}
+.prixFond{position:absolute;inset:-60%;background:repeating-conic-gradient(from 0deg,rgba(255,216,74,.28) 0 10deg,transparent 10deg 20deg);animation:prixTourne 18s linear infinite;pointer-events:none}
+@keyframes prixTourne{to{transform:rotate(360deg)}}
+.prixRuban{position:absolute;top:0;left:50%;transform:translateX(-50%);background:linear-gradient(180deg,#ffe27a,#e0a100);color:#5a2a00;font-family:'Luckiest Guy',sans-serif;font-size:13px;letter-spacing:2px;padding:5px 16px 4px;border-radius:0 0 12px 12px;border:3px solid #7a4a00;border-top:0;white-space:nowrap;z-index:2}
+.prixCorps{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:10px}
+.prixCoupe{width:82px;height:auto;flex:none;filter:drop-shadow(0 4px 0 rgba(0,0,0,.25));animation:prixSaute 2.4s ease-in-out infinite}
+@keyframes prixSaute{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-5px) rotate(4deg)}}
+.prixTxt{text-align:left;line-height:1}
+.prixTop{font-family:'Luckiest Guy',sans-serif;font-size:50px;letter-spacing:1px;color:#ffd84a;text-shadow:0 -1px 0 #fff6c4,0 2px 0 #e0a100,0 3px 0 #b97a00,0 5px 0 #7a4a00,0 8px 10px rgba(0,0,0,.4)}
+.prixGagne{font-family:'Luckiest Guy',sans-serif;font-size:24px;color:#fff;text-shadow:2px 2px 0 #7a0020;margin-top:4px}
+.prixPlaces{position:relative;z-index:1;display:flex;justify-content:center;gap:6px;margin:10px 0 6px}
+.prixPlaces span{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Luckiest Guy',sans-serif;font-size:16px;color:#5a2a00;background:radial-gradient(circle at 35% 30%,#fff6c4,#ffd84a 45%,#e0a100);border:2px solid #7a4a00;box-shadow:0 2px 0 #7a4a00}
+.prixPlaces span:nth-child(2){background:radial-gradient(circle at 35% 30%,#fff,#d9dde3 50%,#9aa3ad)}.prixPlaces span:nth-child(3){background:radial-gradient(circle at 35% 30%,#ffe2c4,#e3a76f 50%,#a8642c)}
+.prixInfo{position:relative;z-index:1;margin:0;font-family:'Mali','Nunito',sans-serif;font-weight:600;font-size:14px;line-height:1.4;color:#fff6e0}
+.etn{position:absolute;z-index:1;color:#ffe27a;font-style:normal;font-size:16px;animation:etn 1.8s ease-in-out infinite;pointer-events:none}
+.e1{left:10%;top:34%}.e2{right:9%;top:26%;animation-delay:.5s;font-size:22px}.e3{left:22%;bottom:30%;animation-delay:1s;font-size:12px}.e4{right:20%;bottom:36%;animation-delay:1.3s}
+@keyframes etn{0%,100%{opacity:.2;transform:scale(.6)}50%{opacity:1;transform:scale(1.15)}}
+@media (prefers-reduced-motion:reduce){.prixFond,.prixCoupe,.etn{animation:none}}
+/* ===== Carte fidélité façon vraie carte ===== */
+.fid{position:relative;overflow:hidden;background:linear-gradient(135deg,#ff2d6f 0%,#c2187a 35%,#6b21c8 70%,#2a0f4f 100%)!important;border:3px solid #ffd84a!important;border-radius:20px!important;padding:14px 14px 12px!important;color:#fff!important;box-shadow:0 0 0 3px #7a4a00,0 10px 20px rgba(42,15,79,.35)}
+.fid::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 10%,rgba(255,255,255,.25),transparent 40%),repeating-linear-gradient(-45deg,rgba(255,255,255,.05) 0 8px,transparent 8px 16px);pointer-events:none}
+.fidReflet{position:absolute;top:-40%;left:-60%;width:40%;height:180%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);transform:rotate(20deg);animation:fidReflet 5s ease-in-out infinite;pointer-events:none}
+@keyframes fidReflet{0%,60%{left:-60%}100%{left:130%}}
+.fid .fidT{position:relative;align-items:flex-start}
+.fidSur{display:block;font-family:'Nunito',sans-serif;font-weight:800;font-size:11px;letter-spacing:2px;text-transform:uppercase;opacity:.85}
+.fid .fidT h3{font-size:24px!important;color:#ffd84a!important;text-shadow:0 -1px 0 #fff6c4,0 1px 0 #e0a100,0 2px 0 #b97a00,0 3px 0 #7a4a00,0 5px 6px rgba(0,0,0,.35)}
+.fid .fidT small{background:#ffd84a;color:#2a0f4f!important;border:2px solid #7a4a00;border-radius:999px;padding:3px 10px;font-weight:900!important;font-size:14px}
+.fid .fidCases{position:relative;gap:8px!important;margin:12px 0 10px!important}
+.fid .fidCase{border-radius:50%!important;border:2px dashed rgba(255,216,74,.85)!important;background:rgba(255,255,255,.12)!important;display:flex;align-items:center;justify-content:center}
+.fid .fidCase .fidN{font-family:'Luckiest Guy',sans-serif;font-size:15px;color:rgba(255,255,255,.55)}
+.fid .fidCase.plein{background:radial-gradient(circle at 40% 35%,#fff,#ffe9ef 70%)!important;border:2px solid #ffd84a!important;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.fid .fidCase.plein svg{width:84%;transform:rotate(var(--rot,0deg))}
+.fid .fidCase.der{background:radial-gradient(circle at 40% 35%,#fff6c4,#ffd84a 60%,#e0a100)!important;border:2px solid #7a4a00!important;box-shadow:0 0 12px rgba(255,216,74,.8)}
+.fid .fidKdo{font-size:22px;animation:prixSaute 2.4s ease-in-out infinite}
+.fidPied{position:relative;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.fidNum{font-family:'Nunito',sans-serif;font-weight:800;letter-spacing:3px;font-size:13px;opacity:.9}
+.fidPuce{width:34px;height:24px;border-radius:5px;background:linear-gradient(135deg,#fff6c4,#e0a100 50%,#ffe27a);border:1px solid #7a4a00;box-shadow:inset 0 0 0 4px rgba(122,74,0,.15)}
+.fid .fidRegle{position:relative;color:#fff!important;opacity:.95;font-size:13.5px}
+.fid .fidRegle b{color:#ffd84a}
+@media (prefers-reduced-motion:reduce){.fidReflet,.fid .fidKdo{animation:none}}
+/* ===== Bloc « Garde ton appli » futuriste ===== */
+.sauve{position:relative;overflow:hidden;background:radial-gradient(circle at 15% 0%,rgba(94,242,255,.25),transparent 45%),radial-gradient(circle at 100% 100%,rgba(181,107,255,.35),transparent 50%),linear-gradient(160deg,#0d1240,#1a0b3d)!important;
+  border:2px solid rgba(94,242,255,.7)!important;border-radius:20px!important;padding:16px!important;color:#e8f6ff!important;box-shadow:0 0 0 1px rgba(181,107,255,.6),0 0 22px rgba(94,242,255,.35),inset 0 0 30px rgba(94,242,255,.08)}
+.sauve::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(94,242,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(94,242,255,.07) 1px,transparent 1px);background-size:18px 18px;pointer-events:none}
+.sauve>*{position:relative}
+.svTete{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.svBadge{flex:none;width:58px;height:58px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,rgba(94,242,255,.18),rgba(181,107,255,.18));border:1.5px solid rgba(94,242,255,.6);box-shadow:0 0 14px rgba(94,242,255,.45);animation:svPulse 2.6s ease-in-out infinite}
+.svBadge svg{width:46px;height:46px}
+@keyframes svPulse{50%{box-shadow:0 0 24px rgba(94,242,255,.75)}}
+.svSur{display:block;font-family:'Nunito',sans-serif;font-weight:900;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#5ef2ff}
+.sauve h4{color:#fff!important;font-size:21px!important;line-height:1.1;margin:2px 0 0!important;text-shadow:0 0 6px rgba(94,242,255,.9),0 0 16px rgba(94,242,255,.5)}
+.sauve .sv-intro{color:#cfe9ff!important}
+.sauve .svBtn{background:linear-gradient(90deg,#00c6ff,#7b5cff)!important;color:#fff!important;border:0!important;box-shadow:0 0 16px rgba(0,198,255,.55),0 4px 0 #2a1a7a!important;border-radius:14px}
+.sauve .sv-plus{color:#cfe9ff!important;background:rgba(255,255,255,.06);border:1px dashed rgba(94,242,255,.45);border-radius:12px;padding:8px 10px}
+.sauve .sv-plus b{color:#ffd84a!important}
+@media (prefers-reduced-motion:reduce){.svBadge{animation:none}}
+/* ===== Guide en direct (main + étapes) ===== */
+.svBtns{display:grid;gap:8px}
+.sauve .svDirect{font-size:19px!important}
+.sauve .svExpl{background:rgba(255,255,255,.1)!important;box-shadow:none!important;border:1.5px solid rgba(94,242,255,.6)!important;font-size:16px!important}
+.gDirect{position:fixed;inset:0;z-index:90;pointer-events:none}
+.gDirect[hidden]{display:none}
+.gdBandeau{pointer-events:auto;position:absolute;left:max(10px,env(safe-area-inset-left,0px));right:max(10px,env(safe-area-inset-right,0px));top:calc(10px + env(safe-area-inset-top,0px));
+  background:linear-gradient(160deg,#0d1240,#1a0b3d);color:#e8f6ff;border:2px solid #5ef2ff;border-radius:18px;padding:12px 44px 12px 14px;box-shadow:0 0 24px rgba(94,242,255,.5),0 10px 24px rgba(0,0,0,.4);font-family:'Nunito',sans-serif}
+.gDirect:not(.bas) .gdBandeau{top:auto;bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+.gdTitre{font-family:'Luckiest Guy',sans-serif;font-size:20px;color:#fff;text-shadow:0 0 8px rgba(94,242,255,.9)}
+.gdEtapes{margin:6px 0 0;padding-left:22px;font-size:15px;line-height:1.4;font-weight:700}
+.gdEtapes li{margin:3px 0}.gdEtapes b{color:#ffd84a}.gdEtapes small{display:block;opacity:.8;font-size:12.5px}
+.gdEtapes li:first-child{color:#fff}
+.gdX{position:absolute;top:8px;right:8px;width:32px;height:32px;margin:0;padding:0;border-radius:50%;background:rgba(255,255,255,.15);color:#fff;font-size:15px;border:0;box-shadow:none}
+.gdMain{position:absolute;display:flex;flex-direction:column;align-items:center;gap:2px}
+.gdMain.bas{left:50%;transform:translateX(-50%);bottom:calc(8px + env(safe-area-inset-bottom,0px))}
+.gdMain.haut{right:max(12px,env(safe-area-inset-right,0px));align-items:flex-end;top:calc(4px + env(safe-area-inset-top,0px))}
+.gdDoigt{font-size:54px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.5));animation:gdTape 1s ease-in-out infinite}
+.gdMain.haut .gdDoigt{order:2}.gdMain.haut .gdTxt{order:3}.gdMain.haut .gdRond{order:1}
+@keyframes gdTape{50%{transform:translateY(10px) scale(.92)}}
+.gdMain.haut .gdDoigt{animation-name:gdTapeH}@keyframes gdTapeH{50%{transform:translateY(-10px) scale(.92)}}
+.gdTxt{font-family:'Luckiest Guy',sans-serif;font-size:16px;color:#0d1240;background:#ffd84a;border:2px solid #0d1240;border-radius:999px;padding:3px 12px;box-shadow:0 0 14px rgba(255,216,74,.8)}
+.gdMain.bas .gdTxt{order:-1}
+.gdRond{width:46px;height:46px;border-radius:50%;border:4px solid #5ef2ff;box-shadow:0 0 18px #5ef2ff;animation:gdOnde 1.2s ease-out infinite}
+.gdMain.bas .gdRond{order:3;margin-top:-6px}
+@keyframes gdOnde{0%{transform:scale(.6);opacity:1}100%{transform:scale(1.5);opacity:0}}
+@media (prefers-reduced-motion:reduce){.gdDoigt,.gdRond{animation:none}}
+/* ===== Design 2 : police IBIZOU pour les titres, Nunito pour le texte, Mali pour les phrases sympas, reliefs choisis ===== */
+body,input,button,select,textarea{letter-spacing:0;font-weight:700!important}
+body{font-family:'Nunito',system-ui,sans-serif}
+h2,h3,h4,summary,button,.points,.unite,.code,.badge,.hTitre,.slotTitre,.grRuban,.funBadge,.lienBtn{font-family:'Luckiest Guy','Arial Black',sans-serif;font-weight:400!important;letter-spacing:.5px}
+input,select,textarea{font-family:'Nunito',sans-serif}
+.bonjour{font-family:'Nunito',sans-serif;font-weight:900!important;font-size:20px}
+/* Phrases sympas en écriture « à la main » */
+.info,.garantie li,.fidRegle,.topCadeau,.sv-intro,.funIntro,.funVrai,.petit,.grBonus,.parent,.aide,.topMoi,.nTexte,#nTexte,.funRes,.slotRes{font-family:'Mali','Nunito',sans-serif;font-weight:600!important;letter-spacing:0}
+.info{font-size:15px;line-height:1.45}
+/* 3 · Arc-en-ciel : le gros chiffre des points */
+.points{background:linear-gradient(180deg,#fff27a 0%,#ffd400 28%,#ff8a00 58%,#ff1744 100%);-webkit-background-clip:text;background-clip:text;color:transparent!important;-webkit-text-stroke:2.5px #2a0f4f;text-shadow:none!important;filter:drop-shadow(4px 5px 0 #00b0ff) drop-shadow(0 8px 8px rgba(0,0,0,.25));padding:0 10px}
+.unite{color:#ff1744;letter-spacing:4px}
+/* 4 · Néon : machine à sous et « Pour le fun » */
+.slotTitre{color:#fff!important;text-shadow:0 0 4px #fff,0 0 10px #ffd400,0 0 22px #ffd400,0 0 38px #ff9100!important}
+.fun h4{color:#fff!important;text-shadow:0 0 4px #fff,0 0 10px #ff4fd8,0 0 22px #ff4fd8,0 0 36px #ff1744!important}
+/* 6 · Or brillant : niveau Or, bouton machine Or, 1er du classement */
+.badge.Or{background:#2a0f4f!important;color:#ffd84a!important;border-color:#e0a100;text-shadow:0 -1px 0 #fff6c4,0 1px 0 #e0a100,0 2px 0 #b97a00,0 3px 0 #7a4a00,0 4px 6px rgba(0,0,0,.45);box-shadow:3px 3px 0 #7a4a00}
+.top li:first-child:not(.sep) .nm,.top li:first-child:not(.sep) .pt{background:linear-gradient(180deg,#ffe27a 0%,#e0a100 50%,#b97a00 100%);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900!important}
+.top li:first-child:not(.sep){background:linear-gradient(90deg,#fffbe6,#fff3b0);border:2px solid #e0a100}
 </style>
 </head>
 <body>
@@ -521,6 +625,13 @@ button{background:#ff1744}
   <button class="gEssai" id="gEssai" type="button">👍 J'essaie maintenant</button>
 </div></div>
 <div class="mainBas" id="mainBas" hidden>Appuie ici<br>👇</div>
+<div class="gDirect" id="gDirect" hidden>
+  <div class="gdBandeau"><button type="button" class="gdX" id="gdX" aria-label="Fermer le guide">✕</button>
+    <div class="gdTitre">Suis la main 👇</div>
+    <ol class="gdEtapes" id="gdEtapes"></ol>
+  </div>
+  <div class="gdMain" id="gdMain"><span class="gdRond"></span><span class="gdDoigt">👆</span><span class="gdTxt" id="gdTxt">Touche ici</span></div>
+</div>
 
 <div class="slotOv" id="slotOv"><div class="slot">
   <div class="slotTitre">IBIZOU</div><div class="slotSous" id="slotSous">Machine à bisous · niveau Or</div>
@@ -619,8 +730,10 @@ button{background:#ff1744}
     <div class="code" id="code"></div>
     <div class="info">Montre ce QR code au stand pour gagner des points ou les échanger contre un cadeau au stand.</div>
     <div class="fid" id="fid" hidden>
-      <div class="fidT"><h3>Ma carte fidélité</h3><small id="fidCompte"></small></div>
+      <div class="fidReflet" aria-hidden="true"></div>
+      <div class="fidT"><div><span class="fidSur">IBIZOU · Jeu des Bouches</span><h3>Carte fidélité</h3></div><small id="fidCompte"></small></div>
       <div class="fidCases" id="fidCases"></div>
+      <div class="fidPied"><span class="fidNum" id="fidNum"></span><span class="fidPuce" aria-hidden="true"></span></div>
       <p class="fidRegle" id="fidRegle"></p>
     </div>
     <div class="actus" id="actus" hidden>
@@ -629,7 +742,21 @@ button{background:#ff1744}
       <a class="actusTout" href="actus.html">Toutes les actus, nouveautés et jeux →</a>
     </div>
     <div class="top" id="top" hidden>
-      <p class="topCadeau">🎁 Les <b>5 premiers du classement</b> gagneront un cadeau à la fin de la foire, à récupérer au stand <b>dès 2 jours avant la fin</b> !</p>
+      <div class="prix">
+        <div class="prixFond" aria-hidden="true"></div>
+        <i class="etn e1">✦</i><i class="etn e2">✦</i><i class="etn e3">✦</i><i class="etn e4">✦</i>
+        <div class="prixRuban">GRAND PRIX DE LA FOIRE</div>
+        <div class="prixCorps">
+          <svg class="prixCoupe" viewBox="0 0 120 130" aria-hidden="true"><defs><linearGradient id="gOr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff6c4"/><stop offset=".35" stop-color="#ffd84a"/><stop offset=".6" stop-color="#e0a100"/><stop offset=".8" stop-color="#ffe27a"/><stop offset="1" stop-color="#b97a00"/></linearGradient></defs>
+<path d="M28 14h64v22c0 22-14 38-32 38S28 58 28 36z" fill="url(#gOr)" stroke="#7a4a00" stroke-width="4"/>
+<path d="M28 22H12c0 18 8 28 20 30M92 22h16c0 18-8 28-20 30" fill="none" stroke="#7a4a00" stroke-width="7" stroke-linecap="round"/><path d="M28 22H12c0 18 8 28 20 30M92 22h16c0 18-8 28-20 30" fill="none" stroke="url(#gOr)" stroke-width="3" stroke-linecap="round"/>
+<path d="M52 74h16v18H52z" fill="url(#gOr)" stroke="#7a4a00" stroke-width="4"/><rect x="34" y="92" width="52" height="14" rx="3" fill="url(#gOr)" stroke="#7a4a00" stroke-width="4"/><rect x="26" y="106" width="68" height="16" rx="4" fill="#ff1744" stroke="#7a4a00" stroke-width="4"/>
+<text x="60" y="52" text-anchor="middle" font-family="Luckiest Guy, Arial Black, sans-serif" font-size="30" fill="#7a4a00">5</text><path d="M40 22c2 10 6 18 12 22" stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none" opacity=".7"/></svg>
+          <div class="prixTxt"><div class="prixTop">TOP 5</div><div class="prixGagne">= 1 cadeau !</div></div>
+        </div>
+        <div class="prixPlaces" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        <p class="prixInfo">Les 5 premiers du classement gagnent un cadeau à la fin de la foire. À récupérer au stand dès 2 jours avant la fin !</p>
+      </div>
       <h4>🏅 Top joueurs <span id="topFoire"></span></h4>
       <ol id="topListe"></ol>
       <p class="topMoi" id="topMoi"></p>
@@ -653,10 +780,10 @@ button{background:#ff1744}
       <div id="ouListe"></div>
     </div>
     <div class="sauve" id="sauve">
-      <h4>📲 Garde ton appli sur ton téléphone</h4>
+      <div class="svTete"><span class="svBadge" aria-hidden="true"><svg viewBox="0 0 64 64"><defs><linearGradient id="svG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5ef2ff"/><stop offset="1" stop-color="#b56bff"/></linearGradient></defs><rect x="15" y="4" width="34" height="56" rx="8" fill="#0d1240" stroke="url(#svG)" stroke-width="3.5"/><rect x="26" y="8.5" width="12" height="3.5" rx="1.75" fill="#5ef2ff" opacity=".8"/><rect x="19" y="15" width="26" height="36" rx="3" fill="#1b2370"/><path d="M32 20v14M27.5 24.5 32 20l4.5 4.5" fill="none" stroke="#5ef2ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M28.5 29h-3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h13a2 2 0 0 0 2-2V31a2 2 0 0 0-2-2h-3" fill="none" stroke="#5ef2ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="27" y="54.5" width="10" height="2" rx="1" fill="#b56bff"/></svg></span><div><span class="svSur">Sauvegarde</span><h4>Garde ton appli<br>sur ton smartphone</h4></div></div>
       <p class="sv-intro">Ajoute IBIZOU sur ton écran d'accueil : tu l'ouvres en 1 seconde, comme une vraie appli, sans rien télécharger.</p>
       <button id="btnInstaller" type="button" class="svBtn" hidden>⬇️ Installer l'appli IBIZOU (1 clic)</button>
-      <button id="btnGuide" type="button" class="svBtn">📲 Comment faire ? (30 secondes)</button>
+      <div class="svBtns"><button id="btnDirect" type="button" class="svBtn svDirect">👆 Guide-moi en direct</button><button id="btnGuide" type="button" class="svBtn svExpl">📖 Voir l'explication</button></div>
       <p class="sv-plus">📸 <b>En plus :</b> fais une capture d'écran de ton QR code. Et note ton code carte <b id="svCode"></b> avec ton code secret : avec les deux, tu retrouves toujours tes points.</p>
     </div>
     <div class="petit sv-ok" id="svOk" hidden>✅ Appli bien installée sur ton téléphone !</div>
@@ -919,9 +1046,18 @@ function ouvrirGuide(bravo){$('gBravo').hidden=!bravo;gchoisir(gos);$('gOv').hid
 function fermerGuide(){$('gOv').hidden=true}
 $('gX').onclick=fermerGuide;
 $('btnGuide').onclick=async()=>{if(estAndroid&&promptInstall&&await installer())return;ouvrirGuide(false)};
-$('gEssai').onclick=async()=>{fermerGuide();if(estInstalle)return;if(estAndroid&&promptInstall&&await installer())return;
-  const m=$('mainBas');m.className='mainBas';if(estAndroid){m.innerHTML='👆<br>Appuie sur ⋮ en haut';m.style.bottom='auto';m.style.top='calc(6px + env(safe-area-inset-top,0px))';}
-  m.hidden=false;clearTimeout(m._t);m._t=setTimeout(()=>m.hidden=true,10000)};
+function guideDirect(){if(estAndroid&&promptInstall){installer();return}
+  const ua=navigator.userAgent||'',chromeIos=/CriOS/i.test(ua);const g=$('gDirect'),mn=$('gdMain');
+  let et,pos;
+  if(estAndroid){et=['Touche les <b>3 petits points ⋮</b> en haut à droite <small>(Samsung : ≡ en bas à droite)</small>','Choisis <b>Ajouter à l\'écran d\'accueil</b> ou <b>Installer</b>','Touche <b>Ajouter</b>'];pos='haut'}
+  else if(chromeIos){et=['Touche le bouton <b>Partager ⬆</b> en haut à droite','Choisis <b>Sur l\'écran d\'accueil</b>','Touche <b>Ajouter</b>'];pos='haut'}
+  else{et=['Touche le bouton <b>Partager ⬆</b> en bas de l\'écran <small>(ou <b>•••</b> en bas à droite, puis Partager)</small>','Fais glisser et choisis <b>Sur l\'écran d\'accueil</b>','Touche <b>Ajouter</b> en haut à droite'];pos='bas'}
+  $('gdEtapes').innerHTML=et.map(t=>'<li>'+t+'</li>').join('');
+  mn.className='gdMain '+pos;$('gdTxt').textContent=pos==='bas'?'Touche ici':'Touche ici';mn.querySelector('.gdDoigt').textContent=pos==='bas'?'👇':'👆';
+  g.classList.toggle('bas',pos==='bas');g.hidden=false;clearTimeout(g._t);g._t=setTimeout(()=>{g.hidden=true},60000)}
+$('gdX').onclick=()=>{$('gDirect').hidden=true};
+$('btnDirect').onclick=guideDirect;
+$('gEssai').onclick=async()=>{fermerGuide();if(estInstalle)return;guideDirect()};
 document.addEventListener('visibilitychange',()=>{if(document.hidden)$('mainBas').hidden=true});
 if(estInstalle){$('sauve').hidden=true;$('svOk').hidden=false}
 // Android : installation en 1 clic quand le téléphone le permet
@@ -1017,7 +1153,7 @@ async function actus(){try{const d=await rpc('ibz_contenu_public',{});const l=(d
     e.appendChild(t);z.appendChild(e)});
 }catch(e){}}
 // Bons cadeaux
-const FID_BOUCHE='<svg viewBox="0 0 40 24" aria-hidden="true"><path d="M2 12 C8 2 14 3 20 7 C26 3 32 2 38 12 C32 22 8 22 2 12Z" fill="#ff1744"/><path d="M5 12 C12 10 28 10 35 12" stroke="#b0002a" stroke-width="2" fill="none"/></svg>';
+const FID_BOUCHE='<svg viewBox="0 0 64 40" aria-hidden="true"><path d="M3 20C9 7 19 2 27 8c2 1.6 4 2.2 5 2.2s3-.6 5-2.2c8-6 18-1 24 12-9-2-19-3-29-2.6C22 17 12 18 3 20z" fill="#e3241b" stroke="#7a0012" stroke-width="2.2" stroke-linejoin="round"/><path d="M10 20.5c10-1.6 34-1.6 44 0l-1.6 4.2c-10 1.4-30 1.4-40.8 0z" fill="#fff" stroke="#7a0012" stroke-width="1.6"/><path d="M22 20v4.6M32 19.6v5.2M42 20v4.6" stroke="#d9d0e6" stroke-width="1.4"/><path d="M3 20c7 3 12 4.6 9.4 4.7C22 26 42 26 51.6 24.7 49 24.6 54 23 61 20c-5 13-17 18-29 18S8 33 3 20z" fill="#e3241b" stroke="#7a0012" stroke-width="2.2" stroke-linejoin="round"/><path d="M15 30c6 3.4 12 4.2 17 4.2" stroke="#ff8a8a" stroke-width="3" stroke-linecap="round" fill="none" opacity=".9"/><path d="M14 11c3-2.6 7-3.6 10-2" stroke="#ff9a9a" stroke-width="2.4" stroke-linecap="round" fill="none" opacity=".8"/><ellipse cx="44" cy="31" rx="4" ry="1.6" fill="#fff" opacity=".55"/></svg>';
 let fidPrec=null;
 async function fidelite(){if(!monId)return;try{const d=await rpc('ibz_fid_client',{p_id:monId});if(!d||!d.length)return;const f=d[0],tot=f.total||10;
   $('fid').hidden=false;$('fidCompte').textContent=f.cases+' / '+tot;
@@ -1026,7 +1162,8 @@ async function fidelite(){if(!monId)return;try{const d=await rpc('ibz_fid_client
   const z=$('fidCases');z.innerHTML='';
   for(let i=0;i<tot;i++){const c=document.createElement('div');const plein=i<f.cases;
     c.className='fidCase'+(plein?' plein':'')+(!plein&&i===tot-1?' der':'')+(plein&&fidPrec!==null&&i>=fidPrec?' neuf':'');
-    c.innerHTML=plein?FID_BOUCHE:(i===tot-1?'🎁':'');z.appendChild(c)}
+    if(plein)c.style.setProperty('--rot',(((i*37)%17)-8)+'deg');c.innerHTML=plein?FID_BOUCHE:(i===tot-1?'<span class="fidKdo">🎁</span>':'<span class="fidN">'+(i+1)+'</span>');z.appendChild(c)}
+  try{$('fidNum').textContent='N° '+(monCode||'')}catch(e){}
   fidPrec=f.cases}catch(e){}}
 async function bons(){try{const d=await rpc('ibz_mes_bons',{p_id:monId});const l=$('bonsListe');l.innerHTML='';
   $('bons').style.display=d&&d.length?'block':'none';
