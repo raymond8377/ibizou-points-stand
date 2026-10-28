@@ -433,12 +433,12 @@ async function rpc(fn,args){
 }
 function montre(id,txt){const e=$(id);e.textContent=txt;e.style.display=txt?'block':'none'}
 let PIN=null,client=null,flux=null,occupe=false;
-try{PIN=localStorage.getItem('ibz_pin')}catch(e){}
+try{localStorage.removeItem('ibz_pin')}catch(e){} // le code n'est plus gardé : il est demandé à chaque ouverture
 
 async function ouvrir(p){
   try{
     if(!(await rpc('ibz_verifier_pin',{p_pin:p}))){montre('errPin','Code incorrect');return}
-    PIN=p;try{localStorage.setItem('ibz_pin',p)}catch(e){}
+    PIN=p;
     $('vuePin').style.display='none';$('vueCaisse').style.display='block';$('btnSortir').style.display='inline';
     let role='patron';try{const q=(await rpc('ibz_qui',{p_pin:p}))[0];if(q){role=q.role;$('qui').textContent='👤 Connecté : '+q.nom+(q.role==='patron'?' (patron)':' (employé)')}}catch(e){}
     document.body.classList.toggle('employe',role==='employe');
@@ -446,7 +446,11 @@ async function ouvrir(p){
     if(role==='patron'){chargerBonus();actifs();chargerLots();chargerTour();chargerConc();bilan();chargerEmp();chargerCont()}
   }catch(e){montre('errPin',e.message)}
 }
-$('btnPin').onclick=()=>ouvrir($('pin').value.trim());
+$('btnPin').onclick=()=>ouvrir($('pin').value.replace(/[\s\/.\-]/g,''));
+$('pin').onkeydown=e=>{if(e.key==='Enter')$('btnPin').click()};
+// Verrouillage : si la caisse reste fermée ou en arrière-plan plus de 2 minutes, le code est redemandé
+let cacheA=0;document.addEventListener('visibilitychange',()=>{if(document.hidden){cacheA=Date.now()}else if(PIN&&cacheA&&Date.now()-cacheA>120000){location.reload()}});
+window.addEventListener('pageshow',e=>{if(e.persisted&&PIN)location.reload()});
 $('btnSortir').onclick=()=>{try{localStorage.removeItem('ibz_pin')}catch(e){};location.reload()};
 
 // Scanner
