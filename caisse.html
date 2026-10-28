@@ -172,6 +172,24 @@ body.employe .patron{display:none!important}
 #cFiche{color:#c2185b;font-weight:700}
 .stats b{color:#ff1744;font-size:30px}
 .tab td:last-child{color:#ff1744;font-weight:800}
+/* ===== Mode tablette (écran large) ===== */
+.attente{display:none}
+@media (min-width:900px){
+  .wrap{max-width:1240px;padding:20px 24px 60px}
+  #vueCaisse[style*="block"]{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:0 20px;align-items:start}
+  #vueCaisse>.bloc{grid-column:1}
+  #vueCaisse>#vueClient,#vueCaisse>#attente{grid-column:2;grid-row:1/span 40;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow-y:auto}
+  #vueCaisse:has(#vueClient[style*="none"]) #attente,#vueCaisse:not(:has(#vueClient[style*="block"])) #attente{display:flex}
+  #vueCaisse:has(#vueClient[style*="block"]) #attente{display:none}
+  .attente{flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:420px;text-align:center;border:4px dashed #c9b6ea;background:#faf7ff}
+  .attente div{font-size:64px}.attente b{font-size:30px;color:#4a1a8c}.attente span{font-family:system-ui,sans-serif;font-size:16px;color:#7a6a96}
+  #vueClient .solde{font-size:84px}
+  #vueClient .grille{gap:12px}
+  #vueClient .grille button{padding:22px 0;font-size:28px;border-radius:16px}
+  .grille.fidG button{font-size:22px!important}
+  #btnScan{padding:22px;font-size:24px}
+  #video{max-height:320px;object-fit:cover}
+}
 </style>
 </head>
 <body>
@@ -201,6 +219,7 @@ body.employe .patron{display:none!important}
     <div class="err" id="errScan"></div>
   </div>
 
+  <div class="bloc attente" id="attente"><div>📷</div><b>Scanne un client</b><span>ou cherche-le à gauche : sa fiche s'ouvrira ici</span></div>
   <div class="bloc client" id="vueClient">
     <div class="nom" id="cNom"></div>
     <div class="meta" id="cMeta"></div>
