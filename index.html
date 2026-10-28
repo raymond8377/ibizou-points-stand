@@ -565,7 +565,13 @@ button{background:#ff1744}
 .gdTitre{font-family:'Luckiest Guy',sans-serif;font-size:20px;color:#fff;text-shadow:0 0 8px rgba(94,242,255,.9)}
 .gdEtapes{margin:6px 0 0;padding-left:22px;font-size:15px;line-height:1.4;font-weight:700}
 .gdEtapes li{margin:3px 0}.gdEtapes b{color:#ffd84a}.gdEtapes small{display:block;opacity:.8;font-size:12.5px}
-.gdEtapes li:first-child{color:#fff}
+.gdEtapes{list-style:none;padding-left:0!important;counter-reset:gd}
+.gdEtapes li{counter-increment:gd;position:relative;padding:5px 8px 5px 34px;border-radius:10px;transition:background .3s,transform .3s;opacity:.7}
+.gdEtapes li::before{content:counter(gd);position:absolute;left:6px;top:5px;width:22px;height:22px;border-radius:50%;background:rgba(94,242,255,.25);color:#5ef2ff;font-size:13px;display:flex;align-items:center;justify-content:center}
+.gdEtapes li .gdM{display:none}
+.gdEtapes li.actif{opacity:1;background:rgba(94,242,255,.18);transform:scale(1.02);box-shadow:0 0 0 2px #5ef2ff inset}
+.gdEtapes li.actif .gdM{display:inline-block;position:absolute;right:6px;top:2px;font-size:20px;animation:gdTapeH 1s ease-in-out infinite}
+.gdEtapes li.actif::before{background:#5ef2ff;color:#0d1240}
 .gdX{position:absolute;top:8px;right:8px;width:32px;height:32px;margin:0;padding:0;border-radius:50%;background:rgba(255,255,255,.15);color:#fff;font-size:15px;border:0;box-shadow:none}
 .gdMain{position:absolute;display:flex;flex-direction:column;align-items:center;gap:2px}
 .gdMain.bas{left:50%;transform:translateX(-50%);bottom:calc(8px + env(safe-area-inset-bottom,0px))}
@@ -627,7 +633,7 @@ input,select,textarea{font-family:'Nunito',sans-serif}
 <div class="mainBas" id="mainBas" hidden>Appuie ici<br>👇</div>
 <div class="gDirect" id="gDirect" hidden>
   <div class="gdBandeau"><button type="button" class="gdX" id="gdX" aria-label="Fermer le guide">✕</button>
-    <div class="gdTitre">Suis la main 👇</div>
+    <div class="gdTitre">Suis les étapes 👇</div>
     <ol class="gdEtapes" id="gdEtapes"></ol>
   </div>
   <div class="gdMain" id="gdMain"><span class="gdRond"></span><span class="gdDoigt">👆</span><span class="gdTxt" id="gdTxt">Touche ici</span></div>
@@ -1051,11 +1057,12 @@ function guideDirect(){if(estAndroid&&promptInstall){installer();return}
   let et,pos;
   if(estAndroid){et=['Touche les <b>3 petits points ⋮</b> en haut à droite <small>(Samsung : ≡ en bas à droite)</small>','Choisis <b>Ajouter à l\'écran d\'accueil</b> ou <b>Installer</b>','Touche <b>Ajouter</b>'];pos='haut'}
   else if(chromeIos){et=['Touche le bouton <b>Partager ⬆</b> en haut à droite','Choisis <b>Sur l\'écran d\'accueil</b>','Touche <b>Ajouter</b>'];pos='haut'}
-  else{et=['Touche le bouton <b>Partager ⬆</b> en bas de l\'écran <small>(ou <b>•••</b> en bas à droite, puis Partager)</small>','Fais glisser et choisis <b>Sur l\'écran d\'accueil</b>','Touche <b>Ajouter</b> en haut à droite'];pos='bas'}
-  $('gdEtapes').innerHTML=et.map(t=>'<li>'+t+'</li>').join('');
+  else{et=['Touche le <b>lien</b> en bas de l\'écran <small>(la barre avec raymond8377.github.io)</small>','Touche les <b>3 petits points •••</b>','Touche <b>Partager ⬆</b>','<b>Glisse vers le bas</b> dans le menu','Touche <b>Sur l\'écran d\'accueil ➕</b>','Touche <b>Ajouter</b> en haut à droite'];pos='bas'}
+  $('gdEtapes').innerHTML=et.map(t=>'<li><span class="gdM">👉</span>'+t+'</li>').join('');
+  clearInterval(g._a);let k=0;const lis=[...$('gdEtapes').children];const pas=()=>{lis.forEach((l,x)=>l.classList.toggle('actif',x===k));k=(k+1)%lis.length};pas();g._a=setInterval(pas,2200);
   mn.className='gdMain '+pos;$('gdTxt').textContent=pos==='bas'?'Touche ici':'Touche ici';mn.querySelector('.gdDoigt').textContent=pos==='bas'?'👇':'👆';
   g.classList.toggle('bas',pos==='bas');g.hidden=false;clearTimeout(g._t);g._t=setTimeout(()=>{g.hidden=true},60000)}
-$('gdX').onclick=()=>{$('gDirect').hidden=true};
+$('gdX').onclick=()=>{const g=$('gDirect');g.hidden=true;clearInterval(g._a)};
 $('btnDirect').onclick=guideDirect;
 $('gEssai').onclick=async()=>{fermerGuide();if(estInstalle)return;guideDirect()};
 document.addEventListener('visibilitychange',()=>{if(document.hidden)$('mainBas').hidden=true});
