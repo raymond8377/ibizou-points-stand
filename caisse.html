@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#5a22a8">
 <meta name="robots" content="noindex">
 <title>IBIZOU – Caisse points</title>
-<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
@@ -222,6 +222,26 @@ body.employe .patron{display:none!important}
   #btnScan{padding:22px;font-size:24px}
   #video{max-height:320px;object-fit:cover}
 }
+/* ===== Caisse simple : écriture lisible, sections claires, outils repliés ===== */
+body,input,button,select,textarea{letter-spacing:0;font-weight:700!important}
+body{font-family:'Nunito',system-ui,sans-serif}
+h2,button,.logo,.solde,.unite,.nom,.grille button,.attente b,.lien{font-family:'Luckiest Guy','Arial Black',sans-serif;font-weight:400!important;letter-spacing:.4px}
+input,select,textarea,.meta,.ok,.err,small{font-family:'Nunito',sans-serif}
+.meta{font-weight:600!important;font-size:13.5px;line-height:1.4}
+.logo{font-size:26px;text-shadow:2px 2px 0 #ff1744}
+.secT{display:flex;align-items:center;gap:6px;font-size:17px!important;padding:6px 10px;border-radius:10px;margin-bottom:8px!important}
+.secV{background:#e3f9ea;color:#0a7a35}.secR{background:#ffe3e8;color:#c4002f}
+.fidC h2{font-size:17px!important}
+.outilsT{grid-column:1;font-family:'Luckiest Guy',sans-serif;color:#ffd400;font-size:20px;margin:18px 4px 8px;text-shadow:2px 2px 0 #2a0f4f;display:flex;align-items:center;gap:8px}
+.outilsT small{font-family:'Nunito',sans-serif;font-size:13px;color:#e9dcff;text-shadow:none;font-weight:700}
+.bloc.repliable{padding:0;overflow:hidden}
+.bloc.repliable>.repliTete{display:flex;align-items:center;gap:10px;width:100%;margin:0;padding:15px 16px;background:#fff;color:var(--encre);border:0;box-shadow:none;border-radius:0;font-size:17px;text-align:left;cursor:pointer}
+.bloc.repliable>.repliTete .chev{margin-left:auto;font-size:22px;color:#7c3aed;transition:transform .2s}
+.bloc.repliable.ouvert>.repliTete .chev{transform:rotate(90deg)}
+.bloc.repliable>.repliCorps{display:none;padding:0 16px 16px}
+.bloc.repliable.ouvert>.repliCorps{display:block}
+.bloc.repliable>.repliCorps>h2:first-child{display:none}
+@media (prefers-reduced-motion:reduce){.bloc.repliable>.repliTete .chev{transition:none}}
 </style>
 </head>
 <body>
@@ -275,7 +295,7 @@ body.employe .patron{display:none!important}
     <div class="solde" id="cSolde">0</div>
     <div class="unite">POINTS</div>
     <div id="cBons"></div>
-    <h2>Donner des points</h2>
+    <h2 class="secT secV">➕ Donner des points</h2>
     <div class="grille">
       <button data-d="1">+1</button><button data-d="3">+3</button><button data-d="5">+5</button><button data-d="10">+10</button>
     </div>
@@ -285,7 +305,7 @@ body.employe .patron{display:none!important}
       <div class="grille fidG"><button data-e="10">10 €</button><button data-e="20">20 €</button><button data-e="30">30 €</button><button data-e="40">40 €</button><button data-e="50">50 €</button></div>
       <div class="fidV" id="fValid" hidden><div id="fTxt"></div><div id="fPlein" hidden><div class="fpT">🎁 Carte pleine ! Cadeau pour <span id="fPrenom"></span> :</div><div class="fpC"><button type="button" id="fChBon" class="on">🎟️ Bon cadeau</button><button type="button" id="fChPts">⭐ Des points</button></div><input id="fCadeau" maxlength="40" aria-label="Nom du cadeau"><input id="fPts" type="number" inputmode="numeric" min="1" max="200" value="30" aria-label="Points offerts" hidden></div><div class="vBt"><button class="gris" id="fAnn" type="button">Annuler</button><button id="fOk" type="button">✅ Valider</button></div></div>
     </div>
-    <h2 style="margin-top:14px">🎁 Utiliser les points pour un cadeau</h2>
+    <h2 style="margin-top:14px" class="secT secR">➖ Échanger ses points contre un cadeau</h2>
     <div class="grille retire">
       <button data-d="-5">−5</button><button data-d="-10">−10</button><button data-d="-20">−20</button><button data-d="-50">−50</button>
     </div>
@@ -497,6 +517,15 @@ async function ouvrir(p){
     if(role==='patron'){suggestions();setInterval(suggestions,300000);orNouveaux();setInterval(orNouveaux,60000);enCours();setInterval(enCours,60000);chargerBonus();actifs();chargerLots();chargerTour();chargerConc();bilan();chargerEmp();chargerCont()}
   }catch(e){montre('errPin',e.message)}
 }
+(function(){const v=document.getElementById('vueCaisse');if(!v)return;
+  const blocs=[...v.children].filter(b=>b.classList&&b.classList.contains('bloc')&&!['blocSugg','attente','vueClient'].includes(b.id)&&!b.classList.contains('encOuvrir')&&b!==v.querySelector('.bloc'));
+  let premier=true;
+  blocs.forEach(b=>{const h=b.querySelector('h2');if(!h)return;
+    if(premier){const t=document.createElement('div');t.className='outilsT';t.innerHTML='🧰 Mes outils <small>touche pour ouvrir</small>';b.before(t);premier=false}
+    const corps=document.createElement('div');corps.className='repliCorps';while(b.firstChild)corps.appendChild(b.firstChild);
+    const tete=document.createElement('button');tete.type='button';tete.className='repliTete';tete.innerHTML='<span></span><span class="chev">›</span>';tete.firstChild.textContent=h.textContent.trim();
+    b.classList.add('repliable');b.append(tete,corps);tete.onclick=()=>b.classList.toggle('ouvert')});
+})();
 $('btnPin').onclick=()=>ouvrir($('pin').value.replace(/[\s\/.\-]/g,''));
 $('pin').onkeydown=e=>{if(e.key==='Enter')$('btnPin').click()};
 // Verrouillage : si la caisse reste fermée ou en arrière-plan plus de 2 minutes, le code est redemandé
