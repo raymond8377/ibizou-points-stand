@@ -156,6 +156,8 @@ body.employe .patron{display:none!important}
 #cBons:not(:empty){background:#fff3b0;border:3px solid #ffd400;border-radius:14px;padding:10px 12px;margin:10px 0 14px;animation:bonsPop .5s ease-out}
 @keyframes bonsPop{0%{transform:scale(.96);box-shadow:0 0 0 6px rgba(255,212,0,.6)}100%{transform:none;box-shadow:none}}
 @media (prefers-reduced-motion:reduce){#cBons:not(:empty){animation:none}}
+.orLot{margin:10px 0;background:#fff8d6;border:3px solid #ffd400;border-radius:12px;padding:10px}.orLot label{display:block;font-size:16px;margin-bottom:6px}.orLot select{width:100%;font-size:16px;padding:10px;border-radius:10px;border:3px solid var(--encre);margin:0 0 6px;background:#fff;color:var(--encre)}
+.sg.or{border-color:#00c853;background:#eafbf0}
 .sugg h2{display:flex;justify-content:space-between;align-items:baseline}.sugg h2 small{color:#ff1744}
 .sg{border:3px solid #ffd400;background:#fffbe6;border-radius:14px;padding:10px 12px;margin-top:10px;font-family:system-ui,sans-serif;color:var(--encre)}
 .sg .sgT{font-weight:800;font-size:15px;line-height:1.35}
@@ -252,7 +254,7 @@ body.employe .patron{display:none!important}
   <div class="bloc patron sugg" id="blocSugg" hidden>
     <h2>💡 Suggestions <small id="suggN"></small></h2>
     <div class="meta">Des idées de cadeaux. Rien n'est donné sans ton ✅ : tu peux changer le cadeau avant de valider.</div>
-    <div id="suggListe"></div>
+    <div id="orListe"></div><div id="suggListe"></div>
     <div class="ok" id="okSugg"></div><div class="err" id="errSugg"></div>
   </div>
   <button type="button" class="bloc patron encOuvrir" id="btnEnCours">📋 Cadeaux en cours <span id="encN2"></span><b>Ouvrir ›</b></button>
@@ -372,6 +374,8 @@ body.employe .patron{display:none!important}
   <div class="bloc patron">
     <h2>🎰 Machine à sous (niveau Or)</h2>
     <div class="meta">Le client la débloque une seule fois en passant Or (150 points gagnés). Un lot est toujours gagné, tiré selon ces chances. Tu peux aussi choisir le lot d'un client dans sa fiche.</div>
+    <div class="orLot"><label for="orLot">🏅 Lot du niveau Or</label><select id="orLot"><option value="">Au hasard (selon les chances)</option></select>
+    <div class="meta">Tous les clients qui passent Or gagneront ce lot. La caisse te prévient à chaque nouveau client Or.</div><div class="ok" id="okOr"></div></div>
     <div id="lots"></div>
     <div class="seg" style="margin-top:10px"><button id="lBon" class="on">Bon au stand</button><button id="lPts">Des points</button></div>
     <div class="petitchamp"><input id="lLib" placeholder="Nom du lot"><input id="lPtsVal" type="number" inputmode="numeric" min="1" placeholder="Points" style="display:none"></div>
@@ -490,7 +494,7 @@ async function ouvrir(p){
     let role='patron';try{const q=(await rpc('ibz_qui',{p_pin:p}))[0];if(q){role=q.role;$('qui').textContent='👤 Connecté : '+q.nom+(q.role==='patron'?' (patron)':' (employé)')}}catch(e){}
     document.body.classList.toggle('employe',role==='employe');
     journal();liste();stats();viderFile();majBandeau();
-    if(role==='patron'){suggestions();setInterval(suggestions,300000);enCours();setInterval(enCours,60000);chargerBonus();actifs();chargerLots();chargerTour();chargerConc();bilan();chargerEmp();chargerCont()}
+    if(role==='patron'){suggestions();setInterval(suggestions,300000);orNouveaux();setInterval(orNouveaux,60000);enCours();setInterval(enCours,60000);chargerBonus();actifs();chargerLots();chargerTour();chargerConc();bilan();chargerEmp();chargerCont()}
   }catch(e){montre('errPin',e.message)}
 }
 $('btnPin').onclick=()=>ouvrir($('pin').value.replace(/[\s\/.\-]/g,''));
@@ -849,7 +853,7 @@ $('btnTourAnn').onclick=resetTour;
 let lots=[],lType='bon';
 function majLType(){$('lBon').className=lType==='bon'?'on':'';$('lPts').className=lType==='points'?'on':'';$('lPtsVal').style.display=lType==='points'?'block':'none'}
 $('lBon').onclick=()=>{lType='bon';majLType()};$('lPts').onclick=()=>{lType='points';majLType()};
-async function chargerLots(){try{lots=await rpc('ibz_lots',{p_pin:PIN})||[];afficherLots();jeuClient()}catch(e){}}
+async function chargerLots(){try{lots=await rpc('ibz_lots',{p_pin:PIN})||[];afficherLots();jeuClient();orLotCharger()}catch(e){}}
 function afficherLots(){const z=$('lots');z.innerHTML='';
   const tot=lots.filter(l=>l.actif).reduce((t,l)=>t+l.chance,0);
   if(!lots.length){z.innerHTML='<div class="meta">Aucun lot.</div>';return}
@@ -928,9 +932,22 @@ $('encQ').oninput=afficherEnCours;
 $('btnEnCours').onclick=()=>{$('encOv').hidden=false;document.body.style.overflow='hidden';enCours()};
 $('encFermer').onclick=()=>{$('encOv').hidden=true;document.body.style.overflow=''};
 $('encOv').onclick=e=>{if(e.target===$('encOv'))$('encFermer').onclick()};
+let ors=[];
+async function orNouveaux(){try{ors=await rpc('ibz_or_nouveaux',{p_pin:PIN})||[];const z=$('orListe');z.innerHTML='';
+  ors.forEach(o=>{const r=document.createElement('div');r.className='sg or';
+    r.innerHTML='<div class="sgT"></div><div class="sgB" style="grid-template-columns:1fr"><button type="button">👍 Vu</button></div>';
+    const h=new Date(o.quand);r.querySelector('.sgT').textContent='⭐ '+o.client+' a atteint le niveau Or le '+h.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})+' à '+h.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+'. '+(o.joue?'Il a gagné à la machine à sous : '+o.lot+'.':'Il va gagner : '+o.lot+' (pas encore joué). Tu peux le changer dans sa fiche.');
+    r.querySelector('button').onclick=async()=>{try{await rpc('ibz_or_vu',{p_pin:PIN,p_jeu:o.id});orNouveaux()}catch(e){}};z.appendChild(r)});
+  majSugg()}catch(e){}}
+function majSugg(){const n=(suggs.length||0)+(ors.length||0);$('blocSugg').hidden=!n;$('suggN').textContent=n?n+' à voir':''}
+async function orLotCharger(){try{const v=await rpc('ibz_or_reglage',{p_pin:PIN,p_lot:null,p_changer:false});const sel=$('orLot');
+  sel.innerHTML='<option value="">Au hasard (selon les chances)</option>';(lots||[]).filter(l=>l.actif).forEach(l=>{const o=document.createElement('option');o.value=l.id;o.textContent=l.libelle;sel.appendChild(o)});
+  sel.value=v?String(v):''}catch(e){}}
+$('orLot').onchange=async()=>{const v=$('orLot').value;try{const r=await rpc('ibz_or_reglage',{p_pin:PIN,p_lot:v?parseInt(v,10):null,p_changer:true});if(r===undefined)return;
+  montre('okOr','Lot du niveau Or : '+$('orLot').options[$('orLot').selectedIndex].text)}catch(e){}};
 let suggs=[];
 async function suggestions(){try{const d=await rpc('ibz_suggestions',{p_pin:PIN});suggs=d||[];const z=$('suggListe');z.innerHTML='';
-  $('blocSugg').hidden=!suggs.length;$('suggN').textContent=suggs.length?suggs.length+' idée'+(suggs.length>1?'s':''):'';
+  majSugg();
   suggs.forEach(g=>{const r=document.createElement('div');r.className='sg';
     r.innerHTML='<div class="sgT"></div><div class="sgC"><input aria-label="Cadeau"><input type="number" inputmode="numeric" min="1" max="100" aria-label="Points"></div><div class="sgB"><button class="non" type="button">❌ Non</button><button type="button">✅ Offrir</button></div>';
     r.querySelector('.sgT').textContent=g.texte;const [lib,pts]=r.querySelectorAll('input');lib.value=g.libelle;pts.value=g.points||'';
