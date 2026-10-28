@@ -586,6 +586,27 @@ button{background:#ff1744}
 .gdMain.bas .gdRond{order:3;margin-top:-6px}
 @keyframes gdOnde{0%{transform:scale(.6);opacity:1}100%{transform:scale(1.5);opacity:0}}
 @media (prefers-reduced-motion:reduce){.gdDoigt,.gdRond{animation:none}}
+/* ===== Envoyer des points ===== */
+.envoi{position:relative;overflow:hidden;margin-top:16px;border-radius:20px;padding:16px;text-align:left;color:#fff;
+  background:radial-gradient(circle at 90% 0%,rgba(255,255,255,.28),transparent 40%),linear-gradient(145deg,#ff9100 0%,#ff4d6d 55%,#c2187a 100%);
+  border:3px solid #ffd84a;box-shadow:0 0 0 3px #7a2a00,0 10px 20px rgba(194,24,122,.3)}
+.envoi::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(-45deg,rgba(255,255,255,.06) 0 10px,transparent 10px 20px);pointer-events:none}
+.envoi>*{position:relative}
+.envT{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.envI{flex:none;width:62px;height:62px;border-radius:18px;background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center}
+.envI svg{width:50px;height:50px}
+.envSur{display:block;font-family:'Nunito',sans-serif;font-weight:900;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#ffe9a8}
+.envoi h4{font-family:'Luckiest Guy',sans-serif;font-weight:400;font-size:24px;color:#fff;margin:2px 0 0;text-shadow:0 2px 0 #c2187a,0 4px 0 #7a2a00,0 6px 8px rgba(0,0,0,.25)}
+.envoi small{font-size:13.5px;color:#fff1f6}
+.envoi label{display:block;font-size:14px;margin:10px 0 4px;color:#fff}
+.envoi input{width:100%;background:#fff;color:#2a0f4f;border:3px solid #7a2a00;border-radius:14px}
+.envoi button#btnEnvoi{margin-top:14px;background:#fff;color:#e65100;border:3px solid #7a2a00;box-shadow:0 4px 0 #7a2a00;font-size:19px}
+.envNote{font-family:'Mali','Nunito',sans-serif;font-weight:600;font-size:13px;line-height:1.4;margin:10px 0 0;color:#fff6e0;background:rgba(0,0,0,.12);border-radius:12px;padding:8px 10px}
+.okEnv{margin-top:8px;background:#e9fbef;border:2px solid #00c853;border-radius:12px;padding:8px 10px;font-size:14px;color:#0b5a2b}
+.envoi .err{background:#fff;border-radius:12px;padding:6px 10px}
+.envL{display:flex;justify-content:space-between;align-items:center;gap:8px;background:#fff;color:#2a0f4f;border-radius:12px;padding:8px 10px;margin-top:8px;font-size:14px}
+.envL small{display:block;color:#6d5d8a}
+.envL button{width:auto;margin:0;padding:6px 10px;font-size:13px;background:#fff;color:#c62828;border:2px solid #c62828;box-shadow:none}
 /* ===== Design 2 : police IBIZOU pour les titres, Nunito pour le texte, Mali pour les phrases sympas, reliefs choisis ===== */
 body,input,button,select,textarea{letter-spacing:0;font-weight:700!important}
 body{font-family:'Nunito',system-ui,sans-serif}
@@ -793,6 +814,19 @@ input,select,textarea{font-family:'Nunito',sans-serif}
       <p class="sv-plus">📸 <b>En plus :</b> fais une capture d'écran de ton QR code. Et note ton code carte <b id="svCode"></b> avec ton code secret : avec les deux, tu retrouves toujours tes points.</p>
     </div>
     <div class="petit sv-ok" id="svOk" hidden>✅ Appli bien installée sur ton téléphone !</div>
+    <div class="envoi" id="blocEnvoi">
+      <div class="envT"><span class="envI" aria-hidden="true"><svg viewBox="0 0 64 64"><rect x="4" y="14" width="30" height="20" rx="4" fill="#fff" stroke="#7a2a00" stroke-width="2.5"/><rect x="4" y="19" width="30" height="4" fill="#ff9100"/><rect x="30" y="34" width="30" height="20" rx="4" fill="#ffd84a" stroke="#7a2a00" stroke-width="2.5"/><rect x="30" y="39" width="30" height="4" fill="#ff1744"/><path d="M38 12c8 0 14 5 15 13" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/><path d="m48 23 5 4 4-6" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 52c4 3 9 4 13 2" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8"/></svg></span><div><span class="envSur">Partage</span><h4>Envoyer des points</h4><small>à un ami ou à quelqu'un de ta famille</small></div></div>
+      <label for="envCode">Code carte de la personne</label>
+      <input id="envCode" maxlength="6" autocapitalize="characters" autocomplete="off" placeholder="Ex : K7MP2Q" style="text-transform:uppercase;letter-spacing:3px">
+      <label for="envPts">Combien de points ?</label>
+      <input id="envPts" type="number" inputmode="numeric" min="1" max="500" placeholder="Ex : 10">
+      <label for="envSecret">Ton code secret (4 chiffres)</label>
+      <input id="envSecret" class="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••">
+      <button id="btnEnvoi" type="button">Envoyer les points</button>
+      <p class="envNote">IBIZOU vérifie et valide l'envoi au stand. Tes points partent seulement à ce moment-là.</p>
+      <div class="err" id="errEnvoi"></div><div class="okEnv" id="okEnvoi" hidden></div>
+      <div id="envListe"></div>
+    </div>
     <div class="parrain" id="blocParrain">
       <h4>🤝 Invite un copain</h4>
       <p id="parrTexte"></p>
@@ -903,7 +937,7 @@ async function afficherCarte(){disposer();
   $('vueInscription').style.display='none';$('vueRecup').style.display='none';$('vueCarte').style.display='block';
   new QRCode($('qr'),{text:'IBZ:'+monId,width:220,height:220,correctLevel:QRCode.CorrectLevel.M});
   await rafraichir();verifierCadeaux();bons();verifierJeu();tournee();concours();classement();passages();actus();
-  fidelite();setInterval(rafraichir,4000);setInterval(verifierCadeaux,8000);setInterval(bons,8000);setInterval(verifierJeu,20000);setInterval(concours,20000);setInterval(classement,30000);
+  fidelite();envois();setInterval(envois,20000);setInterval(rafraichir,4000);setInterval(verifierCadeaux,8000);setInterval(bons,8000);setInterval(verifierJeu,20000);setInterval(concours,20000);setInterval(classement,30000);
 }
 async function rafraichir(){
   try{
@@ -1142,6 +1176,23 @@ async function recu(solde){try{const d=await rpc('ibz_mes_passages',{p_id:monId}
     r.firstChild.textContent=o.motif||'Points';const b=r.lastChild;b.textContent=(o.delta>0?'+':'−')+Math.abs(o.delta);b.className=o.delta>0?'p':'m';z.appendChild(r)});
   $('recuS').textContent=solde;$('recuOv').hidden=false}catch(e){}}
 $('recuOk').onclick=()=>{$('recuOv').hidden=true};
+const ENV_ST={attente:'⏳ en attente au stand',ok:'✅ envoyés',refuse:'❌ refusé par IBIZOU',annule:'annulé'};
+async function envois(){if(!monId)return;try{const d=await rpc('ibz_mes_transferts',{p_id:monId})||[];const z=$('envListe');z.innerHTML='';
+  d.forEach(t=>{const r=document.createElement('div');r.className='envL';r.innerHTML='<span><b></b><small></small></span>';
+    r.querySelector('b').textContent=t.points+' pts → '+t.autre;r.querySelector('small').textContent=ENV_ST[t.statut]||t.statut;
+    if(t.statut==='attente'){const b=document.createElement('button');b.type='button';b.textContent='Annuler';
+      b.onclick=async()=>{try{await rpc('ibz_transfert_annuler',{p_id:monId,p_transfert:t.id});envois()}catch(e){}};r.appendChild(b)}
+    z.appendChild(r)})}catch(e){}}
+$('btnEnvoi').onclick=async()=>{const code=$('envCode').value.trim().toUpperCase(),pts=parseInt($('envPts').value,10),sec=$('envSecret').value.trim();
+  $('errEnvoi').style.display='none';$('okEnvoi').hidden=true;
+  const err=t=>{$('errEnvoi').textContent=t;$('errEnvoi').style.display='block'};
+  if(code.length!==6)return err('Le code carte fait 6 caractères (ex : K7MP2Q).');if(!(pts>0))return err('Mets un nombre de points.');if(!/^\d{4}$/.test(sec))return err('Tape ton code secret à 4 chiffres.');
+  $('btnEnvoi').disabled=true;
+  try{const nom=await rpc('ibz_transfert_demander',{p_id:monId,p_secret:sec,p_code:code,p_points:pts});
+    $('okEnvoi').textContent='👍 Demande envoyée : '+pts+' points pour '+nom+'. IBIZOU va valider au stand.';$('okEnvoi').hidden=false;
+    $('envCode').value='';$('envPts').value='';$('envSecret').value='';envois()}
+  catch(e){err(e.message)}
+  $('btnEnvoi').disabled=false};
 async function passages(){if(!monId)return;try{const d=await rpc('ibz_mes_passages',{p_id:monId});const z=$('pasListe');z.innerHTML='';
   if(!d||!d.length){z.innerHTML='<div class="pas">Aucun passage pour le moment.</div>';return}
   d.forEach(o=>{const r=document.createElement('div');r.className='pas';r.innerHTML='<span><b></b><small></small></span><span></span>';
