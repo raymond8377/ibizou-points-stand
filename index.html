@@ -166,6 +166,9 @@ button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--encre)}
 @keyframes fidTampon{0%{transform:scale(1.6) rotate(-12deg);opacity:0}70%{transform:scale(.92)}100%{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){.fidCase.neuf{animation:none}}
 .fidRegle{font-size:13px;line-height:1.45;margin:4px 0 0;color:#4b3a6b}
+.connx{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:#efe6fb;border-radius:16px;padding:5px;margin:0 0 14px}
+.connx button{margin:0;padding:11px 6px;font-size:15px;background:transparent;color:#4a1a8c;box-shadow:none;border-radius:12px}
+.connx button.on{background:#ff1744;color:#fff;box-shadow:2px 2px 0 #2a0f4f}
 .perdu{background:#fff4d6;border:3px solid #ffd400;border-radius:14px;padding:10px 12px;margin:0 0 12px;font-size:14px;line-height:1.4;color:#2a0f4f;text-align:left}
 .garantie{background:#e9fbef;border:3px solid #00c853;border-radius:18px;padding:12px 14px;margin:12px 0;color:#0b3d1f;text-align:left}
 .gaT{font-family:'Luckiest Guy',sans-serif;font-size:21px;letter-spacing:.5px;color:#00873a}
@@ -521,8 +524,9 @@ button{background:#ff1744}
   <img class="sousImg" src="appli-ibizou.png" alt="L’appli smartphone IBIZOU">
 
   <div class="carte" id="vueInscription" style="display:none">
-    <div class="perdu" id="perduIcone" hidden><b>Tu avais déjà une carte ?</b> Ouvre IBIZOU dans <b>Safari</b> (ou ton navigateur) : ta carte y est toujours. Supprime cette icône, puis remets IBIZOU sur l'écran d'accueil depuis ta carte. Ou appuie sur « Retrouver ma carte ».</div>
+    <div class="perdu" id="perduIcone" hidden><b>Tu avais déjà une carte ?</b> Ouvre IBIZOU dans <b>Safari</b> (ou ton navigateur) : ta carte y est toujours. Supprime cette icône, puis remets IBIZOU sur l'écran d'accueil depuis ta carte. Ou appuie sur « Je me connecte » juste en dessous.</div>
     <div class="ampoules"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="connx"><button type="button" class="on" id="cxInsc1">✨ Je m'inscris</button><button type="button" id="cxCo1">🔑 Je me connecte</button></div>
     <h2 class="hTitre"><span class="c1">Ta</span> <span class="c2">banque</span> <span class="c3">de</span> <span class="c4">tickets</span> 📱</h2>
     <div class="gratuit">
       <div class="grRuban">100 % GRATUIT</div>
@@ -577,7 +581,9 @@ button{background:#ff1744}
 
   <div class="carte" id="vueRecup" style="display:none">
     <div class="ampoules"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-    <h2>Retrouver ma carte</h2>
+    <div class="connx"><button type="button" id="cxInsc2">✨ Je m'inscris</button><button type="button" class="on" id="cxCo2">🔑 Je me connecte</button></div>
+    <h2>Me connecter à ma carte</h2>
+    <p class="petit" style="text-align:center;margin-top:-4px">Tu as déjà une carte IBIZOU ? Tape tes codes pour la retrouver avec tous tes points.</p>
     <div class="seg2"><button id="rModeNom" class="on">Avec mon nom</button><button id="rModeCode">Avec mon code carte</button></div>
     <div id="rChampsNom"><label for="rPrenom">Prénom</label><input id="rPrenom" autocomplete="given-name" maxlength="40">
     <label for="rNom">Nom</label><input id="rNom" autocomplete="family-name" maxlength="40"></div>
@@ -585,7 +591,7 @@ button{background:#ff1744}
     <input id="rCode" maxlength="6" autocapitalize="characters" autocomplete="off" style="text-transform:uppercase;letter-spacing:4px;text-align:center;font-size:22px"></div>
     <label for="rSecret">Code secret</label>
     <input id="rSecret" class="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••">
-    <button id="btnRecup">Retrouver ma carte</button>
+    <button id="btnRecup">🔑 Me connecter</button>
     <div class="err" id="errRecup"></div>
     <p class="petit" style="text-align:center"><a href="#" id="lienNouveau" style="color:var(--rouge)">Créer une nouvelle carte</a></p>
   </div>
@@ -1058,6 +1064,9 @@ $('btnInscrire').onclick=async()=>{
 };
 $('lienDeja').onclick=e=>{e.preventDefault();$('vueInscription').style.display='none';$('vueRecup').style.display='block'};
 $('lienNouveau').onclick=e=>{e.preventDefault();$('vueRecup').style.display='none';$('vueInscription').style.display='block'};
+const allerCo=()=>{$('vueInscription').style.display='none';$('vueRecup').style.display='block';window.scrollTo({top:0})};
+const allerInsc=()=>{$('vueRecup').style.display='none';$('vueInscription').style.display='block';window.scrollTo({top:0})};
+$('cxCo1').onclick=allerCo;$('cxInsc2').onclick=allerInsc;$('cxInsc1').onclick=()=>{};$('cxCo2').onclick=()=>{};
 let rMode='nom';
 function majRMode(){$('rModeNom').className=rMode==='nom'?'on':'';$('rModeCode').className=rMode==='code'?'on':'';
   $('rChampsNom').style.display=rMode==='nom'?'block':'none';$('rChampsCode').style.display=rMode==='code'?'block':'none'}

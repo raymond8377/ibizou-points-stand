@@ -150,6 +150,8 @@ body.employe .patron{display:none!important}
 .nom{font-size:26px}
 .grille button{background:#00c853;font-size:22px;box-shadow:3px 3px 0 var(--encre)}
 .grille.retire button{background:#ff1744}
+#vueClient.fin{position:relative}#vueClient.fin::after{content:"✅ C'est fait · client suivant…";position:sticky;bottom:12px;display:block;margin-top:10px;text-align:center;background:#00c853;color:#fff;font-weight:800;padding:10px;border-radius:12px}
+#vueClient.fin .grille,#vueClient.fin .fidC,#vueClient.fin #btnAutre{pointer-events:none;opacity:.45}
 .fidC{margin-top:14px;background:#fff8d6;border:3px solid #ffd400;border-radius:16px;padding:10px 12px}
 .fidC h2{margin:0 0 6px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .fidC h2 small{font-size:15px;color:#ff1744;font-variant-numeric:tabular-nums}
@@ -481,13 +483,13 @@ $('fOk').onclick=async()=>{const e=fAttente;if(!e||!client||occupe)return;occupe
     if(!r||!r.length)throw new Error('Code caisse incorrect, reverrouille et retape le code');const x=r[0];
     client.points=x.points;$('cSolde').textContent=x.points;
     montre('okMsg','✅ Carte fidélité : +'+x.ajout+' points pour '+client.prenom+(x.cartes?' · 🎁 carte pleine, bon « 10 € de jeu offerts » créé':'')+' (carte : '+x.cases+' / '+((fInfo&&fInfo.total)||10)+')');
-    fAttente=0;fMaj();fidCaisse();bonsClient();journal();historique()}catch(e){montre('errClient',e.message)}
+    fAttente=0;fMaj();fidCaisse();bonsClient();journal();historique();fermerBientot()}catch(e){montre('errClient',e.message)}
   $('fOk').disabled=false;occupe=false};
 function choisir(c){
   client=c;$('vueClient').style.display='block';$('qrRecup').innerHTML='';
   $('cNom').textContent=c.prenom+(c.nom?' '+c.nom:'');$('cMeta').textContent='Code '+c.code+(c.tel?' · '+c.tel:'');
   $('cSolde').textContent=c.points;montre('okMsg','');montre('errClient','');
-  enAttente=0;majValid();fAttente=0;fMaj();fidCaisse();resetSuppr();majCible();majP();bonsClient();fiche();jeuClient();historique();$('vueClient').scrollIntoView({behavior:'smooth'});
+  clearTimeout(tFermer);$('vueClient').classList.remove('fin');reveil();enAttente=0;majValid();fAttente=0;fMaj();fidCaisse();resetSuppr();majCible();majP();bonsClient();fiche();jeuClient();historique();$('vueClient').scrollIntoView({behavior:'smooth'});
 }
 function demanderCode(d){return new Promise(res=>{
   const m=$('pad');let v='';const aff=()=>{$('padAff').textContent='●'.repeat(v.length)+'○'.repeat(4-v.length)};
@@ -539,7 +541,13 @@ async function historique(){const z=$('histListe');z.innerHTML='';if(!client)ret
       r.querySelector('small').textContent=(o.motif||'')+(o.par?' · par '+o.par:'');const v=r.lastChild;v.textContent=(o.delta>0?'+':'')+o.delta+' → '+o.solde_apres;v.className=o.delta>0?'plus':(o.delta<0?'moins':'');
       z.appendChild(r)});
   }catch(e){}}
-$('btnFermer').onclick=()=>{client=null;enAttente=0;majValid();pCible='tous';majP();cible='tous';majCible();$('vueClient').style.display='none';$('recherche').value='';window.scrollTo({top:0,behavior:'smooth'})};
+let tFermer=null,tInactif=null;
+function fermerFiche(){clearTimeout(tFermer);if(!client)return;$('btnFermer').onclick()}
+function fermerBientot(){clearTimeout(tFermer);const c=client;$('vueClient').classList.add('fin');
+  tFermer=setTimeout(()=>{$('vueClient').classList.remove('fin');if(client===c)fermerFiche()},3000)}
+function reveil(){clearTimeout(tInactif);if(client)tInactif=setTimeout(()=>{if(client&&!occupe){fermerFiche();montre('errScan','');toast2('⏱️ Fiche fermée après 1 minute sans activité')}},60000)}
+['pointerdown','keydown','scroll','input'].forEach(ev=>document.addEventListener(ev,reveil,{passive:true}));
+$('btnFermer').onclick=()=>{clearTimeout(tFermer);clearTimeout(tInactif);$('vueClient').classList.remove('fin');fAttente=0;fMaj();client=null;enAttente=0;majValid();pCible='tous';majP();cible='tous';majCible();$('vueClient').style.display='none';$('recherche').value='';window.scrollTo({top:0,behavior:'smooth'})};
 $('btnRecup').onclick=()=>{
   const base=location.href.replace(/caisse\.html.*$/,'');$('qrRecup').innerHTML='';
   new QRCode($('qrRecup'),{text:base+'#id='+client.id,width:200,height:200});
@@ -636,10 +644,10 @@ async function mouvementHL(d){if(!client||occupe)return;occupe=true;montre('errC
     if(s===null)throw new Error('Code caisse incorrect, reverrouille et retape le code');
     client.points=s;$('cSolde').textContent=s;
     montre('okMsg',d>0?('✅ +'+d+' point'+(d>1?'s':'')+' ajouté'+(d>1?'s':'')+' : '+client.prenom+' a maintenant '+s+' points'):('🎁 '+(-d)+' points utilisés : donne-lui son cadeau !'));
-    journal();liste();stats();fiche();jeuClient();
+    journal();liste();stats();fiche();jeuClient();fermerBientot();
   }catch(e){
     if(e.reseau){const f=lireFile();f.push(op);ecrireFile(f);client.points+=d;$('cSolde').textContent=client.points;
-      montre('okMsg','📶 Pas de réseau : '+(d>0?'+'+d:d)+' points enregistrés dans la caisse. Ils seront envoyés tout seuls dès que le réseau revient.');majBandeau()}
+      montre('okMsg','📶 Pas de réseau : '+(d>0?'+'+d:d)+' points enregistrés dans la caisse. Ils seront envoyés tout seuls dès que le réseau revient.');majBandeau();fermerBientot()}
     else montre('errClient',e.message)}
   occupe=false}
 let envoiEnCours=false;
@@ -852,7 +860,7 @@ async function bonsClient(){const z=$('cBons');z.innerHTML='';if(!client)return;
       r.children[0].textContent=b.libelle;
       r.children[1].onclick=async()=>{if(!confirm('Valider « '+b.libelle+' » pour '+client.prenom+' ?'))return;
         try{const ok=await rpc('ibz_utiliser_bon',{p_pin:PIN,p_bon:b.id});if(ok===null)throw new Error('Code caisse incorrect');
-          montre('okMsg','Bon « '+b.libelle+' » utilisé');bonsClient();journal()}catch(e){montre('errClient',e.message)}};
+          montre('okMsg','Bon « '+b.libelle+' » utilisé');bonsClient();journal();fermerBientot()}catch(e){montre('errClient',e.message)}};
       z.appendChild(r)});
   }catch(e){}}
 $('btnOffrir').onclick=async()=>{
