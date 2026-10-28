@@ -164,6 +164,16 @@ body.employe .patron{display:none!important}
 .sg .sgB{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .sg .sgB button{margin:0;padding:10px;font-size:16px}
 .sg .sgB .non{background:#e9e3f3;color:var(--encre)}
+.enc h2{display:flex;justify-content:space-between;align-items:baseline}.enc h2 small{color:#7c3aed}
+.encF{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}
+.encF button{margin:0;padding:8px 2px;font-size:13px;background:#efe6fb;color:var(--encre)}.encF button.on{background:#7c3aed;color:#fff}
+#encQ{margin:0 0 6px}
+.ec{border:2px solid #e2d6f5;border-radius:12px;padding:9px 10px;margin-top:8px;font-family:system-ui,sans-serif;color:var(--encre)}
+.ec .ecH{display:flex;gap:8px;align-items:flex-start}.ec .ecI{font-size:20px;line-height:1.2}
+.ec .ecT{flex:1;min-width:0}.ec .ecT b{display:block;font-size:15px}.ec .ecT small{display:block;color:#6d5d8a;font-size:12.5px;margin-top:2px}
+.ec .ecB{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}.ec .ecB button{margin:0;padding:8px;font-size:14px}
+.ec .ecB .mod{background:#efe6fb;color:var(--encre)}.ec .ecB .ret{background:#fff;color:#c62828;border-color:#c62828}.ec .ecB .ret.sur{background:#c62828;color:#fff}
+.ec .ecM{display:grid;gap:6px;margin-top:8px}.ec .ecM input{margin:0;padding:8px 10px;font-size:15px}.ec .ecM label{font-size:12.5px;color:#6d5d8a}
 .fidC{margin-top:14px;background:#fff8d6;border:3px solid #ffd400;border-radius:16px;padding:10px 12px}
 .fidC h2{margin:0 0 6px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .fidC h2 small{font-size:15px;color:#ff1744;font-variant-numeric:tabular-nums}
@@ -238,6 +248,14 @@ body.employe .patron{display:none!important}
     <div class="meta">Des idées de cadeaux. Rien n'est donné sans ton ✅ : tu peux changer le cadeau avant de valider.</div>
     <div id="suggListe"></div>
     <div class="ok" id="okSugg"></div><div class="err" id="errSugg"></div>
+  </div>
+  <div class="bloc patron enc" id="blocEnCours">
+    <h2>📋 Cadeaux en cours <small id="encN"></small></h2>
+    <div class="meta">Tous les cadeaux que tu as donnés et pas encore utilisés (boîtes cadeaux, bons, machine à sous, fin de foire…). Les automatiques n'y sont pas : bienvenue, anniversaire, niveau Or, parrainage.</div>
+    <div class="encF" id="encF"><button type="button" data-f="tout" class="on">Tout</button><button type="button" data-f="cadeau">🎁 Boîtes</button><button type="button" data-f="bon">🎟️ Bons</button><button type="button" data-f="machine">🎰 Machine</button></div>
+    <input id="encQ" placeholder="Chercher un client ou un cadeau" autocomplete="off">
+    <div id="encListe"></div>
+    <div class="ok" id="okEnc"></div><div class="err" id="errEnc"></div>
   </div>
   <div class="bloc attente" id="attente"><div>📷</div><b>Scanne un client</b><span>ou cherche-le à gauche : sa fiche s'ouvrira ici</span></div>
   <div class="bloc client" id="vueClient">
@@ -465,7 +483,7 @@ async function ouvrir(p){
     let role='patron';try{const q=(await rpc('ibz_qui',{p_pin:p}))[0];if(q){role=q.role;$('qui').textContent='👤 Connecté : '+q.nom+(q.role==='patron'?' (patron)':' (employé)')}}catch(e){}
     document.body.classList.toggle('employe',role==='employe');
     journal();liste();stats();viderFile();majBandeau();
-    if(role==='patron'){suggestions();setInterval(suggestions,300000);chargerBonus();actifs();chargerLots();chargerTour();chargerConc();bilan();chargerEmp();chargerCont()}
+    if(role==='patron'){suggestions();setInterval(suggestions,300000);enCours();setInterval(enCours,60000);chargerBonus();actifs();chargerLots();chargerTour();chargerConc();bilan();chargerEmp();chargerCont()}
   }catch(e){montre('errPin',e.message)}
 }
 $('btnPin').onclick=()=>ouvrir($('pin').value.replace(/[\s\/.\-]/g,''));
@@ -872,6 +890,34 @@ async function actifs(){const z=$('actifs');z.innerHTML='';
         try{const ok=await rpc('ibz_arreter_cadeau',{p_pin:PIN,p_id:g.id});if(ok===null)throw new Error('Code caisse incorrect');actifs()}catch(e){montre('errCad',e.message)}};
       z.appendChild(r)});
   }catch(e){}}
+let encs=[],encFiltre='tout';
+const ENC_ICO={cadeau:'🎁',bon:'🎟️',machine:'🎰'};
+async function enCours(){try{encs=await rpc('ibz_en_cours',{p_pin:PIN})||[];afficherEnCours()}catch(e){}}
+function afficherEnCours(){const z=$('encListe');z.innerHTML='';const q=($('encQ').value||'').toLowerCase();
+  const l=encs.filter(x=>(encFiltre==='tout'||x.sorte===encFiltre)&&(!q||(x.client+' '+x.libelle).toLowerCase().includes(q)));
+  $('encN').textContent=encs.length?encs.length+' en cours':'';
+  if(!l.length){z.innerHTML='<div class="meta" style="margin-top:8px">Rien en cours ici.</div>';return}
+  l.slice(0,60).forEach(x=>{const r=document.createElement('div');r.className='ec';
+    r.innerHTML='<div class="ecH"><span class="ecI"></span><div class="ecT"><b></b><small class="c"></small><small class="d"></small></div></div><div class="ecB"><button type="button" class="mod">✏️ Modifier</button><button type="button" class="ret">🗑️ Retirer</button></div>';
+    r.querySelector('.ecI').textContent=ENC_ICO[x.sorte]||'🎁';
+    r.querySelector('b').textContent=x.libelle+(x.type==='points'?' (+'+x.points+' pts)':'');
+    r.querySelector('.c').textContent='👤 '+x.client+(x.info?' · '+x.info:'');
+    const dd=d=>new Date(d).toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+    r.querySelector('.d').textContent='Donné le '+dd(x.depuis)+(x.jusqua?' · valable jusqu\'au '+dd(x.jusqua):'');
+    const [bMod,bRet]=r.querySelectorAll('.ecB button');
+    bRet.onclick=async()=>{if(!bRet.classList.contains('sur')){bRet.classList.add('sur');bRet.textContent='Sûr ? Retirer';setTimeout(()=>{bRet.classList.remove('sur');bRet.textContent='🗑️ Retirer'},4000);return}
+      montre('okEnc','');montre('errEnc','');try{const ok=await rpc('ibz_en_cours_retirer',{p_pin:PIN,p_sorte:x.sorte,p_id:x.id});if(ok===null)throw new Error('Code caisse incorrect');
+        montre('okEnc','« '+x.libelle+' » retiré.');enCours();actifs();if(client){bonsClient();jeuClient()}}catch(e){montre('errEnc',e.message)}};
+    bMod.onclick=()=>{if(r.querySelector('.ecM'))return;const m=document.createElement('div');m.className='ecM';
+      m.innerHTML=(x.sorte!=='machine'?'<label>Nom du cadeau</label><input class="mL" maxlength="40">':'')+(x.type==='points'?'<label>Points</label><input class="mP" type="number" inputmode="numeric" min="1" max="100">':'')+(x.sorte!=='bon'?'<label>Valable encore (jours)</label><input class="mJ" type="number" inputmode="numeric" min="1" max="60" placeholder="ne pas changer">':'')+'<button type="button">💾 Enregistrer</button>';
+      if(m.querySelector('.mL'))m.querySelector('.mL').value=x.libelle;if(m.querySelector('.mP'))m.querySelector('.mP').value=x.points;
+      m.querySelector('button').onclick=async()=>{montre('okEnc','');montre('errEnc','');
+        try{const ok=await rpc('ibz_en_cours_modifier',{p_pin:PIN,p_sorte:x.sorte,p_id:x.id,p_libelle:m.querySelector('.mL')?m.querySelector('.mL').value.trim():x.libelle,p_points:m.querySelector('.mP')?parseInt(m.querySelector('.mP').value,10):null,p_jours:m.querySelector('.mJ')&&m.querySelector('.mJ').value?parseInt(m.querySelector('.mJ').value,10):null});
+          if(ok===null)throw new Error('Code caisse incorrect');montre('okEnc','Modifié !');enCours();actifs();if(client)bonsClient()}catch(e){montre('errEnc',e.message)}};
+      r.appendChild(m)};
+    z.appendChild(r)})}
+document.querySelectorAll('#encF button').forEach(b=>b.onclick=()=>{encFiltre=b.dataset.f;document.querySelectorAll('#encF button').forEach(x=>x.classList.toggle('on',x===b));afficherEnCours()});
+$('encQ').oninput=afficherEnCours;
 let suggs=[];
 async function suggestions(){try{const d=await rpc('ibz_suggestions',{p_pin:PIN});suggs=d||[];const z=$('suggListe');z.innerHTML='';
   $('blocSugg').hidden=!suggs.length;$('suggN').textContent=suggs.length?suggs.length+' idée'+(suggs.length>1?'s':''):'';
