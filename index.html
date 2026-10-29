@@ -612,6 +612,21 @@ button{background:#ff1744}
 .envL{display:flex;justify-content:space-between;align-items:center;gap:8px;background:#fff;color:#2a0f4f;border-radius:12px;padding:8px 10px;margin-top:8px;font-size:14px}
 .envL small{display:block;color:#6d5d8a}
 .envL button{width:auto;margin:0;padding:6px 10px;font-size:13px;background:#fff;color:#c62828;border:2px solid #c62828;box-shadow:none}
+/* ===== Carte famille ===== */
+.famBar{background:linear-gradient(135deg,#ffffff,#f3ecfd);border:3px solid #7c3aed;border-radius:18px;padding:10px 12px;margin:0 0 12px;color:#2a0f4f;box-shadow:0 4px 0 #2a0f4f}
+.famT{font-family:'Luckiest Guy',sans-serif;font-size:18px;color:#6b21c8;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.famT small{font-family:'Nunito',sans-serif;font-weight:700;font-size:12.5px;color:#6d5d8a}
+.famOnglets{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.famOnglets button{flex:none;width:auto;margin:0;padding:9px 14px;font-size:16px;border-radius:999px;background:#efe6fb;color:#2a0f4f;border:2px solid #c9b6ea;box-shadow:none}
+.famOnglets button.on{background:#ff1744;color:#fff;border-color:#2a0f4f;box-shadow:2px 2px 0 #2a0f4f}
+.famOnglets button small{font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;opacity:.85;margin-left:4px}
+.famOnglets .famPlus{background:#fff;border:2px dashed #7c3aed;color:#6b21c8}
+.famBar.seul .famT small::after{content:' · tu as des enfants ou petits-enfants ? Ajoute-leur une carte'}
+.famBar.seul .famOnglets button:not(.famPlus){display:none}
+.famAjout{margin-top:10px;background:#fff;border:2px solid #e2d6f5;border-radius:14px;padding:10px}
+.famAjout label{display:block;font-size:14px;margin:6px 0 4px}.famAjout input{width:100%}
+.famBtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.famBtns button{margin:0}
+.famBtns .famAnn{background:#efe6fb;color:#2a0f4f}
 /* ===== Design 2 : police IBIZOU pour les titres, Nunito pour le texte, Mali pour les phrases sympas, reliefs choisis ===== */
 body,input,button,select,textarea{letter-spacing:0;font-weight:700!important}
 body{font-family:'Nunito',system-ui,sans-serif}
@@ -750,6 +765,16 @@ input,select,textarea{font-family:'Nunito',sans-serif}
     <p class="petit" style="text-align:center"><a href="#" id="lienNouveau" style="color:var(--rouge)">Créer une nouvelle carte</a></p>
   </div>
 
+  <div class="famBar" id="famBar" hidden>
+    <div class="famT">👨‍👩‍👧 Ma famille <small>touche un prénom pour voir sa carte</small></div>
+    <div class="famOnglets" id="famOnglets"></div>
+    <div class="famAjout" id="famAjout" hidden>
+      <label for="famPrenom">Prénom de l'enfant</label><input id="famPrenom" maxlength="40" autocomplete="off" placeholder="Ex : Léo">
+      <label for="famSecret">Ton code secret (4 chiffres)</label><input id="famSecret" class="pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••">
+      <div class="famBtns"><button type="button" class="famAnn" id="famAnn">Annuler</button><button type="button" id="famOk">Créer sa carte</button></div>
+      <div class="err" id="errFam"></div>
+    </div>
+  </div>
   <div class="carte" id="vueCarte" style="display:none">
     <div class="ampoules"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     <div class="bonjour" id="bonjour"></div>
@@ -939,7 +964,28 @@ function disposer(){const v=$('vueCarte');if(!v)return;const large=matchMedia('(
     v.appendChild(cols)}
   else if(!large&&cols){const items=[...cols.querySelectorAll(':scope>div>*')].sort((a,b)=>a.dataset.pos-b.dataset.pos);items.forEach(e=>v.insertBefore(e,cols));cols.remove()}}
 matchMedia('(min-width:820px)').addEventListener('change',disposer);
-async function afficherCarte(){disposer();
+function lireFam(){try{return localStorage.getItem('ibz_famille')}catch(e){return null}}
+function garderFam(v){try{v?localStorage.setItem('ibz_famille',v):localStorage.removeItem('ibz_famille')}catch(e){}}
+let famRacine=null,famListe=[];
+async function famille(){try{const r=lireFam()||monId;const d=await rpc('ibz_famille',{p_id:r})||[];
+  if(!d.length){$('famBar').hidden=true;return}
+  famRacine=r;garderFam(r);famListe=d;const z=$('famOnglets');z.innerHTML='';
+  $('famBar').hidden=false;$('famBar').classList.toggle('seul',d.length===1);
+  d.forEach(m=>{const b=document.createElement('button');b.type='button';b.className=m.id===monId?'on':'';b.innerHTML='<span></span><small></small>';
+    b.firstChild.textContent=(m.principal?'⭐ ':'')+m.prenom;b.lastChild.textContent=m.points+' pts';b.onclick=()=>{if(m.id!==monId)changerCarte(m.id)};z.appendChild(b)});
+  const p=document.createElement('button');p.type='button';p.className='famPlus';p.textContent='➕ Ajouter un enfant';p.onclick=()=>{$('famAjout').hidden=false;$('famPrenom').focus()};z.appendChild(p);
+}catch(e){}}
+function changerCarte(id){monId=id;garder(id);dernier=null;niveauPrec=null;fidPrec=null;recuDepuis=Date.now();
+  try{history.replaceState(null,'',location.pathname+'#id='+monId)}catch(e){}
+  $('qr').innerHTML='';new QRCode($('qr'),{text:'IBZ:'+monId,width:220,height:220,correctLevel:QRCode.CorrectLevel.M});
+  rafraichir();verifierCadeaux();bons();verifierJeu();classement();passages();fidelite();envois();famille();window.scrollTo({top:0,behavior:'smooth'})}
+$('famAnn').onclick=()=>{$('famAjout').hidden=true;$('errFam').style.display='none'};
+$('famOk').onclick=async()=>{const p=$('famPrenom').value.trim(),c=$('famSecret').value.trim();const err=t=>{$('errFam').textContent=t;$('errFam').style.display='block'};
+  if(!p)return err('Tape le prénom de l\'enfant.');if(!/^\d{4}$/.test(c))return err('Tape ton code secret à 4 chiffres.');
+  $('famOk').disabled=true;try{const id=await rpc('ibz_enfant_ajouter',{p_parent:famRacine||lireFam()||monId,p_secret:c,p_prenom:p});
+    $('famPrenom').value='';$('famSecret').value='';$('famAjout').hidden=true;$('errFam').style.display='none';changerCarte(id)}catch(e){err(e.message)}
+  $('famOk').disabled=false};
+async function afficherCarte(){disposer();famille();setInterval(famille,30000);
   try{history.replaceState(null,'',location.pathname+'#id='+monId)}catch(e){}
   $('vueInscription').style.display='none';$('vueRecup').style.display='none';$('vueCarte').style.display='block';
   new QRCode($('qr'),{text:'IBZ:'+monId,width:220,height:220,correctLevel:QRCode.CorrectLevel.M});
@@ -1291,7 +1337,7 @@ $('btnInscrire').onclick=async()=>{
       :await rpc('ibz_inscription4',{p_prenom:prenom,p_nom:nom,p_tel:tel,p_secret:secret,p_parrain:parr,p_anonyme:false,p_accepte:true,p_moins15:$('cMoins15').checked});
     if(parr&&!d[0].parrain_ok)toast('Code copain inconnu, carte créée quand même');
     if(anonyme)alert('Ta carte est créée ! Note bien ton code carte '+d[0].code+' et ton code secret : sans nom, ce sont les seuls moyens de la retrouver.');
-    monId=d[0].id;garder(monId);afficherCarte();guideApresInscription()}
+    monId=d[0].id;garder(monId);garderFam(null);afficherCarte();guideApresInscription()}
   catch(e){err('errInsc',e.message);$('btnInscrire').disabled=false}
 };
 $('lienDeja').onclick=e=>{e.preventDefault();$('vueInscription').style.display='none';$('vueRecup').style.display='block'};
@@ -1311,7 +1357,7 @@ $('btnRecup').onclick=async()=>{
   $('btnRecup').disabled=true;
   try{const id=rMode==='nom'?await rpc('ibz_recuperer',{p_prenom:p,p_nom:n,p_secret:c}):await rpc('ibz_recuperer_code',{p_code:k,p_secret:c});
     if(!id){err('errRecup','Aucune carte trouvée avec ces informations.');$('btnRecup').disabled=false;return}
-    monId=id;garder(id);afficherCarte()}
+    monId=id;garder(id);garderFam(null);afficherCarte()}
   catch(e){err('errRecup',e.message);$('btnRecup').disabled=false}
 };
 if(monId)afficherCarte();else $('vueInscription').style.display='block';
