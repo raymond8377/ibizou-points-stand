@@ -1125,21 +1125,18 @@ async function validerTicket(code){
 }
 function chargerImg(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
 async function imageTicket(code){
-  try{await document.fonts.load('70px "Luckiest Guy"')}catch(e){}
   const fond=await chargerImg('ticket-partie.jpg');
-  const W=1659,HT=948,HB=560,H=HT+HB,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+  const W=1659,HT=948,H=1105,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
   x.fillStyle='#fff';x.fillRect(0,0,W,H);
   if(fond)x.drawImage(fond,0,0,W,HT);
-  // talon du ticket avec le QR code
-  x.fillStyle='#e3001b';x.beginPath();x.roundRect(20,HT+10,W-40,HB-30,40);x.fill();
-  x.fillStyle='#fff';x.beginPath();x.roundRect(38,HT+28,W-76,HB-66,28);x.fill();
-  x.setLineDash([18,14]);x.strokeStyle='#e3001b';x.lineWidth=5;x.beginPath();x.moveTo(60,HT+4);x.lineTo(W-60,HT+4);x.stroke();x.setLineDash([]);
-  const d=document.createElement('div');new QRCode(d,{text:TICKET_URL+'?t='+code,width:430,height:430,correctLevel:QRCode.CorrectLevel.M});
-  x.drawImage(d.querySelector('canvas'),90,HT+55,430,430);
-  x.textAlign='left';x.fillStyle='#e3001b';x.font='86px "Luckiest Guy", Impact, sans-serif';
-  x.fillText('SCANNE-MOI',600,HT+170);x.fillText('AU STAND !',600,HT+265);
-  x.fillStyle='#1f1530';x.font='800 64px monospace';x.fillText(code,600,HT+365);
-  x.fillStyle='#555';x.font='700 38px sans-serif';x.fillText('Valable une seule fois · 1 partie offerte',600,HT+435);
+  // QR code collé sur le ticket, en bas à droite (façon sticker)
+  const sx=1315,sy=705,sw=320,sh=380;
+  x.save();x.shadowColor='rgba(0,0,0,.35)';x.shadowBlur=24;x.shadowOffsetY=8;
+  x.fillStyle='#e3001b';x.beginPath();x.roundRect(sx,sy,sw,sh,30);x.fill();x.restore();
+  x.fillStyle='#fff';x.beginPath();x.roundRect(sx+10,sy+10,sw-20,sh-20,22);x.fill();
+  const d=document.createElement('div');new QRCode(d,{text:TICKET_URL+'?t='+code,width:270,height:270,correctLevel:QRCode.CorrectLevel.M});
+  x.drawImage(d.querySelector('canvas'),sx+25,sy+25,270,270);
+  x.textAlign='center';x.fillStyle='#1f1530';x.font='800 34px monospace';x.fillText(code,sx+sw/2,sy+335);
   return new Promise(r=>c.toBlob(r,'image/jpeg',.9));
 }
 async function partageTicket(avecTexte){
