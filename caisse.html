@@ -1125,18 +1125,25 @@ async function validerTicket(code){
 }
 function chargerImg(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
 async function imageTicket(code){
+  try{await document.fonts.load('70px "Luckiest Guy"')}catch(e){}
   const fond=await chargerImg('ticket-partie.jpg');
-  const W=1659,HT=948,H=1105,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+  const TW=1659,W=2260,H=948,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
   x.fillStyle='#fff';x.fillRect(0,0,W,H);
-  if(fond)x.drawImage(fond,0,0,W,HT);
-  // QR code collé sur le ticket, en bas à droite (façon sticker)
-  const sx=1315,sy=705,sw=320,sh=380;
-  x.save();x.shadowColor='rgba(0,0,0,.35)';x.shadowBlur=24;x.shadowOffsetY=8;
-  x.fillStyle='#e3001b';x.beginPath();x.roundRect(sx,sy,sw,sh,30);x.fill();x.restore();
-  x.fillStyle='#fff';x.beginPath();x.roundRect(sx+10,sy+10,sw-20,sh-20,22);x.fill();
-  const d=document.createElement('div');new QRCode(d,{text:TICKET_URL+'?t='+code,width:270,height:270,correctLevel:QRCode.CorrectLevel.M});
-  x.drawImage(d.querySelector('canvas'),sx+25,sy+25,270,270);
-  x.textAlign='center';x.fillStyle='#1f1530';x.font='800 34px monospace';x.fillText(code,sx+sw/2,sy+335);
+  if(fond)x.drawImage(fond,0,0,TW,H);
+  // talon à droite, collé au ticket
+  const tx=1585,ty=76,tw=W-tx-14,th=794;
+  x.fillStyle='#111';x.beginPath();x.roundRect(tx,ty,tw,th,[0,46,46,0]);x.fill();
+  x.fillStyle='#e3001b';x.beginPath();x.roundRect(tx,ty+8,tw-8,th-16,[0,40,40,0]);x.fill();
+  x.fillStyle='#fff';x.beginPath();x.roundRect(tx,ty+30,tw-30,th-60,[0,24,24,0]);x.fill();
+  // pointillés de découpe
+  x.setLineDash([22,16]);x.strokeStyle='#e3001b';x.lineWidth=6;x.beginPath();x.moveTo(tx+18,ty+40);x.lineTo(tx+18,ty+th-40);x.stroke();x.setLineDash([]);
+  const cx=tx+18+(tw-48)/2;
+  const d=document.createElement('div');new QRCode(d,{text:TICKET_URL+'?t='+code,width:420,height:420,correctLevel:QRCode.CorrectLevel.M});
+  x.drawImage(d.querySelector('canvas'),cx-210,ty+70,420,420);
+  x.textAlign='center';x.fillStyle='#e3001b';x.font='68px "Luckiest Guy", Impact, sans-serif';
+  x.fillText('SCANNE-MOI',cx,ty+570);x.fillText('AU STAND !',cx,ty+640);
+  x.fillStyle='#1f1530';x.font='800 46px monospace';x.fillText(code,cx,ty+712);
+  x.fillStyle='#555';x.font='700 26px sans-serif';x.fillText('Valable une seule fois',cx,ty+752);
   return new Promise(r=>c.toBlob(r,'image/jpeg',.9));
 }
 async function partageTicket(avecTexte){
