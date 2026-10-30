@@ -1013,8 +1013,9 @@ function majCible(){$('cibleTous').className=cible==='tous'?'on':'';$('cibleClie
 $('cibleTous').onclick=()=>{cible='tous';majCible()};
 $('cibleClient').onclick=()=>{if(!client){montre('errCad','Scanne ou cherche d\'abord un client');return}cible='client';montre('errCad','');majCible()};
 let gType='bon';
-function majType(){$('tBon').className=gType==='bon'?'on':'';$('tPts').className=gType==='points'?'on':'';$('gPts').style.display=gType==='points'?'block':'none';$('infoMachine').style.display=gType==='machine'?'block':'none'}
-$('tBon').onclick=()=>{gType='bon';document.querySelectorAll('.cad button').forEach(x=>x.classList.remove('on'));majType()};$('tPts').onclick=()=>{gType='points';document.querySelectorAll('.cad button').forEach(x=>x.classList.remove('on'));majType()};
+function majType(){$('tBon').className=gType==='bon'?'on':'';$('tPts').className=gType==='points'?'on':'';$('gPts').style.display=gType==='points'?'block':'none';$('infoMachine').style.display=gType==='machine'?'block':'none';$('tBon').parentElement.style.display=gType==='machine'?'none':'';$('gLib').readOnly=gType==='machine'}
+const sansMachine=()=>{if($('gLib').value==='Partie de machine à sous')$('gLib').value=''};
+$('tBon').onclick=()=>{sansMachine();gType='bon';document.querySelectorAll('.cad button').forEach(x=>x.classList.remove('on'));majType()};$('tPts').onclick=()=>{sansMachine();gType='points';document.querySelectorAll('.cad button').forEach(x=>x.classList.remove('on'));majType()};
 document.querySelectorAll('.cad button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.cad button').forEach(x=>x.classList.remove('on'));
   b.classList.add('on');$('gLib').value=b.dataset.l;gType=b.dataset.t;$('gPts').value=b.dataset.p||'';majType()});
 async function fiche(){$('cFiche').textContent='';$('cNiveau').textContent='';if(!client)return;
@@ -1045,7 +1046,8 @@ $('btnOffrir').onclick=async()=>{
   const lib=$('gLib').value.trim(),pts=gType!=='points'?1:parseInt($('gPts').value,10),j=parseInt($('gJours').value,10)||7;
   if(!lib||!(pts>0)){montre('errCad','Choisis un cadeau, ou mets un nom'+(gType==='points'?' et des points':''));return}
   if(cible==='client'&&!client){montre('errCad','Aucun client affiché');return}
-  if(cible==='tous'&&!confirm('Envoyer « '+lib+' »'+(gType==='points'?' (+'+pts+' points)':'')+' à TOUS les clients ?'))return;
+  if(gType==='points'&&/machine/i.test(lib)){montre('errCad','Pour offrir une partie de machine à sous, touche le bouton violet « 🎰 Machine à sous ».');return}
+  if(cible==='tous'&&!confirm('Envoyer « '+lib+' »'+(gType==='points'?' (+'+pts+' points)':gType==='machine'?' (partie de machine à sous)':'')+' à TOUS les clients ?'))return;
   try{const n=await rpc('ibz_offrir2',{p_pin:PIN,p_client:cible==='client'?client.id:null,p_libelle:lib,p_points:pts,p_jours:j,p_type:gType});
     if(n===null)throw new Error('Code caisse incorrect');
     actifs();montre('okCad','Cadeau envoyé'+(cible==='tous'?' à '+n+' client'+(n>1?'s':''):' à '+client.prenom)+' !');
