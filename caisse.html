@@ -1125,24 +1125,22 @@ async function validerTicket(code){
 }
 function chargerImg(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
 async function imageTicket(code){
-  try{await document.fonts.load('60px "Luckiest Guy"')}catch(e){}
-  const W=700,H=1100,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
-  const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#7c3aed');g.addColorStop(1,'#3a0f73');
-  x.fillStyle=g;x.fillRect(0,0,W,H);
-  x.fillStyle='#fff';x.beginPath();x.roundRect(30,30,W-60,H-60,34);x.fill();
-  let src=null;try{src=localStorage.getItem('ibz_photo_ticket')}catch(e){}
-  const ph=await chargerImg(src||'stand-nuit.jpg');
-  x.save();x.beginPath();x.roundRect(30,30,W-60,330,[34,34,0,0]);x.clip();
-  if(ph){const s=Math.max((W-60)/ph.width,330/ph.height);x.drawImage(ph,30+((W-60)-ph.width*s)/2,30+(330-ph.height*s)/2,ph.width*s,ph.height*s)}
-  else{x.fillStyle='#ff3d8b';x.fillRect(30,30,W-60,330)}
-  x.restore();
-  x.textAlign='center';x.fillStyle='#5b1fa6';x.font='54px "Luckiest Guy", Impact, sans-serif';x.fillText('🎟️ PARTIE GRATUITE',W/2,440);
-  const d=document.createElement('div');new QRCode(d,{text:TICKET_URL+'?t='+code,width:400,height:400,correctLevel:QRCode.CorrectLevel.M});
-  x.drawImage(d.querySelector('canvas'),150,475,400,400);
-  x.fillStyle='#1f1530';x.font='800 40px monospace';x.fillText(code,W/2,935);
-  x.fillStyle='#6b5a80';x.font='700 26px sans-serif';x.fillText('Valable une seule fois au stand IBIZOU',W/2,990);
-  x.font='600 22px sans-serif';x.fillText('Montre ce QR code avant de jouer',W/2,1030);
-  return new Promise(r=>c.toBlob(r,'image/png'));
+  try{await document.fonts.load('70px "Luckiest Guy"')}catch(e){}
+  const fond=await chargerImg('ticket-partie.jpg');
+  const W=1659,HT=948,HB=560,H=HT+HB,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+  x.fillStyle='#fff';x.fillRect(0,0,W,H);
+  if(fond)x.drawImage(fond,0,0,W,HT);
+  // talon du ticket avec le QR code
+  x.fillStyle='#e3001b';x.beginPath();x.roundRect(20,HT+10,W-40,HB-30,40);x.fill();
+  x.fillStyle='#fff';x.beginPath();x.roundRect(38,HT+28,W-76,HB-66,28);x.fill();
+  x.setLineDash([18,14]);x.strokeStyle='#e3001b';x.lineWidth=5;x.beginPath();x.moveTo(60,HT+4);x.lineTo(W-60,HT+4);x.stroke();x.setLineDash([]);
+  const d=document.createElement('div');new QRCode(d,{text:TICKET_URL+'?t='+code,width:430,height:430,correctLevel:QRCode.CorrectLevel.M});
+  x.drawImage(d.querySelector('canvas'),90,HT+55,430,430);
+  x.textAlign='left';x.fillStyle='#e3001b';x.font='86px "Luckiest Guy", Impact, sans-serif';
+  x.fillText('SCANNE-MOI',600,HT+170);x.fillText('AU STAND !',600,HT+265);
+  x.fillStyle='#1f1530';x.font='800 64px monospace';x.fillText(code,600,HT+365);
+  x.fillStyle='#555';x.font='700 38px sans-serif';x.fillText('Valable une seule fois · 1 partie offerte',600,HT+435);
+  return new Promise(r=>c.toBlob(r,'image/jpeg',.9));
 }
 async function partageTicket(avecTexte){
   const t=dernierTicket;if(!t)return;
@@ -1156,20 +1154,13 @@ $('btnPartieGratuite').onclick=async()=>{
   try{
     const [code]=await rpc('ibz_tickets_creer',{p_pin:PIN,p_nb:1,p_libelle:'1 partie gratuite'});
     const blob=await imageTicket(code);
-    dernierTicket={code,file:new File([blob],'partie-gratuite-'+code+'.png',{type:'image/png'})};
+    dernierTicket={code,file:new File([blob],'partie-gratuite-'+code+'.jpg',{type:'image/jpeg'})};
     z.innerHTML='';
     const img=document.createElement('img');img.src=URL.createObjectURL(blob);img.style.cssText='width:100%;border-radius:16px;margin-top:12px';
     const b1=document.createElement('button');b1.textContent='📸 Enregistrer dans Photos';b1.style.cssText='margin-top:10px;background:#ff3d8b';b1.onclick=()=>partageTicket(false);
     const b2=document.createElement('button');b2.textContent='📤 Envoyer (AirDrop, SMS, WhatsApp…)';b2.style.marginTop='8px';b2.onclick=()=>partageTicket(true);
-    const b3=document.createElement('button');b3.className='gris';b3.textContent='🖼️ Changer la photo des tickets';b3.style.marginTop='8px';
-    const f=document.createElement('input');f.type='file';f.accept='image/*';f.hidden=true;
-    b3.onclick=()=>f.click();
-    f.onchange=()=>{const fi=f.files[0];if(!fi)return;const im=new Image();im.onload=()=>{
-      const c=document.createElement('canvas');c.width=800;c.height=Math.round(im.height*800/im.width);c.getContext('2d').drawImage(im,0,0,c.width,c.height);
-      try{localStorage.setItem('ibz_photo_ticket',c.toDataURL('image/jpeg',.8));toast2('🖼️ Photo enregistrée : elle sera sur les prochains tickets')}catch(e){toast2('Photo trop lourde')}
-    };im.src=URL.createObjectURL(fi)};
     const n=document.createElement('div');n.className='meta';n.style.marginTop='8px';n.textContent='Astuce : reste appuyé sur l\'image → « Ajouter à Photos ». Quand le client revient, scanne son ticket avec « Scanner un client ».';
-    z.append(img,b1,b2,b3,f,n);
+    z.append(img,b1,b2,n);
   }catch(e){z.innerHTML='';montre('errScan',e.message)}
   b.disabled=false;
 };
