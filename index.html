@@ -646,6 +646,8 @@ input,select,textarea{font-family:'Nunito',sans-serif}
 .badge.Or{background:#2a0f4f!important;color:#ffd84a!important;border-color:#e0a100;text-shadow:0 -1px 0 #fff6c4,0 1px 0 #e0a100,0 2px 0 #b97a00,0 3px 0 #7a4a00,0 4px 6px rgba(0,0,0,.45);box-shadow:3px 3px 0 #7a4a00}
 .top li:first-child:not(.sep) .nm,.top li:first-child:not(.sep) .pt{background:linear-gradient(180deg,#ffe27a 0%,#e0a100 50%,#b97a00 100%);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900!important}
 .top li:first-child:not(.sep){background:linear-gradient(90deg,#fffbe6,#fff3b0);border:2px solid #e0a100}
+#code+.jeuBtn{margin:12px 0 4px}
+#vueCarte>.bons,#vueCarte .colG>.bons{margin:10px 0 6px}
 </style>
 </head>
 <body>
@@ -782,9 +784,10 @@ input,select,textarea{font-family:'Nunito',sans-serif}
     <div class="unite">POINTS</div>
     <div class="niveau" id="niveau" style="display:none"><span class="badge" id="badge"></span>
       <div class="nbar"><i id="nbarI"></i></div><div class="petit" id="nTexte" style="margin-top:4px"></div></div>
-    <button class="jeuBtn" id="jeuBtn" style="display:none">🎰 Niveau Or débloqué ! Joue à la machine à sous</button>
     <div id="qr"></div>
     <div class="code" id="code"></div>
+    <button class="jeuBtn" id="jeuBtn" style="display:none">🎰 Niveau Or débloqué ! Joue à la machine à sous</button>
+    <div class="bons" id="bons" style="display:none"><h4>🎁 Mes cadeaux à utiliser</h4><div id="bonsListe"></div></div>
     <div class="info">Montre ce QR code au stand pour gagner des points ou les échanger contre un cadeau au stand.</div>
     <div class="fid" id="fid" hidden>
       <div class="fidReflet" aria-hidden="true"></div>
@@ -926,7 +929,6 @@ input,select,textarea{font-family:'Nunito',sans-serif}
   </div>
 </div>
 
-    <div class="bons" id="bons" style="display:none"><h4>🎁 Mes cadeaux à utiliser</h4><div id="bonsListe"></div></div>
     <div class="err" id="errCarte"></div>
   </div>
   <a class="decouvre" href="actus.html">📰 L'actu du stand, les nouveautés et les jeux</a>
@@ -955,7 +957,7 @@ let monId=lire()||(m&&m[1]);
 let dernier=null,monCode=null,niveauPrec=null;
 const qp=new URLSearchParams(location.search);
 
-const ORDRE_GAUCHE=['bonjour','points','niveau','jeuBtn','qr','code','fid','garantie'];
+const ORDRE_GAUCHE=['bonjour','points','niveau','jeuBtn','bons','qr','code','fid','garantie'];
 function disposer(){const v=$('vueCarte');if(!v)return;const large=matchMedia('(min-width:820px)').matches;
   document.body.classList.toggle('tablette',large);let cols=v.querySelector('.colsT');
   if(large&&!cols){cols=document.createElement('div');cols.className='colsT';const g=document.createElement('div');g.className='colG';const d=document.createElement('div');d.className='colD';
