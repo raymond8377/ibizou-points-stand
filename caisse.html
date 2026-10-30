@@ -277,7 +277,12 @@ input,select,textarea,.meta,.ok,.err,small{font-family:'Nunito',sans-serif}
     <div class="recents" id="recents" hidden><div class="recT">🕘 Passés au stand récemment</div><div class="recL" id="recL"></div></div>
     <div class="err" id="errScan"></div>
     <div id="ticketRes"></div>
-    <button id="btnPartieGratuite" style="margin-top:12px;background:#ff3d8b">🎁 Générer une partie gratuite</button>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:12px">
+      <button type="button" id="pgMoins" style="width:56px;margin:0;font-size:26px;padding:10px 0">−</button>
+      <div style="flex:1;text-align:center;font-weight:800"><span id="pgNb" style="font-size:30px">1</span><br><small>ticket(s)</small></div>
+      <button type="button" id="pgPlus" style="width:56px;margin:0;font-size:26px;padding:10px 0">+</button>
+    </div>
+    <button id="btnPartieGratuite" style="margin-top:10px;background:#ff3d8b">🎁 Générer 1 partie gratuite</button>
     <div id="pgZone"></div>
   </div>
 
@@ -1108,7 +1113,7 @@ if(PIN)ouvrir(PIN);
 <script>
 /* ---------- Parties gratuites (tickets à usage unique) ---------- */
 const TICKET_URL=location.href.replace(/[^\/]*([?#].*)?$/,'')+'tickets.html';
-let dernierTicket=null;
+let pgNb=1;
 async function validerTicket(code){
   const z=$('ticketRes');z.innerHTML='';
   try{
@@ -1146,25 +1151,39 @@ async function imageTicket(code){
   x.fillStyle='#555';x.font='700 26px sans-serif';x.fillText('Valable une seule fois',cx,ty+752);
   return new Promise(r=>c.toBlob(r,'image/jpeg',.9));
 }
-async function partageTicket(avecTexte){
-  const t=dernierTicket;if(!t)return;
-  const data={files:[t.file]};
-  if(avecTexte)data.text='🎁 Une partie gratuite au stand IBIZOU ! Montre ce QR code au stand. Ton ticket : '+TICKET_URL+'?t='+t.code;
-  if(navigator.canShare&&navigator.canShare({files:[t.file]})){try{await navigator.share(data)}catch(e){}return}
-  const a=document.createElement('a');a.href=URL.createObjectURL(t.file);a.download=t.file.name;a.click();
+async function partager(files,texte){
+  if(navigator.canShare&&navigator.canShare({files})){try{const d={files};if(texte)d.text=texte;await navigator.share(d)}catch(e){}return}
+  files.forEach(f=>{const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;a.click()});
 }
+const txtTicket=code=>'🎁 Une partie gratuite au stand IBIZOU ! Montre ce QR code au stand. Ton ticket : '+TICKET_URL+'?t='+code;
+function majPgNb(){$('pgNb').textContent=pgNb;$('btnPartieGratuite').textContent='🎁 Générer '+pgNb+(pgNb>1?' parties gratuites':' partie gratuite')}
+$('pgMoins').onclick=()=>{if(pgNb>1){pgNb--;majPgNb()}};
+$('pgPlus').onclick=()=>{if(pgNb<20){pgNb++;majPgNb()}};
 $('btnPartieGratuite').onclick=async()=>{
-  const z=$('pgZone'),b=$('btnPartieGratuite');b.disabled=true;z.innerHTML='<div class="meta" style="margin-top:8px">Création du ticket…</div>';
+  const z=$('pgZone'),b=$('btnPartieGratuite');b.disabled=true;
+  z.innerHTML='<div class="meta" style="margin-top:8px">Création de '+pgNb+' ticket(s)…</div>';
   try{
-    const [code]=await rpc('ibz_tickets_creer',{p_pin:PIN,p_nb:1,p_libelle:'1 partie gratuite'});
-    const blob=await imageTicket(code);
-    dernierTicket={code,file:new File([blob],'partie-gratuite-'+code+'.jpg',{type:'image/jpeg'})};
+    const codes=await rpc('ibz_tickets_creer',{p_pin:PIN,p_nb:pgNb,p_libelle:'1 partie gratuite'});
+    const tickets=[];
+    for(const code of codes){const blob=await imageTicket(code);tickets.push({code,blob,file:new File([blob],'partie-gratuite-'+code+'.jpg',{type:'image/jpeg'})})}
     z.innerHTML='';
-    const img=document.createElement('img');img.src=URL.createObjectURL(blob);img.style.cssText='width:100%;border-radius:16px;margin-top:12px';
-    const b1=document.createElement('button');b1.textContent='📸 Enregistrer dans Photos';b1.style.cssText='margin-top:10px;background:#ff3d8b';b1.onclick=()=>partageTicket(false);
-    const b2=document.createElement('button');b2.textContent='📤 Envoyer (AirDrop, SMS, WhatsApp…)';b2.style.marginTop='8px';b2.onclick=()=>partageTicket(true);
-    const n=document.createElement('div');n.className='meta';n.style.marginTop='8px';n.textContent='Astuce : reste appuyé sur l\'image → « Ajouter à Photos ». Quand le client revient, scanne son ticket avec « Scanner un client ».';
-    z.append(img,b1,b2,n);
+    if(tickets.length>1){
+      const t=document.createElement('div');t.className='meta';t.style.cssText='margin-top:12px;font-weight:800';t.textContent='✅ '+tickets.length+' tickets créés';
+      const tout=document.createElement('button');tout.textContent='📸 Enregistrer les '+tickets.length+' tickets dans Photos';tout.style.cssText='margin-top:8px;background:#ff3d8b';
+      tout.onclick=()=>partager(tickets.map(x=>x.file));
+      z.append(t,tout);
+    }
+    tickets.forEach((t,i)=>{
+      const box=document.createElement('div');box.style.cssText='margin-top:14px;padding-top:10px;border-top:2px dashed #e5d5f5';
+      const tit=document.createElement('div');tit.className='meta';tit.style.fontWeight='800';tit.textContent='Ticket '+(i+1)+'/'+tickets.length+' · '+t.code;
+      const img=document.createElement('img');img.src=URL.createObjectURL(t.blob);img.style.cssText='width:100%;border-radius:12px;margin-top:6px';
+      const row=document.createElement('div');row.style.cssText='display:flex;gap:8px;margin-top:8px';
+      const b1=document.createElement('button');b1.textContent='📸 Photos';b1.style.cssText='margin:0;flex:1;background:#ff3d8b';b1.onclick=()=>partager([t.file]);
+      const b2=document.createElement('button');b2.textContent='📤 Envoyer';b2.style.cssText='margin:0;flex:1';b2.onclick=()=>partager([t.file],txtTicket(t.code));
+      row.append(b1,b2);box.append(tit,img,row);z.appendChild(box);
+    });
+    const n=document.createElement('div');n.className='meta';n.style.marginTop='10px';n.textContent='Chaque ticket ne marche qu\'une fois. Quand le client revient, scanne-le avec « Scanner un client ».';
+    z.appendChild(n);
   }catch(e){z.innerHTML='';montre('errScan',e.message)}
   b.disabled=false;
 };
