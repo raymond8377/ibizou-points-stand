@@ -243,6 +243,11 @@ input,select,textarea,.meta,.ok,.err,small{font-family:'Nunito',sans-serif}
 .bloc.repliable.ouvert>.repliCorps{display:block}
 .bloc.repliable>.repliCorps>h2:first-child{display:none}
 @media (prefers-reduced-motion:reduce){.bloc.repliable>.repliTete .chev{transition:none}}
+.recents{margin-top:12px}
+.recT{font-family:'Luckiest Guy',sans-serif;font-size:15px;color:#6b21c8;margin-bottom:6px}
+.recL{display:flex;flex-wrap:wrap;gap:6px}
+.recL button{width:auto;margin:0;padding:8px 12px;font-size:15px;border-radius:999px;background:#efe6fb;color:#2a0f4f;border:2px solid #c9b6ea;box-shadow:none;font-family:'Nunito',sans-serif;font-weight:800!important}
+.recL button small{font-weight:700;color:#7a6a96;margin-left:4px}
 </style>
 </head>
 <body>
@@ -269,6 +274,7 @@ input,select,textarea,.meta,.ok,.err,small{font-family:'Nunito',sans-serif}
       <button id="btnChercher" class="gris">OK</button>
     </div>
     <div id="resultats"></div>
+    <div class="recents" id="recents" hidden><div class="recT">🕘 Passés au stand récemment</div><div class="recL" id="recL"></div></div>
     <div class="err" id="errScan"></div>
   </div>
 
@@ -514,7 +520,7 @@ async function ouvrir(p){
     $('vuePin').style.display='none';$('vueCaisse').style.display='block';$('btnSortir').style.display='inline';
     let role='patron';try{const q=(await rpc('ibz_qui',{p_pin:p}))[0];if(q){role=q.role;$('qui').textContent='👤 Connecté : '+q.nom+(q.role==='patron'?' (patron)':' (employé)')}}catch(e){}
     document.body.classList.toggle('employe',role==='employe');
-    journal();liste();stats();viderFile();majBandeau();
+    journal();liste();stats();viderFile();majBandeau();majRecents();setInterval(majRecents,60000);
     if(role==='patron'){suggestions();setInterval(suggestions,300000);orNouveaux();setInterval(orNouveaux,60000);transferts();setInterval(transferts,20000);enCours();setInterval(enCours,60000);chargerBonus();actifs();chargerLots();chargerTour();chargerConc();bilan();chargerEmp();chargerCont()}
   }catch(e){montre('errPin',e.message)}
 }
@@ -593,7 +599,13 @@ $('fOk').onclick=async()=>{const e=fAttente;if(!e||!client||occupe)return;occupe
     montre('okMsg','✅ Carte fidélité : +'+x.ajout+' points pour '+client.prenom+(x.cartes?(fChoix==='pts'?' · 🎁 carte pleine : +'+(parseInt($('fPts').value,10)||30)+' points offerts':' · 🎁 carte pleine, bon « '+($('fCadeau').value.trim()||'10 € de jeu offerts')+' » créé'):'')+' (carte : '+x.cases+' / '+((fInfo&&fInfo.total)||10)+')');
     fAttente=0;delete $('fCadeau').dataset.touche;fChoisir('bon');$('fPts').value=30;fMaj();fidCaisse();bonsClient();journal();historique();fermerBientot()}catch(e){montre('errClient',e.message)}
   $('fOk').disabled=false;occupe=false};
-function choisir(c){
+function lireRecents(){try{return JSON.parse(localStorage.getItem('ibz_recents')||'[]')}catch(e){return[]}}
+function majRecents(){const l=lireRecents();$('recents').hidden=!l.length;const z=$('recL');z.innerHTML='';
+  l.forEach(r=>{const b=document.createElement('button');b.type='button';b.innerHTML='<span></span><small></small>';b.firstChild.textContent=r.prenom+(r.nom?' '+r.nom.charAt(0)+'.':'');
+    const m=Math.round((Date.now()-r.t)/60000);b.lastChild.textContent=m<1?'à l\'instant':m<60?m+' min':Math.round(m/60)+' h';b.onclick=()=>chercher(r.code,true);z.appendChild(b)})}
+function ajouterRecent(c){try{let l=lireRecents().filter(x=>x.id!==c.id);l.unshift({id:c.id,code:c.code,prenom:c.prenom,nom:c.nom||'',t:Date.now()});
+  l=l.filter(x=>Date.now()-x.t<12*3600e3).slice(0,12);localStorage.setItem('ibz_recents',JSON.stringify(l))}catch(e){}majRecents()}
+function choisir(c){ajouterRecent(c);
   client=c;$('vueClient').style.display='block';$('qrRecup').innerHTML='';
   $('cNom').textContent=c.prenom+(c.nom?' '+c.nom:'');$('cMeta').textContent='Code '+c.code+(c.tel?' · '+c.tel:'');
   $('cSolde').textContent=c.points;montre('okMsg','');montre('errClient','');
@@ -651,9 +663,9 @@ async function historique(){const z=$('histListe');z.innerHTML='';if(!client)ret
   }catch(e){}}
 let tFermer=null,tInactif=null;
 function fermerFiche(){clearTimeout(tFermer);if(!client)return;$('btnFermer').onclick()}
-function fermerBientot(){clearTimeout(tFermer);const c=client;$('vueClient').classList.add('fin');
+function fermerBientot(){return;clearTimeout(tFermer);const c=client;$('vueClient').classList.add('fin');
   tFermer=setTimeout(()=>{$('vueClient').classList.remove('fin');if(client===c)fermerFiche()},3000)}
-function reveil(){clearTimeout(tInactif);if(client)tInactif=setTimeout(()=>{if(client&&!occupe){fermerFiche();montre('errScan','');toast2('⏱️ Fiche fermée après 1 minute sans activité')}},60000)}
+function reveil(){clearTimeout(tInactif);if(client)tInactif=setTimeout(()=>{if(client&&!occupe){fermerFiche();montre('errScan','');toast2('⏱️ Fiche fermée après 3 minutes sans activité')}},180000)}
 ['pointerdown','keydown','scroll','input'].forEach(ev=>document.addEventListener(ev,reveil,{passive:true}));
 $('btnFermer').onclick=()=>{clearTimeout(tFermer);clearTimeout(tInactif);$('vueClient').classList.remove('fin');fAttente=0;fMaj();client=null;enAttente=0;majValid();pCible='tous';majP();cible='tous';majCible();$('vueClient').style.display='none';$('recherche').value='';window.scrollTo({top:0,behavior:'smooth'})};
 $('btnRecup').onclick=()=>{
