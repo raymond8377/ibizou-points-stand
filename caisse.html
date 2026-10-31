@@ -282,8 +282,11 @@ input,select,textarea,.meta,.ok,.err,small{font-family:'Nunito',sans-serif}
       <div style="flex:1;text-align:center;font-weight:800"><span id="pgNb" style="font-size:30px">1</span><br><small id="pgLib">partie sur le ticket</small></div>
       <button type="button" id="pgPlus" style="width:56px;margin:0;font-size:26px;padding:10px 0">+</button>
     </div>
-    <button id="btnPartieGratuite" style="margin-top:10px;background:#ff3d8b">🎁 Générer 1 partie gratuite</button>
+    <button id="btnPartieGratuite" style="margin-top:10px;background:#ff3d8b">🎁 Générer un ticket 1 partie offerte</button>
     <div id="pgZone"></div>
+    <details style="margin-top:12px"><summary class="meta" style="cursor:pointer">🔓 Débloquer un ticket (client qui a perdu sa clé)</summary>
+      <div class="ligne" style="margin-top:8px"><input id="dbCode" placeholder="N° du ticket" autocomplete="off" style="text-transform:uppercase"><button id="btnDebloquer" class="gris">Débloquer</button></div>
+      <div class="meta" id="dbRes"></div></details>
   </div>
 
   <div class="bloc patron sugg" id="blocSugg" hidden>
@@ -1115,24 +1118,48 @@ const APP_URL=location.href.replace(/[^\/]*([?#].*)?$/,'');
 const TICKET_URL=APP_URL+'tickets.html';
 let pgNb=1,dernierQR=null;
 const plP=n=>n+' partie'+(n>1?'s':'');
-async function validerTicket(qr,nb){
-  const z=$('ticketRes');z.innerHTML='';dernierQR=qr;
-  try{
-    const r=await rpc('ibz_ticket_scan',{p_pin:PIN,p_qr:qr,p_nb:nb||1});
-    if(navigator.vibrate)navigator.vibrate(r.ok?150:[80,60,80]);
-    const d=document.createElement('div');
-    d.style.cssText='margin-top:12px;padding:18px;border-radius:14px;text-align:center;font-weight:800;font-size:20px;'+(r.ok?'background:#dcfce7;color:#16a34a':'background:#fee2e2;color:#dc2626');
-    const t=document.createElement('div');t.textContent=r.ok?('✅ '+(r.nb>1?r.nb+' PARTIES OFFERTES':'PARTIE OFFERTE')):('⛔ '+String(r.raison||'').toUpperCase());
-    const s=document.createElement('div');s.style.cssText='font-size:14px;font-weight:600;margin-top:4px';
-    const quand=r.utilise_at?new Date(r.utilise_at).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
-    s.textContent=r.ok?(r.restantes>0?'Il reste '+plP(r.restantes)+' sur ce ticket':'Ticket terminé — il ne marchera plus'):(r.aide||(quand?'le '+quand+' par '+r.utilise_par:''));
-    d.append(t,s);
-    if(r.ok&&r.restantes>0){
-      const plus=document.createElement('button');plus.textContent='➕ Valider 1 partie de plus';plus.style.cssText='margin-top:10px';
-      plus.onclick=()=>validerTicket(dernierQR,1);d.appendChild(plus);
-    }
-    z.appendChild(d);setTimeout(()=>{if(z.contains(d))d.remove()},20000);
-  }catch(e){montre('errScan',e.message)}
+function carteTicket(ok){const d=document.createElement('div');
+  d.style.cssText='margin-top:12px;padding:18px;border-radius:14px;text-align:center;font-weight:800;font-size:20px;'+(ok?'background:#dcfce7;color:#16a34a':'background:#fee2e2;color:#dc2626');return d}
+function ligneTxt(t,css){const e=document.createElement('div');e.textContent=t;if(css)e.style.cssText=css;return e}
+async function validerTicket(qr){
+  const z=$('ticketRes');z.innerHTML='';dernierQR=qr;montre('errScan','');
+  let r;try{r=await rpc('ibz_ticket_verifier',{p_pin:PIN,p_qr:qr})}catch(e){montre('errScan',e.message);return}
+  if(!r.ok){
+    if(navigator.vibrate)navigator.vibrate([80,60,80]);
+    const d=carteTicket(false);const quand=r.utilise_at?new Date(r.utilise_at).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
+    d.append(ligneTxt('⛔ '+String(r.raison||'').toUpperCase()),ligneTxt(r.aide||(quand?'le '+quand+' par '+r.utilise_par:''),'font-size:14px;font-weight:600;margin-top:4px'));
+    z.appendChild(d);setTimeout(()=>{if(z.contains(d))d.remove()},20000);return;
+  }
+  if(navigator.vibrate)navigator.vibrate(60);
+  let nb=1;
+  const d=document.createElement('div');d.style.cssText='margin-top:12px;padding:16px;border-radius:14px;text-align:center;background:#f3e8ff;color:#3a0f73;font-weight:800';
+  d.append(ligneTxt('🎟️ Ticket '+r.code,'font-size:18px'),ligneTxt(r.restantes<r.parties?'Il reste '+plP(r.restantes)+' sur '+r.parties:plP(r.restantes)+' sur ce ticket','font-size:15px;font-weight:600;margin-top:4px'));
+  let cpt=null,nbEl=null;
+  if(r.restantes>1){
+    cpt=document.createElement('div');cpt.style.cssText='display:flex;align-items:center;gap:10px;margin-top:12px';
+    const m=document.createElement('button');m.type='button';m.textContent='−';m.style.cssText='width:56px;margin:0;font-size:26px;padding:8px 0';
+    const p=document.createElement('button');p.type='button';p.textContent='+';p.style.cssText='width:56px;margin:0;font-size:26px;padding:8px 0';
+    nbEl=document.createElement('div');nbEl.style.cssText='flex:1;font-size:26px';
+    cpt.append(m,nbEl,p);
+    m.onclick=()=>{if(nb>1){nb--;maj()}};p.onclick=()=>{if(nb<r.restantes){nb++;maj()}};
+    d.appendChild(cpt);
+  }
+  const ok=document.createElement('button');ok.style.cssText='margin-top:12px;background:#16a34a;font-size:19px';
+  const non=document.createElement('button');non.className='gris';non.textContent='Annuler';non.style.marginTop='8px';
+  function maj(){if(nbEl)nbEl.textContent=plP(nb);ok.textContent='✅ Valider '+(nb>1?nb+' parties':'la partie')}
+  maj();d.append(ok,non);z.appendChild(d);
+  non.onclick=()=>{z.innerHTML=''};
+  ok.onclick=async()=>{
+    ok.disabled=true;
+    try{
+      const v=await rpc('ibz_ticket_scan',{p_pin:PIN,p_qr:qr,p_nb:nb});
+      if(navigator.vibrate)navigator.vibrate(v.ok?150:[80,60,80]);
+      z.innerHTML='';const c=carteTicket(v.ok);
+      c.append(ligneTxt(v.ok?'✅ '+(v.nb>1?v.nb+' PARTIES OFFERTES':'PARTIE OFFERTE'):'⛔ '+String(v.raison||'').toUpperCase()),
+        ligneTxt(v.ok?(v.restantes>0?'Il reste '+plP(v.restantes)+' sur ce ticket':'Ticket terminé — il ne marchera plus'):(v.aide||''),'font-size:14px;font-weight:600;margin-top:4px'));
+      z.appendChild(c);setTimeout(()=>{if(z.contains(c))c.remove()},15000);
+    }catch(e){montre('errScan',e.message);ok.disabled=false}
+  };
 }
 function chargerImg(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
 async function imageTicket(code,n){
