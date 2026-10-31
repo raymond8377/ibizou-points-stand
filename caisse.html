@@ -1212,11 +1212,16 @@ $('btnPartieGratuite').onclick=async()=>{
     z.innerHTML='';
     const tit=document.createElement('div');tit.className='meta';tit.style.cssText='margin-top:12px;font-weight:800';tit.textContent='✅ Ticket '+code+' · '+plP(n);
     const img=document.createElement('img');img.src=URL.createObjectURL(blob);img.style.cssText='width:100%;border-radius:12px;margin-top:6px';
-    const b1=document.createElement('button');b1.textContent='📸 Enregistrer dans Photos';b1.style.cssText='margin-top:10px;background:#ff3d8b';b1.onclick=()=>partager([file]);
-    const b2=document.createElement('button');b2.textContent='📤 Envoyer (AirDrop, SMS, WhatsApp…)';b2.style.marginTop='8px';b2.onclick=()=>partager([file],txtTicket(code,n));
+    const lien=TICKET_URL+'?t='+code;
+    const b0=document.createElement('button');b0.textContent='💌 Envoyer le lien (enveloppe)';b0.style.cssText='margin-top:10px;background:#e3001b';
+    b0.onclick=async()=>{const t='💌 Tu as reçu un cadeau IBIZOU : '+(n>1?n+' parties offertes':'1 partie offerte')+' ! Touche le lien pour ouvrir ton enveloppe 👇';
+      if(navigator.share){try{await navigator.share({text:t,url:lien})}catch(e){}return}
+      try{await navigator.clipboard.writeText(t+' '+lien);toast2('🔗 Lien copié')}catch(e){prompt('Copie ce lien',lien)}};
+    const b2=document.createElement('button');b2.textContent='🖼️ Envoyer la photo du ticket';b2.style.marginTop='8px';b2.onclick=()=>partager([file]);
+    const b1=document.createElement('button');b1.className='gris';b1.textContent='📸 Enregistrer dans Photos';b1.style.marginTop='8px';b1.onclick=()=>partager([file]);
     const info=document.createElement('div');info.className='meta';info.style.marginTop='10px';
-    info.textContent='Au stand, scanne la photo du ticket ou la pochette du client avec « Scanner un client » : 1 scan = 1 partie. Si le client a touché le lien, le ticket est scellé sur son téléphone et seule sa pochette marche.';
-    z.append(tit,img,b1,b2,info);
+    info.textContent='💌 Le lien : la personne reçoit une enveloppe à ouvrir sur son téléphone. 🖼️ La photo : elle la montre au stand et tu la scannes. Dans les deux cas, tu valides chaque partie au scan.';
+    z.append(tit,img,b0,b2,b1,info);
   }catch(e){z.innerHTML='';montre('errScan',e.message)}
   b.disabled=false;
 };
