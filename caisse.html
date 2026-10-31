@@ -1132,9 +1132,9 @@ function chargerImg(src){return new Promise(r=>{const i=new Image();i.onload=()=
 async function imageTicket(code){
   try{await document.fonts.load('70px "Luckiest Guy"')}catch(e){}
   const fond=await chargerImg('ticket-partie.jpg');
-  const TW=1659,W=2260,H=948,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+  const TW=1659,W=2260,H=1040,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
   x.fillStyle='#fff';x.fillRect(0,0,W,H);
-  if(fond)x.drawImage(fond,0,0,TW,H);
+  if(fond)x.drawImage(fond,0,0,TW,948);
   // talon à droite, collé au ticket
   const tx=1585,ty=76,tw=W-tx-14,th=794;
   x.fillStyle='#111';x.beginPath();x.roundRect(tx,ty,tw,th,[0,46,46,0]);x.fill();
@@ -1149,6 +1149,10 @@ async function imageTicket(code){
   x.fillText('SCANNE-MOI',cx,ty+570);x.fillText('AU STAND !',cx,ty+640);
   x.fillStyle='#1f1530';x.font='800 46px monospace';x.fillText(code,cx,ty+712);
   x.fillStyle='#555';x.font='700 26px sans-serif';x.fillText('Valable une seule fois',cx,ty+752);
+  // bandeau sous le ticket
+  x.fillStyle='#111';x.beginPath();x.roundRect(260,900,W-520,108,54);x.fill();
+  x.fillStyle='#fff';x.textAlign='center';x.font='54px "Luckiest Guy", Impact, sans-serif';
+  x.fillText('⚠️ CE TICKET EST VALABLE UNE SEULE FOIS',W/2,975);
   return new Promise(r=>c.toBlob(r,'image/jpeg',.9));
 }
 async function partager(files,texte){
