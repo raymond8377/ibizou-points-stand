@@ -1111,7 +1111,8 @@ if(PIN)ouvrir(PIN);
 </script>
 <script>
 /* ---------- Tickets parties offertes (pochettes scellées) ---------- */
-const TICKET_URL=location.href.replace(/[^\/]*([?#].*)?$/,'')+'tickets.html';
+const APP_URL=location.href.replace(/[^\/]*([?#].*)?$/,'');
+const TICKET_URL=APP_URL+'tickets.html';
 let pgNb=1,dernierQR=null;
 const plP=n=>n+' partie'+(n>1?'s':'');
 async function validerTicket(qr,nb){
@@ -1126,7 +1127,7 @@ async function validerTicket(qr,nb){
     const quand=r.utilise_at?new Date(r.utilise_at).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
     s.textContent=r.ok?(r.restantes>0?'Il reste '+plP(r.restantes)+' sur ce ticket':'Ticket terminé — il ne marchera plus'):(r.aide||(quand?'le '+quand+' par '+r.utilise_par:''));
     d.append(t,s);
-    if(r.ok&&r.restantes>0&&qr.startsWith('IBZT|')){
+    if(r.ok&&r.restantes>0){
       const plus=document.createElement('button');plus.textContent='➕ Valider 1 partie de plus';plus.style.cssText='margin-top:10px';
       plus.onclick=()=>validerTicket(dernierQR,1);d.appendChild(plus);
     }
@@ -1137,7 +1138,7 @@ function chargerImg(src){return new Promise(r=>{const i=new Image();i.onload=()=
 async function imageTicket(code,n){
   try{await document.fonts.load('70px "Luckiest Guy"')}catch(e){}
   const fond=await chargerImg('ticket-partie.jpg');
-  const TW=1659,W=2260,H=1040,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+  const TW=1659,W=2260,H=1150,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
   x.fillStyle='#fff';x.fillRect(0,0,W,H);
   if(fond)x.drawImage(fond,0,0,TW,948);
   // talon à droite, collé au ticket
@@ -1151,22 +1152,25 @@ async function imageTicket(code,n){
   x.fillStyle='#e3001b';x.beginPath();x.roundRect(cx-230,ty+58,460,96,48);x.fill();
   x.textAlign='center';x.fillStyle='#fff';x.font='62px "Luckiest Guy", Impact, sans-serif';
   x.fillText('🎁 '+(n>1?n+' PARTIES':'1 PARTIE'),cx,ty+128);
-  const d=document.createElement('div');new QRCode(d,{text:TICKET_URL+'?t='+code,width:380,height:380,correctLevel:QRCode.CorrectLevel.M});
-  x.drawImage(d.querySelector('canvas'),cx-190,ty+178,380,380);
-  x.fillStyle='#e3001b';x.font='56px "Luckiest Guy", Impact, sans-serif';x.fillText('OUVRE TON TICKET',cx,ty+625);
-  x.fillStyle='#1f1530';x.font='800 42px monospace';x.fillText(code,cx,ty+688);
-  x.fillStyle='#555';x.font='700 25px sans-serif';x.fillText('Touche le lien ou le QR code',cx,ty+732);
+  const d=document.createElement('div');new QRCode(d,{text:TICKET_URL+'?t='+code,width:340,height:340,correctLevel:QRCode.CorrectLevel.M});
+  x.drawImage(d.querySelector('canvas'),cx-170,ty+176,340,340);
+  x.fillStyle='#e3001b';x.font='58px "Luckiest Guy", Impact, sans-serif';x.fillText('MONTRE-MOI',cx,ty+584);x.fillText('AU STAND !',cx,ty+646);
+  x.fillStyle='#1f1530';x.font='800 40px monospace';x.fillText(code,cx,ty+702);
+  x.fillStyle='#555';x.font='700 25px sans-serif';x.fillText('ou touche le lien pour le garder',cx,ty+742);
   // bandeau sous le ticket
   x.fillStyle='#111';x.beginPath();x.roundRect(200,900,W-400,108,54);x.fill();
   x.fillStyle='#fff';x.font='50px "Luckiest Guy", Impact, sans-serif';
   x.fillText('⚠️ CHAQUE PARTIE EST VALABLE UNE SEULE FOIS',W/2,973);
+  // pied : découvrez l'application
+  x.fillStyle='#5b1fa6';x.font='52px "Luckiest Guy", Impact, sans-serif';x.fillText('📱 DÉCOUVREZ L\'APPLICATION IBIZOU',W/2,1072);
+  x.fillStyle='#6b5a80';x.font='700 32px sans-serif';x.fillText(APP_URL.replace(/^https?:\/\//,'').replace(/\/$/,''),W/2,1120);
   return new Promise(r=>c.toBlob(r,'image/jpeg',.9));
 }
 async function partager(files,texte){
   if(navigator.canShare&&navigator.canShare({files})){try{const d={files};if(texte)d.text=texte;await navigator.share(d)}catch(e){}return}
   files.forEach(f=>{const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;a.click()});
 }
-const txtTicket=(code,n)=>'🎁 '+(n>1?n+' parties offertes':'Une partie offerte')+' au stand IBIZOU ! Touche ce lien pour recevoir ton ticket : '+TICKET_URL+'?t='+code;
+const txtTicket=(code,n)=>'🎁 '+(n>1?n+' parties offertes':'Une partie offerte')+' au stand IBIZOU ! Touche ce lien pour recevoir ton ticket : '+TICKET_URL+'?t='+code+'\n\n📱 Découvrez l\'application IBIZOU : '+APP_URL;
 function majPgNb(){$('pgNb').textContent=pgNb;$('pgLib').textContent=(pgNb>1?'parties':'partie')+' sur le ticket';
   $('btnPartieGratuite').textContent='🎁 Générer un ticket '+(pgNb>1?pgNb+' parties offertes':'1 partie offerte')}
 $('pgMoins').onclick=()=>{if(pgNb>1){pgNb--;majPgNb()}};
@@ -1184,7 +1188,7 @@ $('btnPartieGratuite').onclick=async()=>{
     const b1=document.createElement('button');b1.textContent='📸 Enregistrer dans Photos';b1.style.cssText='margin-top:10px;background:#ff3d8b';b1.onclick=()=>partager([file]);
     const b2=document.createElement('button');b2.textContent='📤 Envoyer (AirDrop, SMS, WhatsApp…)';b2.style.marginTop='8px';b2.onclick=()=>partager([file],txtTicket(code,n));
     const info=document.createElement('div');info.className='meta';info.style.marginTop='10px';
-    info.textContent='Le premier qui ouvre le lien reçoit le ticket sur son téléphone (scellé, avec une clé de secours). Au stand, il ouvre sa pochette et tu scannes avec « Scanner un client » : 1 scan = 1 partie.';
+    info.textContent='Au stand, scanne la photo du ticket ou la pochette du client avec « Scanner un client » : 1 scan = 1 partie. Si le client a touché le lien, le ticket est scellé sur son téléphone et seule sa pochette marche.';
     z.append(tit,img,b1,b2,info);
   }catch(e){z.innerHTML='';montre('errScan',e.message)}
   b.disabled=false;
