@@ -115,6 +115,7 @@ async function pageTicket(code){
   if(t.restantes<=0)return ticketFini(t);
   if(t.libre)return ecranRecevoir(t);
   if(!t.mien){if(tok)ecrire(code,null);return ecranPasAMoi(t)}
+  if(t.ouvert)return ecranOuvert(t,tok);
   if(t.offre)return ecranOffreEnCours(t,tok);
   ecranPochette(t,tok);
 }
@@ -140,6 +141,7 @@ function ecranPasAMoi(t){
     ${pochette('🔒 Scellé')}
     <p class="ko">Ce ticket appartient déjà à quelqu'un.</p>
     <p class="note">Une capture d'écran ou un lien copié ne donne pas accès au ticket.</p>
+    <p class="note">💡 C'est le tien ? Rouvre le lien depuis <b>la même appli</b> que la première fois (Messages, WhatsApp, Safari…), ou tape ta clé de secours ci-dessous.</p>
   </div>
   <div class="carte">
     <p><b>C'est ton ticket ?</b> Tape ta clé de secours :</p>
@@ -168,7 +170,8 @@ function ecranPochette(t,tok){
     <p class="note">Ticket n° ${esc(t.code)}</p>
   </div>`;
   $('#ouvrir').onclick=()=>{
-    if(!confirm('Tu es devant le stand IBIZOU ?\n\nOuvre ta pochette seulement au moment de jouer.'))return;
+    if(!confirm('Tu es devant le stand IBIZOU ?\n\nUne fois ouverte, ta pochette reste ouverte jusqu\'à ce que la caisse valide ta partie.'))return;
+    rpc('ibz_ticket_ouvrir',{p_code:t.code,p_token:tok}).catch(()=>{});
     $('#poch').classList.add('ouvre');setTimeout(()=>ecranOuvert(t,tok),550);
   };
   $('#offrir').onclick=()=>ecranOffrir(t,tok);
@@ -182,8 +185,8 @@ async function ecranOuvert(t,tok){
     <div class="qr" id="qr"></div>
     <div class="reste" id="reste">${reste}</div><p><b id="resteTxt">${reste>1?'parties restantes':'partie restante'}</b></p>
     <div id="flash"></div>
+    <p class="note">Ta pochette reste ouverte jusqu'à ce que la caisse IBIZOU valide ta partie. Tu peux fermer la page et revenir.</p>
     <p class="note">Le QR code change toutes les 20 secondes : une capture d'écran ne marche pas.</p>
-    <button class="sec" id="fermer">Refermer ma pochette</button>
   </div>`;
   const dessiner=async()=>{
     const ts=Math.floor(Date.now()/1000).toString();
@@ -200,11 +203,10 @@ async function ecranOuvert(t,tok){
         if(navigator.vibrate)navigator.vibrate(150);
         $('#flash').innerHTML=`<div class="ok">✅ ${joue>1?joue+' parties validées':'Partie validée'} ! Bon jeu 💋</div>`;
         $('#reste').textContent=reste;$('#resteTxt').textContent=reste>1?'parties restantes':'partie restante';
-        if(reste<=0){stop();setTimeout(()=>pageTicket(t.code),3500)}
+        stop();setTimeout(()=>pageTicket(t.code),4000)
       }
     }catch(e){}
   },3000));
-  $('#fermer').onclick=()=>{stop();pageTicket(t.code)};
 }
 
 function ecranOffrir(t,tok){
@@ -286,6 +288,7 @@ async function accueil(){
   }
 }
 
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&P.get('t')&&!P.get('o')&&$('#reste'))pageTicket(P.get('t'))});
 const P=new URLSearchParams(location.search);
 if(P.get('o'))pageOffre(P.get('o'));
 else if(P.get('t'))pageTicket(P.get('t'));
