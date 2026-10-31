@@ -126,7 +126,7 @@ function ecranRecevoir(t){
     ${pochette('🎁 '+pl(t.restantes)+' offerte'+(t.restantes>1?'s':''))}
     <p>Une pochette avec ${pl(t.restantes)} gratuite${t.restantes>1?'s':''} au stand IBIZOU.</p>
     <button class="rose" id="recv">Recevoir mon ticket</button>
-    <p class="note">Le ticket sera rangé sur ce téléphone. Il ne marchera que chez toi.</p>
+    <p class="note">Ton ticket sera enregistré sur ce téléphone : personne d'autre ne pourra l'utiliser à ta place.</p>
   </div>`;
   $('#recv').onclick=async()=>{
     $('#recv').disabled=true;
