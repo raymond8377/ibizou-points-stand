@@ -127,7 +127,13 @@ function ecranRecevoir(t){
     <p>Une pochette avec ${pl(t.restantes)} gratuite${t.restantes>1?'s':''} au stand IBIZOU.</p>
     <button class="rose" id="recv">Recevoir mon ticket</button>
     <p class="note">Ton ticket sera enregistré sur ce téléphone : personne d'autre ne pourra l'utiliser à ta place.</p>
+  </div>
+  <div class="carte">
+    <p><b>C'est pour offrir ?</b></p>
+    <button class="sec" id="donner">🎁 Envoyer à un ami ou un proche</button>
+    <p class="note">N'appuie pas sur « Recevoir » : envoie-lui directement cette enveloppe, c'est lui qui la recevra.</p>
   </div>`;
+  $('#donner').onclick=()=>partager('💌 Je t\'offre '+pl(t.restantes)+' au stand IBIZOU ! Touche le lien pour ouvrir ton enveloppe 👇',BASE+'?t='+t.code);
   $('#recv').onclick=async()=>{
     $('#recv').disabled=true;
     try{const r=await rpc('ibz_ticket_recevoir',{p_code:t.code});ecrire(r.code,r.token);ecranSauvegarde(r.code,r.cle,r.restantes)}
@@ -166,7 +172,8 @@ function ecranPochette(t,tok){
     <p class="note">Ouvre-la seulement devant le stand IBIZOU, au moment de jouer.</p>
   </div>
   <div class="carte">
-    <button class="sec" id="offrir">🎁 Offrir ${n>1?'des parties':'ce ticket'}</button>
+    <p><b>Envie de faire plaisir ?</b></p>
+    <button class="rose" id="offrir">🎁 Offrir ${n>1?'des parties':'ma partie'} à un ami ou un proche</button>
     <p class="note">Ticket n° ${esc(t.code)}</p>
   </div>`;
   $('#ouvrir').onclick=()=>{
