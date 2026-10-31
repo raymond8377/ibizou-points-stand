@@ -78,7 +78,7 @@ function vus(){try{return JSON.parse(localStorage.getItem('ibz_tickets'))||[]}ca
 function garderVu(c){const l=vus();if(!l.includes(c)){l.unshift(c);try{localStorage.setItem('ibz_tickets',JSON.stringify(l))}catch(e){}}}
 async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 async function partager(texte,url){
-  if(navigator.share){try{await navigator.share({text:texte,url});return true}catch(e){return false}}
+  if(navigator.share){try{await navigator.share({text:texte+'\n'+url});return true}catch(e){return false}}
   try{await navigator.clipboard.writeText(texte+' '+url);alert('Lien copié, colle-le dans un message');return true}catch(e){prompt('Copie ce lien',url);return true}
 }
 const pochette=(txt)=>`<div class="poch" id="poch"><div class="sceau">💋</div>${esc(txt)}</div>`;

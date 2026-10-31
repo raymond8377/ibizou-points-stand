@@ -1215,7 +1215,7 @@ $('btnPartieGratuite').onclick=async()=>{
     const lien=TICKET_URL+'?t='+code;
     const b0=document.createElement('button');b0.textContent='💌 Envoyer le lien (enveloppe)';b0.style.cssText='margin-top:10px;background:#e3001b';
     b0.onclick=async()=>{const t='💌 Tu as reçu un cadeau IBIZOU : '+(n>1?n+' parties offertes':'1 partie offerte')+' ! Touche le lien pour ouvrir ton enveloppe 👇';
-      if(navigator.share){try{await navigator.share({text:t,url:lien})}catch(e){}return}
+      if(navigator.share){try{await navigator.share({text:t+'\n'+lien})}catch(e){}return}
       try{await navigator.clipboard.writeText(t+' '+lien);toast2('🔗 Lien copié')}catch(e){prompt('Copie ce lien',lien)}};
     const b2=document.createElement('button');b2.textContent='🖼️ Envoyer la photo du ticket';b2.style.marginTop='8px';b2.onclick=()=>partager([file]);
     const b1=document.createElement('button');b1.className='gris';b1.textContent='📸 Enregistrer dans Photos';b1.style.marginTop='8px';b1.onclick=()=>partager([file]);
