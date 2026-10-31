@@ -279,7 +279,7 @@ input,select,textarea,.meta,.ok,.err,small{font-family:'Nunito',sans-serif}
     <div id="ticketRes"></div>
     <div style="display:flex;align-items:center;gap:10px;margin-top:12px">
       <button type="button" id="pgMoins" style="width:56px;margin:0;font-size:26px;padding:10px 0">−</button>
-      <div style="flex:1;text-align:center;font-weight:800"><span id="pgNb" style="font-size:30px">1</span><br><small>ticket(s)</small></div>
+      <div style="flex:1;text-align:center;font-weight:800"><span id="pgNb" style="font-size:30px">1</span><br><small id="pgLib">partie sur le ticket</small></div>
       <button type="button" id="pgPlus" style="width:56px;margin:0;font-size:26px;padding:10px 0">+</button>
     </div>
     <button id="btnPartieGratuite" style="margin-top:10px;background:#ff3d8b">🎁 Générer 1 partie gratuite</button>
@@ -567,8 +567,7 @@ function boucle(){
     const q=jsQR(img.data,img.width,img.height,{inversionAttempts:'dontInvert'});
     if(q&&q.data){const m=q.data.match(/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i);
       if(m){stopScan();if(navigator.vibrate)navigator.vibrate(80);chercher(m[1],true);return}
-      const tk=q.data.match(/[?&]t=([0-9A-F]{10})\b/i);
-      if(tk){stopScan();validerTicket(tk[1]);return}}
+      if(q.data.startsWith('IBZT|')||/[?&]t=[0-9A-F]{10}\b/i.test(q.data)){stopScan();validerTicket(q.data);return}}
   }
   requestAnimationFrame(boucle);
 }
@@ -1111,25 +1110,31 @@ $('btnListe').onclick=liste;
 if(PIN)ouvrir(PIN);
 </script>
 <script>
-/* ---------- Parties gratuites (tickets à usage unique) ---------- */
+/* ---------- Tickets parties offertes (pochettes scellées) ---------- */
 const TICKET_URL=location.href.replace(/[^\/]*([?#].*)?$/,'')+'tickets.html';
-let pgNb=1;
-async function validerTicket(code){
-  const z=$('ticketRes');z.innerHTML='';
+let pgNb=1,dernierQR=null;
+const plP=n=>n+' partie'+(n>1?'s':'');
+async function validerTicket(qr,nb){
+  const z=$('ticketRes');z.innerHTML='';dernierQR=qr;
   try{
-    const r=await rpc('ibz_ticket_valider',{p_pin:PIN,p_code:code});
+    const r=await rpc('ibz_ticket_scan',{p_pin:PIN,p_qr:qr,p_nb:nb||1});
     if(navigator.vibrate)navigator.vibrate(r.ok?150:[80,60,80]);
     const d=document.createElement('div');
     d.style.cssText='margin-top:12px;padding:18px;border-radius:14px;text-align:center;font-weight:800;font-size:20px;'+(r.ok?'background:#dcfce7;color:#16a34a':'background:#fee2e2;color:#dc2626');
+    const t=document.createElement('div');t.textContent=r.ok?('✅ '+(r.nb>1?r.nb+' PARTIES OFFERTES':'PARTIE OFFERTE')):('⛔ '+String(r.raison||'').toUpperCase());
+    const s=document.createElement('div');s.style.cssText='font-size:14px;font-weight:600;margin-top:4px';
     const quand=r.utilise_at?new Date(r.utilise_at).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
-    d.innerHTML=r.ok?'✅ PARTIE GRATUITE<div style="font-size:14px;font-weight:600;margin-top:4px"></div>'
-                    :'⛔ '+r.raison.toUpperCase()+'<div style="font-size:14px;font-weight:600;margin-top:4px"></div>';
-    d.lastChild.textContent=r.ok?('Ticket '+code+' utilisé — il ne marchera plus'):(quand?('le '+quand+' par '+r.utilise_par):code);
-    z.appendChild(d);setTimeout(()=>{if(z.contains(d))d.remove()},15000);
+    s.textContent=r.ok?(r.restantes>0?'Il reste '+plP(r.restantes)+' sur ce ticket':'Ticket terminé — il ne marchera plus'):(r.aide||(quand?'le '+quand+' par '+r.utilise_par:''));
+    d.append(t,s);
+    if(r.ok&&r.restantes>0&&qr.startsWith('IBZT|')){
+      const plus=document.createElement('button');plus.textContent='➕ Valider 1 partie de plus';plus.style.cssText='margin-top:10px';
+      plus.onclick=()=>validerTicket(dernierQR,1);d.appendChild(plus);
+    }
+    z.appendChild(d);setTimeout(()=>{if(z.contains(d))d.remove()},20000);
   }catch(e){montre('errScan',e.message)}
 }
 function chargerImg(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
-async function imageTicket(code){
+async function imageTicket(code,n){
   try{await document.fonts.load('70px "Luckiest Guy"')}catch(e){}
   const fond=await chargerImg('ticket-partie.jpg');
   const TW=1659,W=2260,H=1040,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
@@ -1140,56 +1145,55 @@ async function imageTicket(code){
   x.fillStyle='#111';x.beginPath();x.roundRect(tx,ty,tw,th,[0,46,46,0]);x.fill();
   x.fillStyle='#e3001b';x.beginPath();x.roundRect(tx,ty+8,tw-8,th-16,[0,40,40,0]);x.fill();
   x.fillStyle='#fff';x.beginPath();x.roundRect(tx,ty+30,tw-30,th-60,[0,24,24,0]);x.fill();
-  // pointillés de découpe
   x.setLineDash([22,16]);x.strokeStyle='#e3001b';x.lineWidth=6;x.beginPath();x.moveTo(tx+18,ty+40);x.lineTo(tx+18,ty+th-40);x.stroke();x.setLineDash([]);
   const cx=tx+18+(tw-48)/2;
-  const d=document.createElement('div');new QRCode(d,{text:TICKET_URL+'?t='+code,width:420,height:420,correctLevel:QRCode.CorrectLevel.M});
-  x.drawImage(d.querySelector('canvas'),cx-210,ty+70,420,420);
-  x.textAlign='center';x.fillStyle='#e3001b';x.font='68px "Luckiest Guy", Impact, sans-serif';
-  x.fillText('SCANNE-MOI',cx,ty+570);x.fillText('AU STAND !',cx,ty+640);
-  x.fillStyle='#1f1530';x.font='800 46px monospace';x.fillText(code,cx,ty+712);
-  x.fillStyle='#555';x.font='700 26px sans-serif';x.fillText('Valable une seule fois',cx,ty+752);
+  // nombre de parties
+  x.fillStyle='#e3001b';x.beginPath();x.roundRect(cx-230,ty+58,460,96,48);x.fill();
+  x.textAlign='center';x.fillStyle='#fff';x.font='62px "Luckiest Guy", Impact, sans-serif';
+  x.fillText('🎁 '+(n>1?n+' PARTIES':'1 PARTIE'),cx,ty+128);
+  const d=document.createElement('div');new QRCode(d,{text:TICKET_URL+'?t='+code,width:380,height:380,correctLevel:QRCode.CorrectLevel.M});
+  x.drawImage(d.querySelector('canvas'),cx-190,ty+178,380,380);
+  x.fillStyle='#e3001b';x.font='56px "Luckiest Guy", Impact, sans-serif';x.fillText('OUVRE TON TICKET',cx,ty+625);
+  x.fillStyle='#1f1530';x.font='800 42px monospace';x.fillText(code,cx,ty+688);
+  x.fillStyle='#555';x.font='700 25px sans-serif';x.fillText('Touche le lien ou le QR code',cx,ty+732);
   // bandeau sous le ticket
-  x.fillStyle='#111';x.beginPath();x.roundRect(260,900,W-520,108,54);x.fill();
-  x.fillStyle='#fff';x.textAlign='center';x.font='54px "Luckiest Guy", Impact, sans-serif';
-  x.fillText('⚠️ CE TICKET EST VALABLE UNE SEULE FOIS',W/2,975);
+  x.fillStyle='#111';x.beginPath();x.roundRect(200,900,W-400,108,54);x.fill();
+  x.fillStyle='#fff';x.font='50px "Luckiest Guy", Impact, sans-serif';
+  x.fillText('⚠️ CHAQUE PARTIE EST VALABLE UNE SEULE FOIS',W/2,973);
   return new Promise(r=>c.toBlob(r,'image/jpeg',.9));
 }
 async function partager(files,texte){
   if(navigator.canShare&&navigator.canShare({files})){try{const d={files};if(texte)d.text=texte;await navigator.share(d)}catch(e){}return}
   files.forEach(f=>{const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;a.click()});
 }
-const txtTicket=code=>'🎁 Une partie gratuite au stand IBIZOU ! Montre ce QR code au stand. Ton ticket : '+TICKET_URL+'?t='+code;
-function majPgNb(){$('pgNb').textContent=pgNb;$('btnPartieGratuite').textContent='🎁 Générer '+pgNb+(pgNb>1?' parties gratuites':' partie gratuite')}
+const txtTicket=(code,n)=>'🎁 '+(n>1?n+' parties offertes':'Une partie offerte')+' au stand IBIZOU ! Touche ce lien pour recevoir ton ticket : '+TICKET_URL+'?t='+code;
+function majPgNb(){$('pgNb').textContent=pgNb;$('pgLib').textContent=(pgNb>1?'parties':'partie')+' sur le ticket';
+  $('btnPartieGratuite').textContent='🎁 Générer un ticket '+(pgNb>1?pgNb+' parties offertes':'1 partie offerte')}
 $('pgMoins').onclick=()=>{if(pgNb>1){pgNb--;majPgNb()}};
-$('pgPlus').onclick=()=>{if(pgNb<20){pgNb++;majPgNb()}};
+$('pgPlus').onclick=()=>{if(pgNb<50){pgNb++;majPgNb()}};
 $('btnPartieGratuite').onclick=async()=>{
-  const z=$('pgZone'),b=$('btnPartieGratuite');b.disabled=true;
-  z.innerHTML='<div class="meta" style="margin-top:8px">Création de '+pgNb+' ticket(s)…</div>';
+  const z=$('pgZone'),b=$('btnPartieGratuite');b.disabled=true;const n=pgNb;
+  z.innerHTML='<div class="meta" style="margin-top:8px">Création du ticket…</div>';
   try{
-    const codes=await rpc('ibz_tickets_creer',{p_pin:PIN,p_nb:pgNb,p_libelle:'1 partie gratuite'});
-    const tickets=[];
-    for(const code of codes){const blob=await imageTicket(code);tickets.push({code,blob,file:new File([blob],'partie-gratuite-'+code+'.jpg',{type:'image/jpeg'})})}
+    const code=await rpc('ibz_pochette_creer',{p_pin:PIN,p_parties:n});
+    const blob=await imageTicket(code,n);
+    const file=new File([blob],'ticket-ibizou-'+code+'.jpg',{type:'image/jpeg'});
     z.innerHTML='';
-    if(tickets.length>1){
-      const t=document.createElement('div');t.className='meta';t.style.cssText='margin-top:12px;font-weight:800';t.textContent='✅ '+tickets.length+' tickets créés';
-      const tout=document.createElement('button');tout.textContent='📸 Enregistrer les '+tickets.length+' tickets dans Photos';tout.style.cssText='margin-top:8px;background:#ff3d8b';
-      tout.onclick=()=>partager(tickets.map(x=>x.file));
-      z.append(t,tout);
-    }
-    tickets.forEach((t,i)=>{
-      const box=document.createElement('div');box.style.cssText='margin-top:14px;padding-top:10px;border-top:2px dashed #e5d5f5';
-      const tit=document.createElement('div');tit.className='meta';tit.style.fontWeight='800';tit.textContent='Ticket '+(i+1)+'/'+tickets.length+' · '+t.code;
-      const img=document.createElement('img');img.src=URL.createObjectURL(t.blob);img.style.cssText='width:100%;border-radius:12px;margin-top:6px';
-      const row=document.createElement('div');row.style.cssText='display:flex;gap:8px;margin-top:8px';
-      const b1=document.createElement('button');b1.textContent='📸 Photos';b1.style.cssText='margin:0;flex:1;background:#ff3d8b';b1.onclick=()=>partager([t.file]);
-      const b2=document.createElement('button');b2.textContent='📤 Envoyer';b2.style.cssText='margin:0;flex:1';b2.onclick=()=>partager([t.file],txtTicket(t.code));
-      row.append(b1,b2);box.append(tit,img,row);z.appendChild(box);
-    });
-    const n=document.createElement('div');n.className='meta';n.style.marginTop='10px';n.textContent='Chaque ticket ne marche qu\'une fois. Quand le client revient, scanne-le avec « Scanner un client ».';
-    z.appendChild(n);
+    const tit=document.createElement('div');tit.className='meta';tit.style.cssText='margin-top:12px;font-weight:800';tit.textContent='✅ Ticket '+code+' · '+plP(n);
+    const img=document.createElement('img');img.src=URL.createObjectURL(blob);img.style.cssText='width:100%;border-radius:12px;margin-top:6px';
+    const b1=document.createElement('button');b1.textContent='📸 Enregistrer dans Photos';b1.style.cssText='margin-top:10px;background:#ff3d8b';b1.onclick=()=>partager([file]);
+    const b2=document.createElement('button');b2.textContent='📤 Envoyer (AirDrop, SMS, WhatsApp…)';b2.style.marginTop='8px';b2.onclick=()=>partager([file],txtTicket(code,n));
+    const info=document.createElement('div');info.className='meta';info.style.marginTop='10px';
+    info.textContent='Le premier qui ouvre le lien reçoit le ticket sur son téléphone (scellé, avec une clé de secours). Au stand, il ouvre sa pochette et tu scannes avec « Scanner un client » : 1 scan = 1 partie.';
+    z.append(tit,img,b1,b2,info);
   }catch(e){z.innerHTML='';montre('errScan',e.message)}
   b.disabled=false;
+};
+$('btnDebloquer').onclick=async()=>{
+  const c=$('dbCode').value.trim().toUpperCase();if(!c)return;
+  try{const ok=await rpc('ibz_ticket_debloquer',{p_pin:PIN,p_code:c});
+    $('dbRes').textContent=ok?'✅ Ticket '+c+' débloqué : le client peut rouvrir son lien pour le recevoir à nouveau.':'Ticket introuvable ou déjà terminé.'}
+  catch(e){$('dbRes').textContent=e.message}
 };
 </script>
 </body>

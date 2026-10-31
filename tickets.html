@@ -3,57 +3,51 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>IBIZOU Tickets</title>
+<title>Ticket IBIZOU</title>
 <meta name="theme-color" content="#5b1fa6">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Ticket IBIZOU">
+<meta property="og:title" content="🎁 Ticket partie offerte — IBIZOU">
+<meta property="og:description" content="Ouvre ce lien pour recevoir ton ticket.">
+<meta property="og:image" content="ticket-partie.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <style>
-:root{--violet:#5b1fa6;--violet2:#3a0f73;--rose:#ff3d8b;--vert:#16a34a;--rouge:#dc2626;--txt:#1f1530}
+:root{--violet:#5b1fa6;--violet2:#3a0f73;--rose:#ff3d8b;--rouge:#e3001b;--vert:#16a34a;--txt:#1f1530;--gris:#6b5a80}
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;font-family:Nunito,system-ui,sans-serif;color:var(--txt);
  background:radial-gradient(circle at 30% 0%,#7c3aed,var(--violet) 40%,var(--violet2));padding:16px 16px 40px}
-h1,.logo{font-family:'Luckiest Guy',cursive;letter-spacing:1px}
-.logo{color:#fff;text-align:center;font-size:42px;margin:8px 0 4px;text-shadow:0 3px 0 var(--rose)}
-.sous{color:#e9d5ff;text-align:center;margin:0 0 18px;font-weight:600}
-.carte{background:#fff;border-radius:22px;padding:20px;max-width:440px;margin:0 auto 16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-.ticket{position:relative;text-align:center;border:3px dashed var(--violet)}
-.ticket h1{color:var(--violet);font-size:30px;margin:4px 0}
-.qr{display:flex;justify-content:center;margin:14px 0}
-.qr img,.qr canvas{width:220px!important;height:220px!important}
-.code{font-family:monospace;font-size:20px;letter-spacing:3px;font-weight:800}
-.etat{display:inline-block;padding:8px 16px;border-radius:999px;font-weight:800;margin-top:10px}
-.ok{background:#dcfce7;color:var(--vert)}.ko{background:#fee2e2;color:var(--rouge)}
-.utilise .qr{opacity:.15}
-.tampon{display:none;position:absolute;top:40%;left:50%;transform:translate(-50%,-50%) rotate(-15deg);
- font-family:'Luckiest Guy';font-size:44px;color:var(--rouge);border:5px solid var(--rouge);padding:4px 14px;border-radius:12px;background:rgba(255,255,255,.85)}
-.utilise .tampon{display:block}
-button,.btn{display:block;width:100%;border:0;border-radius:14px;padding:14px;font:800 17px Nunito;cursor:pointer;
- background:var(--violet);color:#fff;margin-top:10px;text-decoration:none;text-align:center}
-button.sec{background:#f3e8ff;color:var(--violet)}
-input{width:100%;padding:14px;border-radius:12px;border:2px solid #ddd;font:700 18px Nunito;margin-top:8px}
-.onglets{display:flex;gap:6px;max-width:440px;margin:0 auto 12px}
-.onglets button{margin:0;padding:10px;font-size:15px;background:rgba(255,255,255,.2)}
-.onglets button.on{background:#fff;color:var(--violet)}
+.logo{font-family:'Luckiest Guy',cursive;color:#fff;text-align:center;font-size:40px;margin:6px 0 2px;text-shadow:0 3px 0 var(--rose)}
+.sous{color:#e9d5ff;text-align:center;margin:0 0 16px;font-weight:600}
+.carte{background:#fff;border-radius:22px;padding:20px;max-width:440px;margin:0 auto 14px;box-shadow:0 10px 30px rgba(0,0,0,.25);text-align:center}
+h1{font-family:'Luckiest Guy',cursive;color:var(--violet);font-size:28px;margin:4px 0 8px;letter-spacing:.5px}
+p{margin:8px 0;line-height:1.45}
+.note{font-size:14px;color:var(--gris)}
+button{display:block;width:100%;border:0;border-radius:14px;padding:15px;font:800 17px Nunito;cursor:pointer;background:var(--violet);color:#fff;margin-top:10px}
+button.rose{background:var(--rose)}button.sec{background:#f3e8ff;color:var(--violet)}button.vert{background:var(--vert)}
+input{width:100%;padding:14px;border-radius:12px;border:2px solid #ddd;font:800 20px Nunito;text-align:center;margin-top:8px;text-transform:uppercase}
+.poch{position:relative;width:100%;max-width:320px;aspect-ratio:16/10;margin:6px auto 4px;background:var(--rouge);border-radius:16px;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;padding-bottom:16px;color:#fff;font-family:'Luckiest Guy',cursive;font-size:26px;letter-spacing:.5px}
+.poch:before{content:"";position:absolute;inset:0 0 auto 0;height:58%;background:#9b0012;clip-path:polygon(0 0,100% 0,50% 100%)}
+.sceau{position:absolute;top:42%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:#fff;color:var(--rouge);display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 3px 0 rgba(0,0,0,.2)}
+.poch.ouvre{animation:ouvre .6s ease forwards}
+@keyframes ouvre{to{transform:scale(1.08) rotate(-3deg);opacity:0}}
+.badge{display:inline-block;background:#f3e8ff;color:var(--violet);border-radius:999px;padding:6px 14px;font-weight:800;margin-top:6px}
+.cle{font:800 30px monospace;letter-spacing:2px;background:#fff7d6;border:3px dashed #e8b400;border-radius:14px;padding:14px;margin:12px 0}
+.qr{display:flex;justify-content:center;margin:12px 0}
+.qr img,.qr canvas{width:240px!important;height:240px!important}
+.reste{font-family:'Luckiest Guy',cursive;font-size:44px;color:var(--rouge);line-height:1}
+.ok{background:#dcfce7;color:var(--vert);border-radius:14px;padding:14px;font-weight:800;font-size:20px;margin-top:10px}
+.ko{background:#fee2e2;color:#dc2626;border-radius:14px;padding:14px;font-weight:800;margin-top:10px}
+.cpt{display:flex;align-items:center;gap:10px;margin-top:10px}
+.cpt button{width:56px;margin:0;font-size:26px;padding:8px 0}.cpt b{flex:1;font-size:28px}
+.ligne{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #eee;text-align:left}
+.ligne a{color:var(--violet);font-weight:800;text-decoration:none}
 .cache{display:none}
-.res{padding:22px;border-radius:16px;text-align:center;font-weight:800;font-size:22px;margin-top:12px}
-.res small{display:block;font-size:14px;font-weight:600;margin-top:6px}
-.liste .l{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #eee;font-size:14px}
-.grille{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.mini{border:2px dashed var(--violet);border-radius:12px;padding:8px;text-align:center;font-size:12px}
-.mini .qr img{width:120px!important;height:120px!important}
-.note{font-size:14px;color:#6b5a80;margin-top:8px}
-.lien{color:#e9d5ff;text-align:center;display:block;margin-top:20px;font-size:13px}
-#lecteur{border-radius:14px;overflow:hidden}
-@media print{body{background:#fff;padding:0}.onglets,.noprint,.logo,.sous{display:none!important}.carte{box-shadow:none}.mini{break-inside:avoid}}
+.vieux .qr{opacity:.15}
 </style>
 </head>
 <body>
 <div class="logo">IBIZOU</div>
-<p class="sous" id="sous">Le Jeu des Bouches</p>
-<div id="app"></div>
+<p class="sous">Le Jeu des Bouches</p>
+<div id="app"><div class="carte"><p class="note">Chargement…</p></div></div>
 
 <script>
 const SB='https://cytgdpeoxhxempnewrep.supabase.co';
@@ -61,242 +55,235 @@ const KEY='sb_publishable_5nYZv-C8Bfc7AErue3h9-g_D8OUnOOW';
 const BASE=location.origin+location.pathname;
 const app=document.getElementById('app');
 const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pl=n=>n+' partie'+(n>1?'s':'');
 
 async function rpc(fn,args){
-  const r=await fetch(`${SB}/rest/v1/rpc/${fn}`,{method:'POST',
-    headers:{apikey:KEY,Authorization:'Bearer '+KEY,'Content-Type':'application/json'},body:JSON.stringify(args)});
+  let r;try{r=await fetch(`${SB}/rest/v1/rpc/${fn}`,{method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},body:JSON.stringify(args)})}
+  catch(e){throw new Error('Pas de connexion internet')}
   const j=await r.json().catch(()=>null);
-  if(!r.ok) throw new Error((j&&j.message)||'Erreur réseau');
+  if(!r.ok)throw new Error((j&&j.message)||'Erreur réseau');
   return j;
 }
-function store(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k));localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}}
-function qr(el,code,size){el.innerHTML='';new QRCode(el,{text:BASE+'?t='+code,width:size||440,height:size||440,correctLevel:QRCode.CorrectLevel.M})}
-function extraitCode(txt){try{const u=new URL(txt);return u.searchParams.get('t')||txt}catch(e){return txt}}
-const fdate=d=>new Date(d).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+/* mémoire du téléphone : code -> jeton du propriétaire */
+function lire(){try{return JSON.parse(localStorage.getItem('ibz_poch'))||{}}catch(e){return {}}}
+function ecrire(code,tok){const m=lire();if(tok)m[code]=tok;else delete m[code];try{localStorage.setItem('ibz_poch',JSON.stringify(m))}catch(e){}}
+function vus(){try{return JSON.parse(localStorage.getItem('ibz_tickets'))||[]}catch(e){return []}}
+function garderVu(c){const l=vus();if(!l.includes(c)){l.unshift(c);try{localStorage.setItem('ibz_tickets',JSON.stringify(l))}catch(e){}}}
+async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function partager(texte,url){
+  if(navigator.share){try{await navigator.share({text:texte,url});return true}catch(e){return false}}
+  try{await navigator.clipboard.writeText(texte+' '+url);alert('Lien copié, colle-le dans un message');return true}catch(e){prompt('Copie ce lien',url);return true}
+}
+const pochette=(txt)=>`<div class="poch" id="poch"><div class="sceau">💋</div>${esc(txt)}</div>`;
+let timers=[];function stop(){timers.forEach(clearInterval);timers=[]}
 
-/* ---------------- CÔTÉ CLIENT ---------------- */
-function mesTickets(){return store('ibz_tickets')||[]}
-function garder(code){const l=mesTickets();if(!l.includes(code)){l.unshift(code);store('ibz_tickets',l)}}
+/* ---------- Écran de sauvegarde ---------- */
+function ecranSauvegarde(code,cle,restantes){
+  stop();
+  app.innerHTML=`<div class="carte">
+    <h1>🎉 Ticket reçu !</h1>
+    <p><span class="badge">🎁 ${pl(restantes)} offerte${restantes>1?'s':''}</span></p>
+    <p>Ton ticket est maintenant <b>sur ce téléphone</b>. Personne d'autre ne peut l'utiliser.</p>
+  </div>
+  <div class="carte">
+    <h1>📌 Sauvegarde-le</h1>
+    <p><b>1. Fais une capture d'écran de ta clé de secours</b> 👇</p>
+    <div class="cle">${esc(cle)}</div>
+    <p class="note">Si tu changes de téléphone ou si Safari est effacé, rouvre ton lien et tape cette clé pour récupérer ton ticket. Ne la donne à personne.</p>
+    <p><b>2. Garde le message</b> qui contient ton lien (SMS, WhatsApp…), ou ajoute cette page à tes favoris.</p>
+    <p class="note">Ticket n° ${esc(code)}</p>
+    <button class="rose" id="fait">C'est fait, voir mon ticket</button>
+  </div>`;
+  $('#fait').onclick=()=>{history.replaceState(null,'',BASE+'?t='+code);pageTicket(code)};
+}
 
+/* ---------- Page d'un ticket ---------- */
 async function pageTicket(code){
-  code=code.toUpperCase();
-  garder(code);
-  app.innerHTML=`<div class="carte ticket" id="t">
-    <h1>🎟️ Partie gratuite</h1><div id="lib" class="note">Chargement…</div>
-    <div class="qr" id="q"></div><div class="tampon">UTILISÉ</div>
-    <div class="code">${code}</div><div id="et"></div></div>
-   <div class="carte noprint">
-    <b>Garde ton ticket 📱</b>
-    <p class="note">Il est déjà enregistré sur ce téléphone. Pour le retrouver facilement : touche <b>Partager</b> ⬆️ puis <b>« Sur l'écran d'accueil »</b>, ou fais une capture d'écran.</p>
-    <button onclick="telecharger('${code}')">Enregistrer l'image du ticket</button>
-    <button class="sec" onclick="location.href=BASE">Voir tous mes tickets</button>
-    <p class="note">Montre ce QR code au stand IBIZOU. Il ne marche qu'une seule fois.</p></div>`;
-  qr($('#q'),code);
-  const maj=async()=>{
-    try{
-      const e=await rpc('ibz_ticket_etat',{p_code:code});
-      if(!e){$('#lib').textContent='';$('#et').innerHTML='<span class="etat ko">Ticket inconnu</span>';return true}
-      $('#lib').textContent=e.libelle;
-      if(e.utilise){$('#t').classList.add('utilise');$('#et').innerHTML=`<span class="etat ko">Utilisé le ${fdate(e.utilise_at)}</span>`;return true}
-      $('#et').innerHTML='<span class="etat ok">✅ Valable</span>';return false;
-    }catch(err){$('#et').innerHTML='<span class="etat ko">Pas de connexion</span>';return false}
+  stop();code=code.toUpperCase();garderVu(code);
+  const tok=lire()[code]||null;
+  let t;try{t=await rpc('ibz_ticket_voir',{p_code:code,p_token:tok})}
+  catch(e){app.innerHTML=`<div class="carte"><h1>Oups</h1><p class="ko">${esc(e.message)}</p><button onclick="location.reload()">Réessayer</button></div>`;return}
+  if(!t.existe){app.innerHTML=`<div class="carte"><h1>Ticket inconnu</h1><p class="note">Vérifie le lien que tu as reçu.</p></div>`;return}
+  if(!t.pochette)return ancienTicket(t);
+  if(t.restantes<=0)return ticketFini(t);
+  if(t.libre)return ecranRecevoir(t);
+  if(!t.mien){if(tok)ecrire(code,null);return ecranPasAMoi(t)}
+  if(t.offre)return ecranOffreEnCours(t,tok);
+  ecranPochette(t,tok);
+}
+
+function ecranRecevoir(t){
+  app.innerHTML=`<div class="carte">
+    <h1>Tu as reçu un cadeau !</h1>
+    ${pochette('🎁 '+pl(t.restantes)+' offerte'+(t.restantes>1?'s':''))}
+    <p>Une pochette avec ${pl(t.restantes)} gratuite${t.restantes>1?'s':''} au stand IBIZOU.</p>
+    <button class="rose" id="recv">Recevoir mon ticket</button>
+    <p class="note">Le ticket sera rangé sur ce téléphone. Il ne marchera que chez toi.</p>
+  </div>`;
+  $('#recv').onclick=async()=>{
+    $('#recv').disabled=true;
+    try{const r=await rpc('ibz_ticket_recevoir',{p_code:t.code});ecrire(r.code,r.token);ecranSauvegarde(r.code,r.cle,r.restantes)}
+    catch(e){alert(e.message);pageTicket(t.code)}
   };
-  if(!(await maj())){const it=setInterval(async()=>{if(await maj())clearInterval(it)},4000)}
 }
 
-function telecharger(code){
-  const img=$('#q img')||$('#q canvas');
-  const c=document.createElement('canvas');c.width=600;c.height=820;const x=c.getContext('2d');
-  x.fillStyle='#5b1fa6';x.fillRect(0,0,600,820);
-  x.fillStyle='#fff';x.beginPath();x.roundRect(30,30,540,760,30);x.fill();
-  x.fillStyle='#5b1fa6';x.textAlign='center';x.font='56px "Luckiest Guy"';x.fillText('IBIZOU',300,115);
-  x.font='800 30px Nunito';x.fillText('1 PARTIE GRATUITE',300,170);
-  x.drawImage(img,100,200,400,400);
-  x.font='800 34px monospace';x.fillStyle='#1f1530';x.fillText(code,300,660);
-  x.font='600 22px Nunito';x.fillStyle='#6b5a80';x.fillText('Valable une seule fois au stand',300,720);
-  c.toBlob(async b=>{
-    const f=new File([b],`ticket-ibizou-${code}.png`,{type:'image/png'});
-    if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f]});return}catch(e){}}
-    const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=f.name;a.click();
-  });
+function ecranPasAMoi(t){
+  app.innerHTML=`<div class="carte">
+    <h1>Ticket déjà pris</h1>
+    ${pochette('🔒 Scellé')}
+    <p class="ko">Ce ticket appartient déjà à quelqu'un.</p>
+    <p class="note">Une capture d'écran ou un lien copié ne donne pas accès au ticket.</p>
+  </div>
+  <div class="carte">
+    <p><b>C'est ton ticket ?</b> Tape ta clé de secours :</p>
+    <input id="cle" placeholder="IBZ-XXXXXX" autocomplete="off" autocapitalize="characters">
+    <button id="rec">Récupérer mon ticket</button>
+    <p class="note">Clé perdue ? Passe au stand IBIZOU avec ton numéro de ticket : ${esc(t.code)}</p>
+  </div>`;
+  $('#rec').onclick=async()=>{
+    let c=$('#cle').value.trim().toUpperCase();if(!c)return;if(!c.startsWith('IBZ-'))c='IBZ-'+c.replace(/^IBZ/,'');
+    try{const r=await rpc('ibz_ticket_recuperer',{p_code:t.code,p_cle:c});ecrire(r.code,r.token);pageTicket(r.code)}
+    catch(e){alert(e.message)}
+  };
 }
 
-async function pageAccueil(){
-  const l=mesTickets();
-  if(!l.length){
-    app.innerHTML=`<div class="carte" style="text-align:center"><h1 style="color:var(--violet)">Mes tickets</h1>
-      <p class="note">Aucun ticket sur ce téléphone. Scanne le QR code que tu as reçu pour l'ajouter.</p></div>
-      <a class="lien" href="#" onclick="pageStand();return false">Espace stand</a>`;return;
-  }
-  app.innerHTML=`<div class="carte"><h1 style="color:var(--violet);margin-top:0">Mes tickets</h1><div class="liste" id="ml"></div></div>
-    <a class="lien" href="#" onclick="pageStand();return false">Espace stand</a>`;
+function ecranPochette(t,tok){
+  const n=t.restantes;
+  app.innerHTML=`<div class="carte">
+    <h1>Ma pochette</h1>
+    ${pochette('🎁 '+pl(n))}
+    <p><span class="badge">${n<t.parties?'Il reste '+pl(n)+' sur '+t.parties:pl(n)+' offerte'+(n>1?'s':'')}</span></p>
+    <button class="rose" id="ouvrir">Ouvrir ma pochette</button>
+    <p class="note">Ouvre-la seulement devant le stand IBIZOU, au moment de jouer.</p>
+  </div>
+  <div class="carte">
+    <button class="sec" id="offrir">🎁 Offrir ${n>1?'des parties':'ce ticket'}</button>
+    <p class="note">Ticket n° ${esc(t.code)}</p>
+  </div>`;
+  $('#ouvrir').onclick=()=>{
+    if(!confirm('Tu es devant le stand IBIZOU ?\n\nOuvre ta pochette seulement au moment de jouer.'))return;
+    $('#poch').classList.add('ouvre');setTimeout(()=>ecranOuvert(t,tok),550);
+  };
+  $('#offrir').onclick=()=>ecranOffrir(t,tok);
+}
+
+async function ecranOuvert(t,tok){
+  stop();
+  let reste=t.restantes;
+  app.innerHTML=`<div class="carte">
+    <h1>Montre-moi à la caisse</h1>
+    <div class="qr" id="qr"></div>
+    <div class="reste" id="reste">${reste}</div><p><b id="resteTxt">${reste>1?'parties restantes':'partie restante'}</b></p>
+    <div id="flash"></div>
+    <p class="note">Le QR code change toutes les 20 secondes : une capture d'écran ne marche pas.</p>
+    <button class="sec" id="fermer">Refermer ma pochette</button>
+  </div>`;
+  const dessiner=async()=>{
+    const ts=Math.floor(Date.now()/1000).toString();
+    const h=await sha(tok+ts);const el=$('#qr');if(!el)return;el.innerHTML='';
+    new QRCode(el,{text:'IBZT|'+t.code+'|'+ts+'|'+h,width:480,height:480,correctLevel:QRCode.CorrectLevel.M});
+  };
+  await dessiner();
+  timers.push(setInterval(dessiner,20000));
+  timers.push(setInterval(async()=>{
+    try{const v=await rpc('ibz_ticket_voir',{p_code:t.code,p_token:tok});
+      if(!v.mien){stop();return pageTicket(t.code)}
+      if(v.restantes<reste){
+        const joue=reste-v.restantes;reste=v.restantes;
+        if(navigator.vibrate)navigator.vibrate(150);
+        $('#flash').innerHTML=`<div class="ok">✅ ${joue>1?joue+' parties validées':'Partie validée'} ! Bon jeu 💋</div>`;
+        $('#reste').textContent=reste;$('#resteTxt').textContent=reste>1?'parties restantes':'partie restante';
+        if(reste<=0){stop();setTimeout(()=>pageTicket(t.code),3500)}
+      }
+    }catch(e){}
+  },3000));
+  $('#fermer').onclick=()=>{stop();pageTicket(t.code)};
+}
+
+function ecranOffrir(t,tok){
+  let nb=t.restantes;
+  app.innerHTML=`<div class="carte">
+    <h1>🎁 Offrir</h1>
+    ${t.restantes>1?`<p>Combien de parties veux-tu offrir ?</p>
+      <div class="cpt"><button id="m">−</button><b id="nb">${nb}</b><button id="p">+</button></div>
+      <p class="note" id="info"></p>`:'<p>Tu vas offrir ton ticket. Il quittera ce téléphone dès que la personne ouvrira le lien.</p>'}
+    <button class="rose" id="go">Créer le lien d'offre</button>
+    <button class="sec" id="ret">Retour</button>
+  </div>`;
+  const maj=()=>{if(!$('#nb'))return;$('#nb').textContent=nb;
+    $('#info').textContent=nb===t.restantes?'Tu offres toute ta pochette.':'Tu offres '+pl(nb)+', tu gardes '+pl(t.restantes-nb)+'.'};
+  if($('#m')){$('#m').onclick=()=>{if(nb>1){nb--;maj()}};$('#p').onclick=()=>{if(nb<t.restantes){nb++;maj()}};maj()}
+  $('#ret').onclick=()=>pageTicket(t.code);
+  $('#go').onclick=async()=>{
+    try{const off=await rpc('ibz_ticket_offrir',{p_code:t.code,p_token:tok,p_nb:nb});
+      await partager('🎁 Je t\'offre '+pl(nb)+' au stand IBIZOU ! Ouvre ce lien pour recevoir ton ticket :',BASE+'?o='+off);
+      pageTicket(t.code)}
+    catch(e){alert(e.message)}
+  };
+}
+
+function ecranOffreEnCours(t,tok){
+  const lien=BASE+'?o='+t.offre;
+  app.innerHTML=`<div class="carte">
+    <h1>Offre en attente</h1>
+    ${pochette('📨 En route')}
+    <p>Tu offres <b>${pl(t.offre_nb)}</b>. ${t.offre_nb===t.restantes?'Le ticket partira':(t.offre_nb>1?'Ces parties partiront':'Cette partie partira')} dès que la personne ouvrira le lien.</p>
+    <button class="rose" id="renv">Renvoyer le lien</button>
+    <button class="sec" id="ann">Annuler l'offre</button>
+  </div>`;
+  $('#renv').onclick=()=>partager('🎁 Je t\'offre '+pl(t.offre_nb)+' au stand IBIZOU ! Ouvre ce lien pour recevoir ton ticket :',lien);
+  $('#ann').onclick=async()=>{try{await rpc('ibz_ticket_annuler_offre',{p_code:t.code,p_token:tok})}catch(e){alert(e.message)}pageTicket(t.code)};
+  timers.push(setInterval(async()=>{try{const v=await rpc('ibz_ticket_voir',{p_code:t.code,p_token:tok});if(!v.mien||!v.offre||v.restantes!==t.restantes){stop();
+    if(!v.mien){ecrire(t.code,null);app.innerHTML=`<div class="carte"><h1>Ticket offert ✅</h1><p>La personne a reçu ton ticket. Il n'est plus sur ce téléphone.</p><button onclick="location.href=BASE">Mes tickets</button></div>`}
+    else{app.innerHTML=`<div class="carte"><h1>Cadeau reçu ✅</h1><p>La personne a reçu ${pl(t.offre_nb)}.</p><button id="vm">Voir ma pochette</button></div>`;$('#vm').onclick=()=>pageTicket(t.code)}}}catch(e){}},4000));
+}
+
+function ticketFini(t){
+  if(lire()[t.code])ecrire(t.code,null);
+  app.innerHTML=`<div class="carte"><h1>Ticket terminé</h1>${pochette('✔ Joué')}
+    <p class="ko">Toutes les parties de ce ticket ont été jouées.</p><p class="note">Merci et à bientôt au stand IBIZOU 💋</p></div>`;
+}
+
+/* ancien ticket simple (sans pochette) */
+function ancienTicket(t){
+  app.innerHTML=`<div class="carte ${t.restantes<=0?'vieux':''}"><h1>🎟️ Partie gratuite</h1><div class="qr" id="qr"></div>
+    <p><b>${esc(t.code)}</b></p>${t.restantes<=0?'<p class="ko">Déjà utilisé</p>':'<p class="ok">Valable</p><p class="note">Montre ce QR code au stand IBIZOU. Il ne marche qu\'une fois.</p>'}</div>`;
+  new QRCode($('#qr'),{text:BASE+'?t='+t.code,width:480,height:480,correctLevel:QRCode.CorrectLevel.M});
+}
+
+/* ---------- Accepter une offre ---------- */
+async function pageOffre(off){
+  let o;try{o=await rpc('ibz_ticket_offre_voir',{p_offre:off})}catch(e){o=null}
+  if(!o){app.innerHTML=`<div class="carte"><h1>Offre plus valable</h1><p class="note">Ce cadeau a déjà été reçu ou a été annulé.</p><button onclick="location.href=BASE">Mes tickets</button></div>`;return}
+  app.innerHTML=`<div class="carte"><h1>On t'offre un cadeau !</h1>${pochette('🎁 '+pl(o.nb))}
+    <p>${pl(o.nb)} gratuite${o.nb>1?'s':''} au stand IBIZOU.</p>
+    <button class="rose" id="acc">Recevoir mon ticket</button></div>`;
+  $('#acc').onclick=async()=>{$('#acc').disabled=true;
+    try{const r=await rpc('ibz_ticket_accepter',{p_offre:off});ecrire(r.code,r.token);garderVu(r.code);ecranSauvegarde(r.code,r.cle,r.restantes)}
+    catch(e){alert(e.message);pageOffre(off)}};
+}
+
+/* ---------- Accueil : mes tickets ---------- */
+async function accueil(){
+  const l=vus();
+  if(!l.length){app.innerHTML=`<div class="carte"><h1>Mes tickets</h1><p class="note">Aucun ticket sur ce téléphone. Ouvre le lien que tu as reçu pour le recevoir.</p></div>`;return}
+  app.innerHTML=`<div class="carte"><h1>Mes tickets</h1><div id="liste"></div></div>`;
+  const m=lire();
   for(const c of l){
-    let e=null;try{e=await rpc('ibz_ticket_etat',{p_code:c})}catch(_){}
-    const d=document.createElement('div');d.className='l';
-    d.innerHTML=`<a href="?t=${c}" style="color:var(--violet);font-weight:800">🎟️ ${e?e.libelle:c}</a>
-      <span class="etat ${e&&!e.utilise?'ok':'ko'}" style="margin:0;padding:3px 10px;font-size:13px">${!e?'?':e.utilise?'Utilisé':'Valable'}</span>`;
-    $('#ml').appendChild(d);
+    let t=null;try{t=await rpc('ibz_ticket_voir',{p_code:c,p_token:m[c]||null})}catch(e){}
+    if(!t||!t.existe)continue;
+    const etat=t.restantes<=0?'Terminé':(t.pochette&&!t.mien)?'Plus à toi':pl(t.restantes);
+    const d=document.createElement('div');d.className='ligne';
+    d.innerHTML=`<a href="?t=${esc(c)}">🎁 Ticket ${esc(c)}</a><span class="badge">${esc(etat)}</span>`;
+    $('#liste').appendChild(d);
   }
 }
 
-/* ---------------- CÔTÉ STAND ---------------- */
-let PIN=sessionStorage.getItem('ibz_pin')||'';let scanner=null;
-
-function pageStand(){
-  history.replaceState(null,'',BASE+'?stand');
-  $('#sous').textContent='Espace stand — tickets gratuits';
-  if(!PIN){
-    app.innerHTML=`<div class="carte"><b>Code PIN de la caisse</b>
-      <input id="pin" type="password" inputmode="numeric" autocomplete="off">
-      <button onclick="entrer()">Entrer</button><div id="perr" class="note"></div></div>`;
-    $('#pin').focus();return;
-  }
-  app.innerHTML=`<div class="onglets noprint">
-      <button id="o1" onclick="onglet(1)">📷 Scanner</button>
-      <button id="o2" onclick="onglet(2)">🎁 Offrir</button>
-      <button id="o3" onclick="onglet(3)">📋 Suivi</button></div>
-    <div id="v1" class="carte noprint"><div id="lecteur"></div>
-      <div id="res"></div>
-      <input id="manuel" placeholder="ou tape le code" style="text-transform:uppercase">
-      <button class="sec" onclick="valider($('#manuel').value)">Valider ce code</button></div>
-    <div id="v2" class="carte cache">
-      <div class="noprint">
-      <button style="background:var(--rose);font-size:20px;padding:18px" onclick="partieGratuite()">🎁 Générer une partie gratuite</button>
-      <div id="pg"></div>
-      <button class="sec" onclick="$('#photo').click()">🖼️ Choisir la photo des tickets</button>
-      <input id="photo" type="file" accept="image/*" class="cache" onchange="choisirPhoto(this)">
-      <hr style="border:0;border-top:1px solid #eee;margin:18px 0">
-      <b>Plusieurs tickets d'un coup</b><br><b>Nombre de tickets</b><input id="nb" type="number" value="10" min="1" max="200">
-      <b style="display:block;margin-top:10px">Texte du ticket</b><input id="lib" value="1 partie gratuite">
-      <button onclick="creer()">Générer les QR codes</button></div>
-      <div id="gen"></div></div>
-    <div id="v3" class="carte cache"><div id="suivi" class="liste"></div></div>
-    <a class="lien noprint" href="#" onclick="sessionStorage.removeItem('ibz_pin');PIN='';pageStand();return false">Verrouiller</a>`;
-  onglet(1);
-}
-async function entrer(){
-  const p=$('#pin').value.trim();
-  try{if(await rpc('ibz_verifier_pin',{p_pin:p})){PIN=p;sessionStorage.setItem('ibz_pin',p);pageStand()}else $('#perr').textContent='PIN incorrect'}
-  catch(e){$('#perr').textContent=e.message}
-}
-function onglet(n){
-  [1,2,3].forEach(i=>{$('#v'+i).classList.toggle('cache',i!==n);$('#o'+i).classList.toggle('on',i===n)});
-  if(n===1)demarrerScan();else arreterScan();
-  if(n===3)suivi();
-}
-function demarrerScan(){
-  if(scanner)return;
-  scanner=new Html5Qrcode('lecteur');
-  scanner.start({facingMode:'environment'},{fps:10,qrbox:230},txt=>{valider(extraitCode(txt))},()=>{})
-    .catch(()=>{$('#res').innerHTML='<p class="note">Caméra indisponible — tape le code à la main.</p>';scanner=null});
-}
-function arreterScan(){if(scanner){scanner.stop().catch(()=>{});scanner=null}}
-let dernier='',bloque=false;
-async function valider(code){
-  code=(code||'').trim().toUpperCase();if(!code||bloque)return;
-  if(code===dernier&&$('#res').innerHTML)return;
-  bloque=true;dernier=code;
-  try{
-    const r=await rpc('ibz_ticket_valider',{p_pin:PIN,p_code:code});
-    if(navigator.vibrate)navigator.vibrate(r.ok?120:[80,60,80]);
-    $('#res').innerHTML=r.ok
-      ?`<div class="res ok">✅ PARTIE GRATUITE<small>${r.libelle} — ticket ${code} grillé</small></div>`
-      :`<div class="res ko">⛔ ${r.raison.toUpperCase()}<small>${r.utilise_at?'le '+fdate(r.utilise_at)+' par '+r.utilise_par:code}</small></div>`;
-  }catch(e){$('#res').innerHTML=`<div class="res ko">${e.message}</div>`}
-  setTimeout(()=>{bloque=false},1500);
-  setTimeout(()=>{dernier='';},6000);
-}
-async function creer(){
-  const nb=+$('#nb').value, lib=$('#lib').value;
-  $('#gen').innerHTML='<p class="note">Création…</p>';
-  try{
-    const codes=await rpc('ibz_tickets_creer',{p_pin:PIN,p_nb:nb,p_libelle:lib});
-    $('#gen').innerHTML=`<p class="note noprint">${codes.length} tickets créés. Touche un ticket pour l'envoyer par message, ou imprime la page.</p>
-      <button class="sec noprint" onclick="print()">🖨️ Imprimer / PDF</button><div class="grille" id="g"></div>`;
-    codes.forEach(c=>{
-      const d=document.createElement('div');d.className='mini';
-      d.innerHTML=`<div class="qr"></div><b>${lib}</b><br><span class="code" style="font-size:13px">${c}</span>`;
-      d.onclick=()=>envoyer(c,lib);
-      $('#g').appendChild(d);qr(d.querySelector('.qr'),c,240);
-    });
-  }catch(e){$('#gen').innerHTML=`<p class="note" style="color:var(--rouge)">${e.message}</p>`}
-}
-function choisirPhoto(inp){
-  const f=inp.files[0];if(!f)return;
-  const im=new Image();im.onload=()=>{
-    const c=document.createElement('canvas'),w=800,h=Math.round(im.height*800/im.width);
-    c.width=w;c.height=h;c.getContext('2d').drawImage(im,0,0,w,h);
-    try{localStorage.setItem('ibz_photo',c.toDataURL('image/jpeg',.8));alert('Photo enregistrée pour les tickets ✅')}
-    catch(e){alert('Photo trop lourde, choisis-en une autre')}
-  };im.src=URL.createObjectURL(f);
-}
-function chargerImg(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
-async function imageTicket(code,lib){
-  try{await document.fonts.load('60px "Luckiest Guy"');await document.fonts.load('800 30px Nunito')}catch(e){}
-  const W=700,H=1100,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
-  const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#7c3aed');g.addColorStop(1,'#3a0f73');
-  x.fillStyle=g;x.fillRect(0,0,W,H);
-  x.fillStyle='#fff';x.beginPath();x.roundRect(30,30,W-60,H-60,34);x.fill();
-  // photo en haut
-  let src=null;try{src=localStorage.getItem('ibz_photo')}catch(e){}
-  const ph=src?await chargerImg(src):null;
-  x.save();x.beginPath();x.roundRect(30,30,W-60,330,[34,34,0,0]);x.clip();
-  if(ph){const s=Math.max((W-60)/ph.width,330/ph.height);x.drawImage(ph,30+((W-60)-ph.width*s)/2,30+(330-ph.height*s)/2,ph.width*s,ph.height*s)}
-  else{x.fillStyle='#ff3d8b';x.fillRect(30,30,W-60,330);x.fillStyle='#fff';x.textAlign='center';x.font='110px "Luckiest Guy"';x.fillText('IBIZOU',W/2,240)}
-  x.restore();
-  x.textAlign='center';x.fillStyle='#5b1fa6';x.font='54px "Luckiest Guy"';x.fillText('🎟️ '+lib.toUpperCase(),W/2,440);
-  const d=document.createElement('div');new QRCode(d,{text:BASE+'?t='+code,width:400,height:400,correctLevel:QRCode.CorrectLevel.M});
-  x.drawImage(d.querySelector('canvas'),150,475,400,400);
-  x.fillStyle='#1f1530';x.font='800 40px monospace';x.fillText(code,W/2,935);
-  x.fillStyle='#6b5a80';x.font='700 26px Nunito';x.fillText('Valable une seule fois au stand IBIZOU',W/2,990);
-  x.font='600 22px Nunito';x.fillText('Montre ce QR code avant de jouer',W/2,1030);
-  return new Promise(r=>c.toBlob(r,'image/png'));
-}
-let dernierTicket=null;
-async function partieGratuite(){
-  $('#pg').innerHTML='<p class="note">Création…</p>';
-  try{
-    const [code]=await rpc('ibz_tickets_creer',{p_pin:PIN,p_nb:1,p_libelle:'1 partie gratuite'});
-    const blob=await imageTicket(code,'Partie gratuite');
-    dernierTicket={code,file:new File([blob],`partie-gratuite-${code}.png`,{type:'image/png'})};
-    $('#pg').innerHTML=`<img src="${URL.createObjectURL(blob)}" style="width:100%;border-radius:16px;margin-top:12px">
-      <button style="background:var(--rose)" onclick="enregistrerPhoto()">📸 Enregistrer dans Photos</button>
-      <button onclick="envoyerImage()">📤 Envoyer le ticket (SMS, WhatsApp, mail…)</button>
-      <p class="note">Astuce : tu peux aussi rester appuyé sur l'image → « Ajouter à Photos ».</p>`;
-  }catch(e){$('#pg').innerHTML=`<p class="note" style="color:var(--rouge)">${e.message}</p>`}
-}
-async function enregistrerPhoto(){
-  const t=dernierTicket;if(!t)return;
-  // image seule (sans texte) : l'iPhone propose alors « Enregistrer l'image »
-  if(navigator.canShare&&navigator.canShare({files:[t.file]})){try{await navigator.share({files:[t.file]})}catch(e){}return}
-  const a=document.createElement('a');a.href=URL.createObjectURL(t.file);a.download=t.file.name;a.click();
-}
-async function envoyerImage(){
-  const t=dernierTicket;if(!t)return;
-  const txt=`🎁 Une partie gratuite au stand IBIZOU ! Montre ce QR code au stand. Ton ticket : ${BASE}?t=${t.code}`;
-  if(navigator.canShare&&navigator.canShare({files:[t.file]})){try{await navigator.share({files:[t.file],text:txt})}catch(e){}return}
-  const a=document.createElement('a');a.href=URL.createObjectURL(t.file);a.download=t.file.name;a.click();
-}
-async function envoyer(c,lib){
-  const url=BASE+'?t='+c, txt=`🎟️ IBIZOU — ${lib} ! Ouvre ce lien et garde ton ticket : ${url}`;
-  if(navigator.share){try{await navigator.share({text:txt});return}catch(e){return}}
-  try{await navigator.clipboard.writeText(txt);alert('Lien copié')}catch(e){prompt('Copie ce lien',url)}
-}
-async function suivi(){
-  $('#suivi').innerHTML='<p class="note">Chargement…</p>';
-  try{
-    const l=await rpc('ibz_tickets_liste',{p_pin:PIN});
-    const u=l.filter(t=>t.utilise_at).length;
-    $('#suivi').innerHTML=`<p><b>${l.length}</b> tickets — <b style="color:var(--vert)">${l.length-u} valables</b> — <b style="color:var(--rouge)">${u} utilisés</b></p>`+
-      l.map(t=>`<div class="l"><span class="code" style="font-size:14px">${t.code}</span><span>${t.utilise_at?'⛔ '+fdate(t.utilise_at):'✅ valable'}</span></div>`).join('');
-  }catch(e){$('#suivi').innerHTML=`<p class="note">${e.message}</p>`}
-}
-
-/* ---------------- ROUTAGE ---------------- */
 const P=new URLSearchParams(location.search);
-if(P.get('t'))pageTicket(P.get('t'));
-else if(P.has('stand'))pageStand();
-else pageAccueil();
+if(P.get('o'))pageOffre(P.get('o'));
+else if(P.get('t'))pageTicket(P.get('t'));
+else accueil();
 </script>
 </body>
 </html>
