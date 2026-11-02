@@ -1037,11 +1037,15 @@ async function rafraichir(){
     else{$('nbarI').parentNode.style.display='none';$('nTexte').textContent='Tu as atteint le plus haut niveau !'}
     if(niveauPrec&&niveauPrec!==c.niveau){toast(ic+' Bravo, tu passes '+c.niveau+' !');verifierJeu()}
     niveauPrec=c.niveau;
-    const b=c.bonus_parrainage||0;
-    $('parrTexte').textContent=b?('Donne ton code '+c.code+' à un copain. Quand il gagne ses premiers points au stand, vous recevez chacun '+b+' points !'):('Donne ton code '+c.code+' à un copain pour qu\'il s\'inscrive.');
+    parrTexte(c.code);
     $('parrStats').textContent=c.filleuls?(c.filleuls+' copain'+(c.filleuls>1?'s':'')+' parrainé'+(c.filleuls>1?'s':'')+' 🎉'):'';
   }catch(e){}
 }
+
+let parrInfo=null;
+async function parrTexte(code){try{if(!parrInfo)parrInfo=await rpc('ibz_parrainage_info',{})}catch(e){}
+  const i=parrInfo||{points:0,partie:false},cad=[];if(i.partie)cad.push('1 partie gratuite (5 balles)');if(i.points>0)cad.push(i.points+' points');
+  $('parrTexte').textContent=cad.length?('Donne ton code '+code+' à un copain. Quand il joue pour la première fois au stand, vous recevez chacun '+cad.join(' + ')+' !'):('Donne ton code '+code+' à un copain pour qu\'il s\'inscrive.')}
 
 // Profil facultatif
 let profSecret=null;
@@ -1367,7 +1371,7 @@ $('btnOuvrir').onclick=async()=>{
 if(qp.get('parrain'))$('parrain').value=qp.get('parrain').toUpperCase().slice(0,6);
 $('btnPartager').onclick=async()=>{
   const url=location.origin+location.pathname+'?parrain='+monCode;
-  const txt='Viens jouer à IBIZOU ! Inscris-toi avec mon code '+monCode+' et on gagne des points tous les deux : ';
+  const txt='Viens jouer à IBIZOU ! Inscris-toi avec mon code '+monCode+(parrInfo&&parrInfo.partie?' et on gagne chacun une partie gratuite au stand : ':' et on gagne des points tous les deux : ');
   try{if(navigator.share){await navigator.share({title:'IBIZOU',text:txt,url});return}}catch(e){if(e.name==='AbortError')return}
   try{await navigator.clipboard.writeText(txt+url);toast('Lien copié !')}catch(e){prompt('Copie ce lien :',url)}
 };

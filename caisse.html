@@ -475,8 +475,9 @@ input,select,textarea,.meta,.ok,.err,small{font-family:'Nunito',sans-serif}
   </div>
   <div class="bloc patron">
     <h2>🤝 Parrainage</h2>
-    <div class="meta">Quand un filleul gagne ses premiers points au stand, lui et son parrain reçoivent ce bonus.</div>
-    <div class="petitchamp"><span style="align-self:center;font-size:15px">Bonus pour chacun (points)</span><input id="bonusParr" type="number" inputmode="numeric" min="0" max="500"></div>
+    <div class="meta">Quand un filleul joue pour la première fois au stand, lui et son parrain reçoivent ce cadeau, tout seul.</div>
+    <label style="display:flex;gap:10px;align-items:center;font-size:16px;font-weight:800;margin:10px 0 4px"><input id="partieParr" type="checkbox" style="width:24px;height:24px"> 🎟 1 partie gratuite (5 balles) chacun</label>
+    <div class="petitchamp"><span style="align-self:center;font-size:15px">+ points pour chacun (0 = pas de points)</span><input id="bonusParr" type="number" inputmode="numeric" min="0" max="500"></div>
     <button class="gris" id="btnBonus">Enregistrer</button>
     <div class="ok" id="okBonus"></div><div class="err" id="errBonus"></div>
   </div>
@@ -1087,11 +1088,13 @@ async function suggestions(){try{const d=await rpc('ibz_suggestions',{p_pin:PIN}
         if(x===null)throw new Error('Code caisse incorrect');montre('okSugg',ok?'🎁 Cadeau envoyé à '+g.nom+' : il le verra en ouvrant son appli.':'Suggestion ignorée.');suggestions();actifs()}
       catch(e){montre('errSugg',e.message);r.querySelectorAll('button').forEach(b=>b.disabled=false)}};
     const [bNon,bOk]=r.querySelectorAll('.sgB button');bNon.onclick=()=>go(false);bOk.onclick=()=>go(true);z.appendChild(r)})}catch(e){}}
-async function chargerBonus(){try{$('bonusParr').value=await rpc('ibz_bonus_parrainage',{})}catch(e){}}
+async function chargerBonus(){try{const i=await rpc('ibz_parrainage_info',{});$('bonusParr').value=i.points;$('partieParr').checked=!!i.partie}catch(e){}}
 $('btnBonus').onclick=async()=>{montre('okBonus','');montre('errBonus','');const v=parseInt($('bonusParr').value,10);
   if(!(v>=0))return montre('errBonus','Mets un nombre de points');
-  try{const r=await rpc('ibz_reglage_parrainage',{p_pin:PIN,p_bonus:v});if(r===null)throw new Error('Code caisse incorrect');
-    montre('okBonus',v?('Bonus parrainage : '+v+' points chacun'):'Parrainage désactivé (0 point)')}catch(e){montre('errBonus',e.message)}};
+  const pa=$('partieParr').checked;
+  try{const r=await rpc('ibz_reglage_parrainage2',{p_pin:PIN,p_bonus:v,p_partie:pa});if(r===null)throw new Error('Code caisse incorrect');
+    const cad=[];if(pa)cad.push('1 partie gratuite');if(v)cad.push(v+' points');
+    montre('okBonus',cad.length?('Parrainage : '+cad.join(' + ')+' chacun'):'Parrainage désactivé')}catch(e){montre('errBonus',e.message)}};
 
 // Cadeaux
 let cible='tous';
