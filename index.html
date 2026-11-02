@@ -648,6 +648,10 @@ input,select,textarea{font-family:'Nunito',sans-serif}
 .top li:first-child:not(.sep){background:linear-gradient(90deg,#fffbe6,#fff3b0);border:2px solid #e0a100}
 #code+.jeuBtn{margin:12px 0 4px}
 #vueCarte>.bons,#vueCarte .colG>.bons{margin:10px 0 6px}
+.mesParties{display:flex;align-items:center;gap:12px;margin:12px 0 6px;padding:10px 14px;border-radius:16px;background:linear-gradient(135deg,#2f80ed,#1559b5);color:#fff;border:3px solid #ffd400;box-shadow:0 4px 0 #2a0f4f;text-align:left}
+.mpI{font-size:30px}.mesParties>div{flex:1;min-width:0}.mesParties small{display:block;white-space:nowrap;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;opacity:.9}
+.mesParties b{font-family:'Luckiest Guy',sans-serif;font-weight:400;font-size:30px;white-space:nowrap;line-height:1;color:#ffd400;text-shadow:2px 2px 0 #2a0f4f}
+.mpR{flex:none;font-family:'Mali','Nunito',sans-serif;font-weight:600;font-size:12.5px;text-align:right;max-width:30%;line-height:1.3}
 </style>
 </head>
 <body>
@@ -786,6 +790,7 @@ input,select,textarea{font-family:'Nunito',sans-serif}
       <div class="nbar"><i id="nbarI"></i></div><div class="petit" id="nTexte" style="margin-top:4px"></div></div>
     <div id="qr"></div>
     <div class="code" id="code"></div>
+    <div class="mesParties" id="mesParties" hidden><span class="mpI">🎟️</span><div><small>Mes balles achetées</small><b id="mpN">0</b></div><span class="mpR" id="mpR">à jouer quand tu veux</span></div>
     <button class="jeuBtn" id="jeuBtn" style="display:none">🎰 Niveau Or débloqué ! Joue à la machine à sous</button>
     <div class="bons" id="bons" style="display:none"><h4>🎁 Mes cadeaux à utiliser</h4><div id="bonsListe"></div></div>
     <div class="info">Montre ce QR code au stand pour gagner des points ou les échanger contre un cadeau au stand.</div>
@@ -957,7 +962,7 @@ let monId=lire()||(m&&m[1]);
 let dernier=null,monCode=null,niveauPrec=null;
 const qp=new URLSearchParams(location.search);
 
-const ORDRE_GAUCHE=['bonjour','points','niveau','jeuBtn','bons','qr','code','fid','garantie'];
+const ORDRE_GAUCHE=['bonjour','points','niveau','mesParties','jeuBtn','bons','qr','code','fid','garantie'];
 function disposer(){const v=$('vueCarte');if(!v)return;const large=matchMedia('(min-width:820px)').matches;
   document.body.classList.toggle('tablette',large);let cols=v.querySelector('.colsT');
   if(large&&!cols){cols=document.createElement('div');cols.className='colsT';const g=document.createElement('div');g.className='colG';const d=document.createElement('div');d.className='colD';
@@ -977,7 +982,7 @@ async function famille(){try{const r=lireFam()||monId;const d=await rpc('ibz_fam
     b.firstChild.textContent=(m.principal?'⭐ ':'')+m.prenom;b.lastChild.textContent=m.points+' pts';b.onclick=()=>{if(m.id!==monId)changerCarte(m.id)};z.appendChild(b)});
   const p=document.createElement('button');p.type='button';p.className='famPlus';p.textContent='➕ Ajouter un enfant';p.onclick=()=>{$('famAjout').hidden=false;$('famPrenom').focus()};z.appendChild(p);
 }catch(e){}}
-function changerCarte(id){monId=id;garder(id);dernier=null;niveauPrec=null;fidPrec=null;recuDepuis=Date.now();
+function changerCarte(id){monId=id;garder(id);mpPrec=null;setTimeout(mesParties,0);dernier=null;niveauPrec=null;fidPrec=null;recuDepuis=Date.now();
   try{history.replaceState(null,'',location.pathname+'#id='+monId)}catch(e){}
   $('qr').innerHTML='';new QRCode($('qr'),{text:'IBZ:'+monId,width:220,height:220,correctLevel:QRCode.CorrectLevel.M});
   rafraichir();verifierCadeaux();bons();verifierJeu();classement();passages();fidelite();envois();famille();window.scrollTo({top:0,behavior:'smooth'})}
@@ -992,7 +997,7 @@ async function afficherCarte(){disposer();famille();setInterval(famille,30000);
   $('vueInscription').style.display='none';$('vueRecup').style.display='none';$('vueCarte').style.display='block';
   new QRCode($('qr'),{text:'IBZ:'+monId,width:220,height:220,correctLevel:QRCode.CorrectLevel.M});
   await rafraichir();verifierCadeaux();bons();verifierJeu();tournee();concours();classement();passages();actus();
-  fidelite();envois();setInterval(envois,20000);setInterval(rafraichir,4000);setInterval(verifierCadeaux,8000);setInterval(bons,8000);setInterval(verifierJeu,20000);setInterval(concours,20000);setInterval(classement,30000);
+  fidelite();envois();mesParties();setInterval(mesParties,5000);setInterval(envois,20000);setInterval(rafraichir,4000);setInterval(verifierCadeaux,8000);setInterval(bons,8000);setInterval(verifierJeu,20000);setInterval(concours,20000);setInterval(classement,30000);
 }
 async function rafraichir(){
   try{
@@ -1285,6 +1290,9 @@ async function fidelite(){if(!monId)return;try{const d=await rpc('ibz_fid_client
     if(plein)c.style.setProperty('--rot',(((i*37)%17)-8)+'deg');c.innerHTML=plein?FID_BOUCHE:(i===tot-1?'<span class="fidKdo">🎁</span>':'<span class="fidN">'+(i+1)+'</span>');z.appendChild(c)}
   try{$('fidNum').textContent='N° '+(monCode||'')}catch(e){}
   fidPrec=f.cases}catch(e){}}
+let mpPrec=null;
+async function mesParties(){if(!monId)return;try{const n=await rpc('ibz_parties_client',{p_id:monId})||0;$('mesParties').hidden=!n;$('mpN').textContent=n+' balle'+(n>1?'s':'');$('mpR').textContent=n>=5?'= '+Math.floor(n/5)+' partie'+(n>=10?'s':'')+', à jouer quand tu veux':'à jouer quand tu veux';
+  if(mpPrec!==null&&n!==mpPrec){if(typeof toast==='function')toast(n>mpPrec?'🎟️ +'+(n-mpPrec)+' balles sur ta carte !':'🎟️ Balles jouées · il t\'en reste '+n);passages()}mpPrec=n}catch(e){}}
 async function bons(){try{const d=await rpc('ibz_mes_bons',{p_id:monId});const l=$('bonsListe');l.innerHTML='';
   $('bons').style.display=d&&d.length?'block':'none';
   (d||[]).forEach(b=>{const e=document.createElement('div');e.textContent='🎟️ '+b.libelle;l.appendChild(e)})}catch(e){}}

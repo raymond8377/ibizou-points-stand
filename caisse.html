@@ -248,6 +248,17 @@ input,select,textarea,.meta,.ok,.err,small{font-family:'Nunito',sans-serif}
 .recL{display:flex;flex-wrap:wrap;gap:6px}
 .recL button{width:auto;margin:0;padding:8px 12px;font-size:15px;border-radius:999px;background:#efe6fb;color:#2a0f4f;border:2px solid #c9b6ea;box-shadow:none;font-family:'Nunito',sans-serif;font-weight:800!important}
 .recL button small{font-weight:700;color:#7a6a96;margin-left:4px}
+.partC{margin:12px 0 4px;background:#eef6ff;border:3px solid #2f80ed;border-radius:16px;padding:10px 12px}
+.partC h2{margin:0 0 8px;display:flex;justify-content:space-between;align-items:baseline;gap:8px;color:#1559b5}
+.partC h2 span{font-size:18px;color:#ff1744;font-variant-numeric:tabular-nums}
+.pRow button{margin:0 0 8px;background:#2f80ed;color:#fff;font-size:20px;padding:14px}
+.grille.pG{grid-template-columns:repeat(3,1fr)}.grille.pG button{background:#fff;color:#1559b5;border-color:#1559b5;font-size:20px;padding:10px 0;line-height:1.1}.grille.pG button small{display:block;font-family:'Nunito',sans-serif;font-weight:800;font-size:12.5px;color:#2a0f4f}
+.pMini{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}.pMini button{margin:0;padding:8px 4px;font-size:15px;background:#dbeafe;color:#1559b5;border-color:#1559b5}
+.pTarifT{font-family:'Luckiest Guy',sans-serif;color:#1559b5;margin-bottom:6px}
+.pValid{margin-top:10px;font-weight:800;color:#2a0f4f}
+.pValid label{display:block;margin:8px 0 4px;font-size:14px}.pValid label small{font-weight:600;color:#6d5d8a}
+.pValid input{width:100%;margin:0}
+.pValid .vBt{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.pValid .vBt button{margin:0}
 </style>
 </head>
 <body>
@@ -313,6 +324,18 @@ input,select,textarea,.meta,.ok,.err,small{font-family:'Nunito',sans-serif}
     <div class="solde" id="cSolde">0</div>
     <div class="unite">POINTS</div>
     <div id="cBons"></div>
+    <div class="partC">
+      <h2>🎟️ Balles achetées <span id="pReste">0 balle</span></h2>
+      <div class="pRow"><button type="button" class="pMoins" data-pj="-5">−5 balles · 1 partie jouée</button></div>
+      <div class="pMini"><button type="button" data-pj="-1">−1 balle</button><button type="button" data-pj="-10">−10</button><button type="button" data-pj="0">Autre…</button></div>
+      <div class="pTarifT">Il achète :</div>
+      <div class="grille pG" id="pTarifs"></div>
+      <div class="pValid" id="pValid" hidden>
+        <div id="pTxt"></div>
+        <div id="pAutre" hidden><label for="pNb">Nombre de balles</label><input id="pNb" type="number" inputmode="numeric" min="1" max="1000"></div>
+        <div class="vBt"><button class="gris" id="pAnn" type="button">Annuler</button><button id="pOk" type="button">✅ Valider</button></div>
+      </div>
+    </div>
     <h2 class="secT secV">➕ Donner des points</h2>
     <div class="grille">
       <button data-d="1">+1</button><button data-d="3">+3</button><button data-d="5">+5</button><button data-d="10">+10</button>
@@ -531,7 +554,7 @@ async function ouvrir(p){
     $('vuePin').style.display='none';$('vueCaisse').style.display='block';$('btnSortir').style.display='inline';
     let role='patron';try{const q=(await rpc('ibz_qui',{p_pin:p}))[0];if(q){role=q.role;$('qui').textContent='👤 Connecté : '+q.nom+(q.role==='patron'?' (patron)':' (employé)')}}catch(e){}
     document.body.classList.toggle('employe',role==='employe');
-    journal();liste();stats();viderFile();majBandeau();majRecents();setInterval(majRecents,60000);
+    journal();liste();stats();viderFile();majBandeau();majRecents();setInterval(majRecents,60000);chargerPrix();
     if(role==='patron'){suggestions();setInterval(suggestions,300000);orNouveaux();setInterval(orNouveaux,60000);transferts();setInterval(transferts,20000);enCours();setInterval(enCours,60000);chargerBonus();actifs();chargerLots();chargerTour();chargerConc();bilan();chargerEmp();chargerCont()}
   }catch(e){montre('errPin',e.message)}
 }
@@ -611,13 +634,36 @@ $('fOk').onclick=async()=>{const e=fAttente;if(!e||!client||occupe)return;occupe
     montre('okMsg','✅ Carte fidélité : +'+x.ajout+' points pour '+client.prenom+(x.cartes?(fChoix==='pts'?' · 🎁 carte pleine : +'+(parseInt($('fPts').value,10)||30)+' points offerts':' · 🎁 carte pleine, bon « '+($('fCadeau').value.trim()||'10 € de jeu offerts')+' » créé'):'')+' (carte : '+x.cases+' / '+((fInfo&&fInfo.total)||10)+')');
     fAttente=0;delete $('fCadeau').dataset.touche;fChoisir('bon');$('fPts').value=30;fMaj();fidCaisse();bonsClient();journal();historique();fermerBientot()}catch(e){montre('errClient',e.message)}
   $('fOk').disabled=false;occupe=false};
+let pInfo=0,pAtt=null,TARIFS=[[5,5],[10,12],[20,30],[30,45],[40,60],[50,75]];
+async function partiesCaisse(){if(!client)return;try{pInfo=await rpc('ibz_parties_client',{p_id:client.id})||0;
+  $('pReste').textContent=pInfo+' balle'+(pInfo>1?'s':'')+(pInfo>=5?' · '+Math.floor(pInfo/5)+' partie'+(pInfo>=10?'s':''):'');
+  document.querySelectorAll('[data-pj]').forEach(b=>{const n=-parseInt(b.dataset.pj,10);b.disabled=pInfo<1||(n>0&&n>pInfo)})}catch(e){}}
+function dessinerTarifs(){$('pTarifs').innerHTML=TARIFS.map(t=>'<button type="button" data-eur="'+t[0]+'" data-bal="'+t[1]+'">'+t[0]+' €<small>'+t[1]+' balles</small></button>').join('');
+  document.querySelectorAll('[data-eur]').forEach(b=>b.onclick=()=>{if(!client)return;pAtt={d:+b.dataset.bal,eur:+b.dataset.eur};pMontrer()})}
+async function chargerPrix(){try{const v=await rpc('ibz_prix_partie',{});const t=String(v||'').split(',').map(x=>x.split(':').map(Number)).filter(x=>x[0]>0&&x[1]>0);if(t.length)TARIFS=t}catch(e){}dessinerTarifs()}
+function pMontrer(){const v=$('pValid');if(!pAtt){v.hidden=true;return}v.hidden=false;$('pAutre').hidden=pAtt.d!==0;
+  if(pAtt.d===0){$('pTxt').textContent='Combien de balles '+client.prenom+' joue ?';$('pNb').value='';$('pNb').focus()}
+  else if(pAtt.d<0)$('pTxt').textContent=client.prenom+' joue '+(-pAtt.d)+' balle'+(pAtt.d<-1?'s':'')+' ? Il lui en restera '+(pInfo+pAtt.d)+'.';
+  else $('pTxt').textContent=client.prenom+' achète '+pAtt.d+' balles pour '+pAtt.eur+' € ?'+(pAtt.eur>=10?' Sa carte fidélité avance de '+Math.floor(pAtt.eur/10)+' case'+(pAtt.eur>=20?'s':'')+'.':'');
+  v.scrollIntoView({behavior:'smooth',block:'nearest'})}
+document.querySelectorAll('[data-pj]').forEach(b=>b.onclick=()=>{if(!client||b.disabled)return;pAtt={d:parseInt(b.dataset.pj,10),eur:0};pMontrer()});
+$('pAnn').onclick=()=>{pAtt=null;pMontrer()};
+$('pOk').onclick=async()=>{if(!client||occupe||!pAtt)return;let d=pAtt.d,eur=pAtt.eur||0;
+  if(d===0){d=-parseInt($('pNb').value,10);if(!(d<0)){montre('errClient','Mets le nombre de balles jouées.');return}}
+  occupe=true;$('pOk').disabled=true;montre('errClient','');
+  try{const r=await rpc('ibz_parties',{p_pin:PIN,p_client:client.id,p_delta:d,p_euros:eur,p_cle:'par-'+client.id+'-'+Date.now()});if(!r||!r.length)throw new Error('Code caisse incorrect');
+    const x=r[0];client.points=x.points;$('cSolde').textContent=x.points;
+    montre('okMsg',d>0?'✅ +'+d+' balles pour '+client.prenom+' ('+eur+' €) · il en a '+x.parties+(eur>=10?' · carte fidélité +'+Math.floor(eur/10)+' case'+(eur>=20?'s':''):''):'🎟️ '+(-d)+' balle'+(d<-1?'s':'')+' jouée'+(d<-1?'s':'')+' · il lui en reste '+x.parties);
+    pAtt=null;pMontrer();partiesCaisse();fidCaisse();journal();historique()}catch(e){montre('errClient',e.message)}
+  $('pOk').disabled=false;occupe=false};
+dessinerTarifs();
 function lireRecents(){try{return JSON.parse(localStorage.getItem('ibz_recents')||'[]')}catch(e){return[]}}
 function majRecents(){const l=lireRecents();$('recents').hidden=!l.length;const z=$('recL');z.innerHTML='';
   l.forEach(r=>{const b=document.createElement('button');b.type='button';b.innerHTML='<span></span><small></small>';b.firstChild.textContent=r.prenom+(r.nom?' '+r.nom.charAt(0)+'.':'');
     const m=Math.round((Date.now()-r.t)/60000);b.lastChild.textContent=m<1?'à l\'instant':m<60?m+' min':Math.round(m/60)+' h';b.onclick=()=>chercher(r.code,true);z.appendChild(b)})}
 function ajouterRecent(c){try{let l=lireRecents().filter(x=>x.id!==c.id);l.unshift({id:c.id,code:c.code,prenom:c.prenom,nom:c.nom||'',t:Date.now()});
   l=l.filter(x=>Date.now()-x.t<12*3600e3).slice(0,12);localStorage.setItem('ibz_recents',JSON.stringify(l))}catch(e){}majRecents()}
-function choisir(c){ajouterRecent(c);
+function choisir(c){ajouterRecent(c);pAtt=null;setTimeout(()=>{pMontrer();partiesCaisse()},0);
   client=c;$('vueClient').style.display='block';$('qrRecup').innerHTML='';
   $('cNom').textContent=c.prenom+(c.nom?' '+c.nom:'');$('cMeta').textContent='Code '+c.code+(c.tel?' · '+c.tel:'');
   $('cSolde').textContent=c.points;montre('okMsg','');montre('errClient','');
