@@ -665,7 +665,11 @@ input,select,textarea{font-family:'Nunito',sans-serif}
 .clDe{font-family:'Luckiest Guy',sans-serif;font-size:24px;color:#ff3d8b;margin-top:4px}
 .clLib{font-family:'Luckiest Guy',sans-serif;font-size:22px;margin:8px 0;color:#4a1a8c}
 .clInfo{font-family:'Mali','Nunito',sans-serif;font-weight:600;font-size:14px;margin-bottom:10px}
-.clB button{margin-top:8px}.clB .clF{background:#efe6fb;color:#2a0f4f}
+.clB button{margin-top:8px}.clB .clF{background:#efe6fb;color:#2a0f4f}.clB .clD{background:#7c3aed;color:#fff}
+.offQR{display:flex;justify-content:center;background:#fff;border:3px dashed #ff3d8b;border-radius:16px;padding:12px;margin:6px auto 10px;width:max-content;max-width:100%}
+.offQR img,.offQR canvas{width:min(230px,62vw)!important;height:auto!important}
+.offEtat{font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;color:#7a6a96;margin:4px 0 2px}
+.offEtat.fini{display:block;background:#00c853;color:#fff;border-radius:12px;padding:8px;font-size:18px}
 </style>
 </head>
 <body>
@@ -678,7 +682,14 @@ input,select,textarea{font-family:'Nunito',sans-serif}
 <div class="toast" id="toast"></div>
 <div class="cadLien" id="cadLien" hidden><div class="clB" role="dialog" aria-live="polite">
   <div class="clI">🎁</div><div class="clDe" id="clDe"></div><div class="clLib" id="clLib"></div><div class="clInfo" id="clInfo"></div>
-  <button type="button" id="clOk">🎁 Recevoir mon cadeau</button><button type="button" class="clF" id="clFermer">Fermer</button>
+  <button type="button" id="clOk">🎁 Recevoir mon cadeau</button><button type="button" class="clD" id="clDonne" hidden>🎁 Pas pour moi : je l'offre à quelqu'un</button><button type="button" class="clF" id="clFermer">Fermer</button>
+</div></div>
+<div class="cadLien" id="offOv" hidden><div class="clB" role="dialog" aria-live="polite">
+  <div class="clDe">🎁 Offrir ce cadeau</div><div class="clLib" id="offLib"></div>
+  <div class="offQR" id="offQR"></div>
+  <div class="clInfo">📷 Fais scanner ce QR code par la personne, avec l'appareil photo de son téléphone. Elle le reçoit dans son appli, même sans carte.</div>
+  <div class="offEtat" id="offEtat"></div>
+  <button type="button" id="offMsg">📤 Ou l'envoyer par message</button><button type="button" class="clF" id="offFermer">Fermer</button>
 </div></div>
 <div class="recuOv" id="recuOv" hidden><div class="recu" role="dialog" aria-live="assertive">
   <h3>📲 Ta carte a bougé</h3><div class="rH" id="recuH"></div>
@@ -1319,23 +1330,32 @@ let bonsSig='';
 async function bons(){try{const d=await rpc('ibz_mes_bons2',{p_id:monId})||[];const sig=JSON.stringify(d);if(sig===bonsSig)return;bonsSig=sig;const l=$('bonsListe');l.innerHTML='';
   $('bons').style.display=d.length?'block':'none';
   d.forEach(b=>{const e=document.createElement('div');e.className='bonL';e.innerHTML='<span class="bonT"></span><div class="bonA"></div>';e.firstChild.textContent='🎟️ '+b.libelle;const a=e.lastChild;
-    if(b.lien){a.innerHTML='<small>🔗 Lien envoyé, en attente</small><button type="button" class="bonP">Renvoyer</button><button type="button" class="bonX">Annuler</button>';
-      a.querySelector('.bonP').onclick=()=>partagerCadeau(b.lien,b.libelle);a.querySelector('.bonX').onclick=async()=>{try{await rpc('ibz_bon_lien_annuler',{p_id:monId,p_bon:b.id});bonsSig='';bons()}catch(x){}}}
-    else{a.innerHTML='<button type="button" class="bonP">🎁 Offrir avec un lien</button>';
-      a.querySelector('.bonP').onclick=async()=>{try{const t=await rpc('ibz_bon_lien_creer',{p_id:monId,p_bon:b.id});bonsSig='';bons();partagerCadeau(t,b.libelle)}catch(x){toast(x.message)}}}
+    if(b.lien){a.innerHTML='<small>🎁 En cours d\'offre : la personne doit scanner ton QR ou ouvrir ton lien</small><button type="button" class="bonP">Montrer le QR</button><button type="button" class="bonX">Annuler</button>';
+      a.querySelector('.bonP').onclick=()=>ouvrirOffre(b.lien,b.libelle);a.querySelector('.bonX').onclick=async()=>{try{await rpc('ibz_bon_lien_annuler',{p_id:monId,p_bon:b.id});bonsSig='';bons()}catch(x){}}}
+    else{a.innerHTML='<button type="button" class="bonP">🎁 Offrir à quelqu\'un</button>';
+      a.querySelector('.bonP').onclick=async()=>{try{const t=await rpc('ibz_bon_lien_creer',{p_id:monId,p_bon:b.id});bonsSig='';bons();ouvrirOffre(t,b.libelle)}catch(x){toast(x.message)}}}
     l.appendChild(e)})}catch(e){}}
 async function partagerCadeau(tok,lib){const url=location.origin+location.pathname+'?cadeau='+tok;const nom=String(lib).replace(/ · .*$/,'');
   const txt='🎁 Je t\'offre un cadeau au stand IBIZOU : '+nom+' ! Touche ce lien pour le recevoir dans ton appli (gratuite) :';
   try{if(navigator.share){await navigator.share({title:'Un cadeau IBIZOU pour toi',text:txt,url});return}}catch(e){if(e&&e.name==='AbortError')return}
   try{await navigator.clipboard.writeText(txt+' '+url);toast('🔗 Lien copié : colle-le dans un message')}catch(e){prompt('Copie ce lien :',url)}}
+// Offrir : QR à faire scanner sur place, ou lien par message
+let offTok=null,offT=null;
+function ouvrirOffre(tok,lib){offTok=tok;const nom=String(lib).replace(/ · .*$/,'');$('offLib').textContent=nom;
+  const z=$('offQR');z.innerHTML='';try{new QRCode(z,{text:location.origin+location.pathname+'?cadeau='+tok,width:230,height:230,colorDark:'#2a0f4f',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M})}catch(e){}
+  $('offEtat').className='offEtat';$('offEtat').textContent='⏳ En attente…';$('offMsg').hidden=false;$('offMsg').onclick=()=>partagerCadeau(tok,nom);$('offOv').hidden=false;
+  clearInterval(offT);offT=setInterval(async()=>{if(!offTok)return;try{const v=await rpc('ibz_bon_lien_voir',{p_token:offTok});
+    if(!v.ok){clearInterval(offT);const pris=/récupéré/.test(v.raison||'');$('offEtat').className='offEtat'+(pris?' fini':'');$('offEtat').textContent=pris?'✅ Cadeau reçu ! Merci pour lui 🎉':v.raison;$('offMsg').hidden=true;bonsSig='';if(monId)bons()}}catch(e){}},2500)}
+$('offFermer').onclick=()=>{clearInterval(offT);offTok=null;$('offOv').hidden=true;$('offQR').innerHTML=''};
 // Recevoir un cadeau par lien
 async function cadeauLien(){const tok=qp.get('cadeau')||(()=>{try{return localStorage.getItem('ibz_cadeau_attente')}catch(e){return null}})();if(!tok)return;
   let v;try{v=await rpc('ibz_bon_lien_voir',{p_token:tok})}catch(e){return}
   const ov=$('cadLien');$('clDe').textContent=v.ok?v.de+' t\'offre un cadeau !':'Oups…';$('clLib').textContent=v.ok?v.libelle:v.raison;
-  const ok=$('clOk');ok.hidden=!v.ok;$('clInfo').textContent='';
-  if(v.ok&&!monId){try{localStorage.setItem('ibz_cadeau_attente',tok)}catch(e){}ok.textContent='Créer ma carte gratuite pour le recevoir';ok.onclick=()=>{ov.hidden=true}}
-  else if(v.ok){ok.textContent='🎁 Recevoir mon cadeau';ok.onclick=async()=>{ok.disabled=true;try{const r=await rpc('ibz_bon_lien_prendre',{p_token:tok,p_id:monId});
-      try{localStorage.removeItem('ibz_cadeau_attente')}catch(e){}$('clDe').textContent='🎉 C\'est à toi !';$('clLib').textContent=r.libelle;$('clInfo').textContent='Il est dans « Mes cadeaux à utiliser », sous ton QR. Montre-le au stand !';ok.hidden=true;bonsSig='';bons();if(typeof confettis==='function')confettis()}
+  const ok=$('clOk');ok.hidden=!v.ok;$('clInfo').textContent='';const dn=$('clDonne');dn.hidden=!v.ok;
+  dn.onclick=()=>{try{localStorage.removeItem('ibz_cadeau_attente')}catch(e){}ov.hidden=true;ouvrirOffre(tok,v.libelle)};
+  if(v.ok&&!monId){try{localStorage.setItem('ibz_cadeau_attente',tok)}catch(e){}ok.textContent='Je le garde : créer ma carte gratuite';ok.onclick=()=>{ov.hidden=true}}
+  else if(v.ok){ok.textContent='🎁 Je le garde : le recevoir';ok.onclick=async()=>{ok.disabled=true;try{const r=await rpc('ibz_bon_lien_prendre',{p_token:tok,p_id:monId});
+      try{localStorage.removeItem('ibz_cadeau_attente')}catch(e){}$('clDe').textContent='🎉 C\'est à toi !';$('clLib').textContent=r.libelle;$('clInfo').textContent='Il est dans « Mes cadeaux à utiliser », sous ton QR. Montre-le au stand !';ok.hidden=true;dn.hidden=true;bonsSig='';bons();if(typeof confettis==='function')confettis()}
     catch(e){$('clInfo').textContent=e.message;ok.disabled=false}}}
   else{try{localStorage.removeItem('ibz_cadeau_attente')}catch(e){}}
   ov.hidden=false;try{history.replaceState(null,'',location.pathname+location.hash)}catch(e){}}

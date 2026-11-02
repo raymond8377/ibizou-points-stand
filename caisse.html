@@ -263,6 +263,18 @@ input,select,textarea,.meta,.ok,.err,small{font-family:'Nunito',sans-serif}
 .pgC h2{margin:0 0 8px;color:#c2185b}
 .grille.pgG button{background:#ff3d8b;color:#fff;font-size:22px}
 .pgV{margin-top:10px;font-weight:800;color:#2a0f4f}.pgV .vBt{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.pgV .vBt button{margin:0}
+/* QR cadeau à scanner : la personne scanne l'écran de la caisse, la partie arrive dans son appli */
+.qrAppliB{margin-top:12px;background:#7c3aed}
+.qrOv{position:fixed;inset:0;z-index:60;background:rgba(30,8,64,.94);display:flex;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom))}
+.qrOv[hidden]{display:none}
+.qrBox{background:#fff;color:#2a0f4f;border:5px solid #ffd400;outline:5px solid #ff3d8b;border-radius:24px;padding:20px 18px;width:min(400px,100%);text-align:center;max-height:100%;overflow:auto}
+.qrBox h3{font-family:'Luckiest Guy',sans-serif;font-weight:400;font-size:28px;margin:0;color:#ff3d8b;letter-spacing:.5px}
+.qrBox .qrNb{font-size:19px;font-weight:900;margin:4px 0 12px}
+#qrAppli{display:flex;justify-content:center}#qrAppli img,#qrAppli canvas{width:min(270px,70vw)!important;height:auto!important}
+.qrBox .qrAide{font-size:16px;font-weight:700;line-height:1.4;margin:12px 0 0}
+.qrBox .qrEtat{margin-top:12px;font-size:16px;font-weight:800;color:#7a6a96}
+.qrBox .qrEtat.qrRecu{display:block;color:#fff;background:#00c853;border-radius:14px;padding:10px;font-size:21px}
+.qrBox button{margin-top:12px}
 </style>
 </head>
 <body>
@@ -294,9 +306,10 @@ input,select,textarea,.meta,.ok,.err,small{font-family:'Nunito',sans-serif}
     <div id="ticketRes"></div>
     <div style="display:flex;align-items:center;gap:10px;margin-top:12px">
       <button type="button" id="pgMoins" style="width:56px;margin:0;font-size:26px;padding:10px 0">−</button>
-      <div style="flex:1;text-align:center;font-weight:800"><span id="pgNb" style="font-size:30px">1</span><br><small id="pgLib">partie sur le ticket</small></div>
+      <div style="flex:1;text-align:center;font-weight:800"><span id="pgNb" style="font-size:30px">1</span><br><small id="pgLib">partie offerte</small></div>
       <button type="button" id="pgPlus" style="width:56px;margin:0;font-size:26px;padding:10px 0">+</button>
     </div>
+    <button id="btnQrAppli" class="qrAppliB">📲 Offrir dans l'appli : QR à scanner</button>
     <button id="btnPartieGratuite" style="margin-top:10px;background:#ff3d8b">🎁 Générer un ticket 1 partie offerte</button>
     <div id="pgZone"></div>
     <details style="margin-top:12px"><summary class="meta" style="cursor:pointer">🔓 Débloquer un ticket (client qui a perdu sa clé)</summary>
@@ -1264,7 +1277,7 @@ async function partager(files,texte){
   files.forEach(f=>{const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;a.click()});
 }
 const txtTicket=(code,n)=>'🎁 '+(n>1?n+' parties offertes':'Une partie offerte')+' au stand IBIZOU ! Touche ce lien pour recevoir ton ticket : '+TICKET_URL+'?t='+code+'\n\n📱 Découvrez l\'application IBIZOU : '+APP_URL;
-function majPgNb(){$('pgNb').textContent=pgNb;$('pgLib').textContent=(pgNb>1?'parties':'partie')+' sur le ticket';
+function majPgNb(){$('pgNb').textContent=pgNb;$('pgLib').textContent=(pgNb>1?'parties offertes':'partie offerte');
   $('btnPartieGratuite').textContent='🎁 Générer un ticket '+(pgNb>1?pgNb+' parties offertes':'1 partie offerte')}
 $('pgMoins').onclick=()=>{if(pgNb>1){pgNb--;majPgNb()}};
 $('pgPlus').onclick=()=>{if(pgNb<50){pgNb++;majPgNb()}};
@@ -1291,6 +1304,20 @@ $('btnPartieGratuite').onclick=async()=>{
   }catch(e){z.innerHTML='';montre('errScan',e.message)}
   b.disabled=false;
 };
+// QR cadeau à scanner dans l'appli (pas besoin du numéro de la personne)
+let qrTok=null,qrPris=false,qrT=null;
+function qrFermer(){clearInterval(qrT);const t=qrTok;qrTok=null;$('qrOv').hidden=true;$('qrAppli').innerHTML='';
+  if(t&&!qrPris)rpc('ibz_cadeau_qr_annuler',{p_pin:PIN,p_token:t}).catch(()=>{})}
+$('btnQrAppli').onclick=async()=>{const b=$('btnQrAppli'),n=pgNb;b.disabled=true;montre('errScan','');
+  try{const t=await rpc('ibz_cadeau_qr_creer',{p_pin:PIN,p_nb:n});qrTok=t;qrPris=false;
+    $('qrNb').textContent='🎟️ '+(n>1?n+' parties gratuites au stand':'1 partie gratuite au stand');
+    $('qrAppli').innerHTML='';new QRCode($('qrAppli'),{text:APP_URL+'?cadeau='+t,width:270,height:270,colorDark:'#2a0f4f',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});
+    $('qrEtat').className='qrEtat';$('qrEtat').textContent='⏳ En attente du scan…';$('qrFermer').textContent='Annuler';$('qrOv').hidden=false;
+    clearInterval(qrT);qrT=setInterval(async()=>{if(!qrTok)return;try{const e=await rpc('ibz_cadeau_qr_etat',{p_pin:PIN,p_token:qrTok});
+      if(e&&e.pris){qrPris=true;clearInterval(qrT);$('qrEtat').className='qrEtat qrRecu';$('qrEtat').textContent='✅ Reçu par '+e.nom+' ('+e.code+')';$('qrFermer').textContent='Fermer'}}catch(x){}},2000)}
+  catch(e){montre('errScan',e.message)}b.disabled=false};
+document.addEventListener('click',e=>{if(e.target&&e.target.id==='qrFermer')qrFermer()});
+
 $('btnDebloquer').onclick=async()=>{
   const c=$('dbCode').value.trim().toUpperCase();if(!c)return;
   try{const ok=await rpc('ibz_ticket_debloquer',{p_pin:PIN,p_code:c});
@@ -1298,5 +1325,12 @@ $('btnDebloquer').onclick=async()=>{
   catch(e){$('dbRes').textContent=e.message}
 };
 </script>
+<div class="qrOv" id="qrOv" hidden><div class="qrBox" role="dialog" aria-label="Cadeau à scanner">
+  <h3>🎁 Cadeau IBIZOU</h3><div class="qrNb" id="qrNb"></div>
+  <div id="qrAppli"></div>
+  <p class="qrAide">📷 Scanne ce QR code avec l'appareil photo de ton téléphone. Tu peux garder la partie dans ton appli IBIZOU, ou l'offrir à quelqu'un. Même sans carte.</p>
+  <div class="qrEtat" id="qrEtat"></div>
+  <button id="qrFermer" class="gris">Annuler</button>
+</div></div>
 </body>
 </html>
