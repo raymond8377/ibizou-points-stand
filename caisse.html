@@ -259,6 +259,10 @@ input,select,textarea,.meta,.ok,.err,small{font-family:'Nunito',sans-serif}
 .pValid label{display:block;margin:8px 0 4px;font-size:14px}.pValid label small{font-weight:600;color:#6d5d8a}
 .pValid input{width:100%;margin:0}
 .pValid .vBt{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.pValid .vBt button{margin:0}
+.pgC{margin:12px 0 4px;background:#fff0f6;border:3px solid #ff3d8b;border-radius:16px;padding:10px 12px}
+.pgC h2{margin:0 0 8px;color:#c2185b}
+.grille.pgG button{background:#ff3d8b;color:#fff;font-size:22px}
+.pgV{margin-top:10px;font-weight:800;color:#2a0f4f}.pgV .vBt{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.pgV .vBt button{margin:0}
 </style>
 </head>
 <body>
@@ -324,6 +328,11 @@ input,select,textarea,.meta,.ok,.err,small{font-family:'Nunito',sans-serif}
     <div class="solde" id="cSolde">0</div>
     <div class="unite">POINTS</div>
     <div id="cBons"></div>
+    <div class="pgC patron">
+      <h2>🎁 Offrir des parties gratuites</h2>
+      <div class="grille pgG"><button type="button" data-pg="1">1</button><button type="button" data-pg="2">2</button><button type="button" data-pg="3">3</button><button type="button" data-pg="5">5</button></div>
+      <div class="pgV" id="pgV" hidden><div id="pgTxt"></div><div class="vBt"><button class="gris" id="pgAnn" type="button">Annuler</button><button id="pgOk" type="button">✅ Offrir</button></div></div>
+    </div>
     <div class="partC">
       <h2>🎟️ Balles achetées <span id="pReste">0 balle</span></h2>
       <div class="pRow"><button type="button" class="pMoins" data-pj="-5">−5 balles · 1 partie jouée</button></div>
@@ -634,6 +643,14 @@ $('fOk').onclick=async()=>{const e=fAttente;if(!e||!client||occupe)return;occupe
     montre('okMsg','✅ Carte fidélité : +'+x.ajout+' points pour '+client.prenom+(x.cartes?(fChoix==='pts'?' · 🎁 carte pleine : +'+(parseInt($('fPts').value,10)||30)+' points offerts':' · 🎁 carte pleine, bon « '+($('fCadeau').value.trim()||'10 € de jeu offerts')+' » créé'):'')+' (carte : '+x.cases+' / '+((fInfo&&fInfo.total)||10)+')');
     fAttente=0;delete $('fCadeau').dataset.touche;fChoisir('bon');$('fPts').value=30;fMaj();fidCaisse();bonsClient();journal();historique();fermerBientot()}catch(e){montre('errClient',e.message)}
   $('fOk').disabled=false;occupe=false};
+let pgAtt=0;
+document.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>{if(!client)return;pgAtt=+b.dataset.pg;$('pgTxt').textContent='Offrir '+pgAtt+' partie'+(pgAtt>1?'s':'')+' gratuite'+(pgAtt>1?'s':'')+' à '+client.prenom+' ? Elle'+(pgAtt>1?'s':'')+' arrive'+(pgAtt>1?'nt':'')+' dans ses cadeaux à utiliser.';$('pgV').hidden=false});
+$('pgAnn').onclick=()=>{pgAtt=0;$('pgV').hidden=true};
+$('pgOk').onclick=async()=>{if(!client||!pgAtt||occupe)return;occupe=true;$('pgOk').disabled=true;montre('errClient','');
+  try{const n=await rpc('ibz_offrir_parties_client',{p_pin:PIN,p_client:client.id,p_nb:pgAtt});if(n===null)throw new Error('Code caisse incorrect');
+    montre('okMsg','🎁 '+n+' partie'+(n>1?'s':'')+' gratuite'+(n>1?'s':'')+' offerte'+(n>1?'s':'')+' à '+client.prenom+' : elle'+(n>1?'s':'')+' apparai'+(n>1?'ssent':'t')+' sous son QR.');
+    pgAtt=0;$('pgV').hidden=true;bonsClient();journal();historique()}catch(e){montre('errClient',e.message)}
+  $('pgOk').disabled=false;occupe=false};
 let pInfo=0,pAtt=null,TARIFS=[[5,5],[10,12],[20,30],[30,45],[40,60],[50,75]];
 async function partiesCaisse(){if(!client)return;try{pInfo=await rpc('ibz_parties_client',{p_id:client.id})||0;
   $('pReste').textContent=pInfo+' balle'+(pInfo>1?'s':'')+(pInfo>=5?' · '+Math.floor(pInfo/5)+' partie'+(pInfo>=10?'s':''):'');
@@ -663,7 +680,7 @@ function majRecents(){const l=lireRecents();$('recents').hidden=!l.length;const 
     const m=Math.round((Date.now()-r.t)/60000);b.lastChild.textContent=m<1?'à l\'instant':m<60?m+' min':Math.round(m/60)+' h';b.onclick=()=>chercher(r.code,true);z.appendChild(b)})}
 function ajouterRecent(c){try{let l=lireRecents().filter(x=>x.id!==c.id);l.unshift({id:c.id,code:c.code,prenom:c.prenom,nom:c.nom||'',t:Date.now()});
   l=l.filter(x=>Date.now()-x.t<12*3600e3).slice(0,12);localStorage.setItem('ibz_recents',JSON.stringify(l))}catch(e){}majRecents()}
-function choisir(c){ajouterRecent(c);pAtt=null;setTimeout(()=>{pMontrer();partiesCaisse()},0);
+function choisir(c){ajouterRecent(c);pgAtt=0;$('pgV').hidden=true;pAtt=null;setTimeout(()=>{pMontrer();partiesCaisse()},0);
   client=c;$('vueClient').style.display='block';$('qrRecup').innerHTML='';
   $('cNom').textContent=c.prenom+(c.nom?' '+c.nom:'');$('cMeta').textContent='Code '+c.code+(c.tel?' · '+c.tel:'');
   $('cSolde').textContent=c.points;montre('okMsg','');montre('errClient','');
